@@ -5,6 +5,7 @@ export default function Document() {
     <Html data-theme="dark">
       <Head />
       <link rel="icon" href="/favicon.ico" />
+      <title>Invoice / RibeiroLabs</title>
       <body className="prose max-w-full">
         <Main />
         <NextScript />

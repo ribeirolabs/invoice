@@ -6,6 +6,13 @@ module.exports = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ['business']
+    themes: [
+      {
+        business: {
+          ...require('daisyui/src/colors/themes')["[data-theme=business]"],
+          primary: '#48b16d'
+        }
+      }
+    ]
   }
 };

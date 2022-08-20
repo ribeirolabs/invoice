@@ -9,10 +9,14 @@ export function Header() {
   }
 
   return (
-    <header className="navbar bg-base-200">
-      <div className="flex-1">
+    <header className="not-prose navbar bg-base-200">
+      <div className="flex-1 items-baseline text-secondary">
+        <Link href="https://ribeiro.app">
+          <a>ribeirolabs</a>
+        </Link>
+        <span className="mx-1">/</span>
         <Link href="/">
-          <a className="btn btn-link normal-case text-xl">Invoice</a>
+          <a className="text-primary font-bold normal-case"> invoice</a>
         </Link>
       </div>
 

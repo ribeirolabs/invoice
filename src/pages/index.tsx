@@ -13,10 +13,8 @@ const Home: NextPage = () => {
   return (
     <ProtectedPage>
       <Header />
-      <main className="dark container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold">
-          Invoice : <span className="text-primary">RibeiroLabs</span>
-        </h1>
+      <main className="p-4">
+        <h1 className="text-xl leading-normal font-extrabold">Invoices</h1>
       </main>
     </ProtectedPage>
   );

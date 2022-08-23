@@ -62,6 +62,7 @@ model Company {
   name                 String
   address              String
   invoiceNumberPattern String
+  invoiceNumberCount   Int
   users                User[]
 
   receiverInvoices Invoice[] @relation("receiver")

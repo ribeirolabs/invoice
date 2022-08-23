@@ -23,6 +23,14 @@ export const companyRouter = createProtectedRouter()
   })
   .query("getAll", {
     async resolve({ ctx }) {
-      // return await ctx.prisma.example.findMany();
+      return ctx.prisma.company.findMany({
+        where: {
+          users: {
+            every: {
+              id: ctx.session.user.id,
+            },
+          },
+        },
+      });
     },
   });

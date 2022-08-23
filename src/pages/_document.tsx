@@ -9,7 +9,7 @@ export default function Document() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;600;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;800&display=swap"
         rel="stylesheet"
       />
       <body className="prose max-w-full">

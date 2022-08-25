@@ -8,8 +8,6 @@ import { useRouter } from "next/router";
 import { FormEvent } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  console.log("serversideprops", ctx.params);
-
   return ssp(ctx, (ssr) => {
     if (ctx.params?.id && ctx.params.id !== "new") {
       return ssr.fetchQuery("company.get", {
@@ -39,10 +37,11 @@ const NewCompanyPage: NextPage = () => {
     const data = new FormData(form);
 
     try {
-      const response = await createCompany.mutateAsync({
+      await createCompany.mutateAsync({
         id: data.get("id") as string,
         name: data.get("name") as string,
         address: data.get("address") as string,
+        currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
       });
 
@@ -56,49 +55,49 @@ const NewCompanyPage: NextPage = () => {
 
   return (
     <ProtectedPage>
-      <Header />
-      <main className="p-4">
-        <h1>{company.data ? company.data.name : "New Company"}</h1>
+      <h1>{company.data ? company.data.name : "New Company"}</h1>
 
-        <form className="form max-w-lg" onSubmit={onSubmit}>
-          <input type="hidden" name="id" value={company.data?.id} />
+      <form className="form max-w-lg" onSubmit={onSubmit}>
+        <input type="hidden" name="id" value={company.data?.id} />
 
-          <Input label="Name" name="name" defaultValue={company.data?.name} />
+        <Input label="Name" name="name" defaultValue={company.data?.name} />
 
-          <Input
-            label="Address"
-            name="address"
-            placeholder="Street, number - city/state, country"
-            defaultValue={company.data?.address}
-          />
+        <Input
+          label="Address"
+          name="address"
+          placeholder="Street, number - city/state, country"
+          defaultValue={company.data?.address}
+        />
 
-          <Input
-            label="Invoice Number Pattern"
-            name="invoice_number_pattern"
-            placeholder="INV-%Y/%0[4]"
-            helper="GALLEY-2022/0001"
-            defaultValue={company.data?.invoiceNumberPattern}
-          />
+        <Input
+          label="Currency"
+          name="currency"
+          defaultValue={company.data?.currency}
+        />
 
-          <ul className="leading-4 text-xs">
-            <li>%Y = year</li>
-            <li>%M = month</li>
-            <li>%D = day</li>
-            <li>%0 = increment. Use [n] to specify number of leading zeros</li>
+        <Input
+          label="Invoice Number Pattern"
+          name="invoice_number_pattern"
+          placeholder="INV-%Y/%0[4]"
+          helper="GALLEY-2022/0001"
+          defaultValue={company.data?.invoiceNumberPattern}
+        />
 
-            <ul className="not-prose leading-4 text-xs">
-              <li>%0[3] = 001, 002, 003...</li>
-            </ul>
+        <ul className="leading-4 text-xs">
+          <li>%Y = year</li>
+          <li>%M = month</li>
+          <li>%D = day</li>
+          <li>%0 = increment. Use [n] to specify number of leading zeros</li>
+
+          <ul className="not-prose leading-4 text-xs">
+            <li>%0[3] = 001, 002, 003...</li>
           </ul>
+        </ul>
 
-          <button
-            className="btn btn-primary"
-            disabled={createCompany.isLoading}
-          >
-            Confirm
-          </button>
-        </form>
-      </main>
+        <button className="btn btn-primary" disabled={createCompany.isLoading}>
+          Confirm
+        </button>
+      </form>
     </ProtectedPage>
   );
 };

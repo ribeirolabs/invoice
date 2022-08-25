@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
 
@@ -6,12 +7,14 @@ export const companyRouter = createProtectedRouter()
     input: z.object({
       id: z.string().cuid().nullish(),
       name: z.string(),
+      currency: z.string(),
       address: z.string(),
       invoiceNumberPattern: z.string(),
     }),
     resolve({ input, ctx }) {
-      const data = {
+      const data: Prisma.CompanyCreateInput = {
         name: input.name,
+        currency: input.currency,
         address: input.address,
         invoiceNumberPattern: input.invoiceNumberPattern,
       };

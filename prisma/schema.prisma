@@ -64,6 +64,7 @@ model Company {
   invoiceNumberPattern String
   invoiceNumberCount   Int    @default(0)
   users                User[]
+  currency             String @default("USD")
 
   receiverInvoices Invoice[] @relation("receiver")
   payerInvoices    Invoice[] @relation("payer")
@@ -73,9 +74,10 @@ model Invoice {
   id          String   @id @default(cuid())
   number      String
   description String
-  value       Float
+  amount      Float
   currency    String
-  createdAt   DateTime
+  createdAt   DateTime @default(now())
+  issuedAt    DateTime
   expiredAt   DateTime
 
   receiver   Company @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)

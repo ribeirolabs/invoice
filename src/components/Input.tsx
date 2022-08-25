@@ -1,18 +1,33 @@
-import { InputHTMLAttributes } from "react";
+import { createElement, InputHTMLAttributes, ReactNode } from "react";
 
 type InputProps<T = HTMLInputElement> = {
   label: string;
   helper?: string;
+  leading?: ReactNode;
+  trailing?: ReactNode;
 } & InputHTMLAttributes<T>;
 
-export function Input<T>({ label, helper, ...props }: InputProps<T>) {
+export function Input<T = HTMLInputElement>({
+  label,
+  helper,
+  leading,
+  trailing,
+  ...props
+}: InputProps<T>) {
   return (
     <div className="form-control w-full mb-4">
       <label className="label">
         <span className="label-text">{label}</span>
       </label>
 
-      <input {...props} className="input input-bordered w-full" />
+      <div className="input-group">
+        {leading}
+        {createElement(props.type === "textarea" ? "textarea" : "input", {
+          ...props,
+          className: "input input-bordered w-full",
+        })}
+        {trailing}
+      </div>
 
       {helper && (
         <label className="label">

@@ -76,16 +76,19 @@ export const invoiceRouter = createProtectedRouter()
       });
     },
   })
-  .query("getAll", {
-    async resolve({ ctx }) {
-      return Promise.resolve();
-    },
-  })
   .query("get", {
     input: z.object({
       id: z.string().cuid(),
     }),
     async resolve({ ctx, input }) {
-      return Promise.resolve();
+      return ctx.prisma.invoice.findFirstOrThrow({
+        where: {
+          id: input.id,
+        },
+        include: {
+          payer: true,
+          receiver: true,
+        },
+      });
     },
   });

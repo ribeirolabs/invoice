@@ -38,7 +38,7 @@ export const ssp = async (
       return {
         redirect: {
           permanent: false,
-          destination: "/api/auth/signin",
+          destination: `/auth/signin?callbackUrl=${ctx.resolvedUrl}`,
         },
       };
     }

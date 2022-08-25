@@ -12,7 +12,11 @@ export const ProtectedPage = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (session.data == null && session.status === "success") {
-      router.push("/api/auth/signin");
+      router.push("/auth/signin", {
+        query: {
+          callbackUrl: router.pathname,
+        },
+      });
     }
   }, [session, router]);
 

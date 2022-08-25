@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export function Header() {
@@ -11,9 +11,7 @@ export function Header() {
   return (
     <header className="not-prose navbar bg-base-200">
       <div className="flex-1 items-baseline text-secondary">
-        <Link href="https://ribeiro.app">
-          <a>ribeirolabs</a>
-        </Link>
+        <span>ribeirolabs</span>
         <span className="mx-1">/</span>
         <Link href="/">
           <a className="text-primary font-bold normal-case"> invoice</a>
@@ -31,10 +29,9 @@ export function Header() {
             className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-300 rounded-box w-52"
           >
             <li>
-              <Link href="/profile">Profile</Link>
-            </li>
-            <li>
-              <Link href="/api/auth/signout">Sign out</Link>
+              <button onClick={() => signOut({ callbackUrl: "/" })}>
+                Sign out
+              </button>
             </li>
           </ul>
         </div>

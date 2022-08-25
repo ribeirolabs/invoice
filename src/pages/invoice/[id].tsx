@@ -8,7 +8,7 @@ import { useEffect, useMemo } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("invoice.get", {
+    return ssr.fetchQuery("invoice.public.get", {
       id: ctx.params?.id as string,
     });
   });
@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 const InvoicePage: NextPage = () => {
   const router = useRouter();
   const invoice = trpc.useQuery([
-    "invoice.get",
+    "invoice.public.get",
     { id: router.query.id as string },
   ]);
 

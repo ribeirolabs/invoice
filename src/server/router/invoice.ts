@@ -1,6 +1,24 @@
 import { parseInvoicePattern } from "@/utils/invoice";
 import { z } from "zod";
+import { createRouter } from "./context";
 import { createProtectedRouter } from "./protected-router";
+
+export const invoicePublicRouter = createRouter().query("get", {
+  input: z.object({
+    id: z.string().cuid(),
+  }),
+  async resolve({ ctx, input }) {
+    return ctx.prisma.invoice.findFirstOrThrow({
+      where: {
+        id: input.id,
+      },
+      include: {
+        payer: true,
+        receiver: true,
+      },
+    });
+  },
+});
 
 export const invoiceRouter = createProtectedRouter()
   .mutation("generate", {
@@ -72,22 +90,6 @@ export const invoiceRouter = createProtectedRouter()
         },
         orderBy: {
           createdAt: "desc",
-        },
-      });
-    },
-  })
-  .query("get", {
-    input: z.object({
-      id: z.string().cuid(),
-    }),
-    async resolve({ ctx, input }) {
-      return ctx.prisma.invoice.findFirstOrThrow({
-        where: {
-          id: input.id,
-        },
-        include: {
-          payer: true,
-          receiver: true,
         },
       });
     },

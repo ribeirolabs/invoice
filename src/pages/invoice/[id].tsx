@@ -1,4 +1,5 @@
 import { ssp } from "@/server/ssp";
+import { CURRENCY_SYMBOL, getCurrency } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
@@ -51,6 +52,14 @@ const InvoicePage: NextPage = () => {
     }).format(amount);
   }, [invoice.data]);
 
+  const currency = useMemo(() => {
+    if (!invoice.data?.payer) {
+      return "";
+    }
+
+    return getCurrency(invoice.data.payer.currency);
+  }, [invoice.data]);
+
   if (invoice.data == null) {
     return null;
   }
@@ -83,7 +92,10 @@ const InvoicePage: NextPage = () => {
 
           <div>
             <h3>Amount</h3>
-            <p className="text-end">${amount}</p>
+            <p className="text-end">
+              {currency}
+              {amount}
+            </p>
           </div>
         </div>
 

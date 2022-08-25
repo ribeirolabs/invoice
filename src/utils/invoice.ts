@@ -40,3 +40,13 @@ export function parseInvoicePattern(
 
   return invoiceNumber;
 }
+
+export const CURRENCY_SYMBOL = {
+  USD: "$",
+  BRL: "R$",
+  EUR: "€",
+};
+
+export const getCurrency = (code: string) => {
+  return CURRENCY_SYMBOL[code as keyof typeof CURRENCY_SYMBOL];
+};

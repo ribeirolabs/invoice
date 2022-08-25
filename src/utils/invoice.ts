@@ -29,7 +29,7 @@ export function parseInvoicePattern(
     if (regex.test(pattern)) {
       const result = Array.from(pattern.matchAll(new RegExp(regex, "g")));
 
-      const padding = result[0]?.[2]?.replace(/\D/g, "");
+      const padding = result[0]?.[2]?.replace(/\D/g, "") ?? "";
 
       invoiceNumber = invoiceNumber.replace(
         regex,

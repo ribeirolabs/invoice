@@ -31,7 +31,8 @@ export const CompaniesTable = () => {
             <tr>
               <th></th>
               <th>Name</th>
-              <th>Invoices</th>
+              <th>Receiver Invoices</th>
+              <th>Payer Invoices</th>
               <th>Owner</th>
               <th></th>
             </tr>
@@ -44,15 +45,12 @@ export const CompaniesTable = () => {
                 )
               );
 
-              const invoices = isOwned
-                ? company._count.receiverInvoices
-                : company._count.payerInvoices;
-
               return (
                 <tr key={company.id}>
                   <th>{i + 1}</th>
                   <td>{company.name}</td>
-                  <td>{invoices}</td>
+                  <td>{company._count.receiverInvoices}</td>
+                  <td>{company._count.payerInvoices}</td>
                   <td>
                     <div className="input-group">
                       <input

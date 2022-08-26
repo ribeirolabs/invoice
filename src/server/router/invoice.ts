@@ -31,14 +31,23 @@ export const invoiceRouter = createProtectedRouter()
       amount: z.number(),
     }),
     async resolve({ input, ctx }) {
-      const payer = await ctx.prisma.company.findFirstOrThrow({
-        where: {
-          id: input.payerId,
-        },
-      });
+      const [payer, totalInvoices] = await Promise.all([
+        ctx.prisma.company.findFirstOrThrow({
+          where: {
+            id: input.payerId,
+          },
+        }),
+
+        ctx.prisma.invoice.count({
+          where: {
+            receiverId: input.receiverId,
+            payerId: input.payerId,
+          },
+        }),
+      ]);
 
       const invoiceNumber = parseInvoicePattern(payer.invoiceNumberPattern, {
-        INCREMENT: payer.invoiceNumberCount,
+        INCREMENT: totalInvoices,
       });
 
       const response = await ctx.prisma.invoice.create({
@@ -49,31 +58,32 @@ export const invoiceRouter = createProtectedRouter()
         },
       });
 
-      await ctx.prisma.company.update({
-        data: {
-          invoiceNumberCount: payer.invoiceNumberCount + 1,
-        },
-        where: {
-          id: payer.id,
-        },
-      });
-
       return response;
     },
   })
-  .mutation("get-number", {
+  .mutation("getNumber", {
     input: z.object({
-      company_id: z.string().cuid(),
+      receiverId: z.string().cuid(),
+      payerId: z.string().cuid(),
     }),
     async resolve({ input, ctx }) {
-      const company = await ctx.prisma.company.findFirstOrThrow({
-        where: {
-          id: input.company_id,
-        },
-      });
+      const [payer, totalInvoices] = await Promise.all([
+        ctx.prisma.company.findFirstOrThrow({
+          where: {
+            id: input.payerId,
+          },
+        }),
 
-      const invoiceNumber = parseInvoicePattern(company.invoiceNumberPattern, {
-        INCREMENT: company.invoiceNumberCount,
+        ctx.prisma.invoice.count({
+          where: {
+            receiverId: input.receiverId,
+            payerId: input.payerId,
+          },
+        }),
+      ]);
+
+      const invoiceNumber = parseInvoicePattern(payer.invoiceNumberPattern, {
+        INCREMENT: totalInvoices,
       });
 
       return invoiceNumber;
@@ -81,9 +91,13 @@ export const invoiceRouter = createProtectedRouter()
   })
   .query("latestFromPayer", {
     input: z.object({
-      payer_id: z.string().cuid(),
+      payer_id: z.string().cuid().nullish(),
     }),
     async resolve({ ctx, input }) {
+      if (!input.payer_id) {
+        return null;
+      }
+
       return ctx.prisma.invoice.findFirst({
         where: {
           payerId: input.payer_id,

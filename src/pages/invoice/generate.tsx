@@ -3,7 +3,7 @@ import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
 import { trpc } from "@/utils/trpc";
 import { GetServerSideProps } from "next";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useLocalStorage } from "@ribeirolabs/local-storage/react";
 import { KEYS } from "@/utils/local-storage";
 import format from "date-fns/format";
@@ -16,28 +16,45 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 };
 
 export default function InvoiceGenerate() {
-  const companies = trpc.useQuery(["company.getAll"]);
-
-  const { mutate: generateInvoiceNumber, ...invoiceNumber } =
-    trpc.useMutation("invoice.get-number");
-
-  const { mutateAsync: generateInvoice, ...invoice } =
-    trpc.useMutation("invoice.generate");
-
   const [receiverId, setReceiverId] = useLocalStorage(KEYS.receiver, "");
   const [payerId, setPayerId] = useLocalStorage(KEYS.payer, "");
   const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [dueDateDays, setDueDateDays] = useLocalStorage(KEYS.dueDateDays, 5);
 
+  const session = trpc.useQuery(["auth.getSession"]);
+  const companies = trpc.useQuery(["company.getAll"]);
+  const invoiceNumber = trpc.useMutation("invoice.getNumber");
+  const invoice = trpc.useMutation("invoice.generate");
   const latest = trpc.useQuery([
     "invoice.latestFromPayer",
     {
-      payer_id: payerId,
+      payer_id: payerId || null,
     },
   ]);
 
+  const receivers = useMemo(() => {
+    return (
+      companies.data?.filter((company) =>
+        company.users.find(
+          (user) => user.userId === session.data?.user?.id && user.owner
+        )
+      ) ?? []
+    );
+  }, [companies.data, session.data]);
+
+  const payers = useMemo(() => {
+    return (
+      companies.data?.filter(
+        (company) => company.users.filter((user) => !user.owner).length
+      ) ?? []
+    );
+  }, [companies.data]);
+
   const dueDate = useMemo(() => {
-    return addDays(new Date(date), dueDateDays).toLocaleDateString();
+    return format(
+      addDays(new Date(`${date} ${new Date().toTimeString()}`), dueDateDays),
+      "yyyy-MM-dd"
+    );
   }, [date, dueDateDays]);
 
   const payer = useMemo(() => {
@@ -45,14 +62,17 @@ export default function InvoiceGenerate() {
   }, [payerId, companies]);
 
   useEffect(() => {
-    if (!payerId) {
+    if (!payerId || !receiverId) {
+      invoiceNumber.reset();
+
       return;
     }
 
-    generateInvoiceNumber({
-      company_id: payerId,
+    invoiceNumber.mutateAsync({
+      receiverId: receiverId,
+      payerId: payerId,
     });
-  }, [payerId, generateInvoiceNumber]);
+  }, [receiverId, payerId, invoiceNumber.mutateAsync, invoiceNumber.reset]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,17 +81,23 @@ export default function InvoiceGenerate() {
 
     const data = new FormData(form);
 
+    const time = new Date().toTimeString();
+    const issuedAt = new Date(`${data.get("date") as string} ${time}`);
+    const expiredAt = new Date(`${dueDate} ${time}`);
+
     try {
-      await generateInvoice({
+      const response = await invoice.mutateAsync({
         receiverId: data.get("receiver_id") as string,
         payerId: data.get("payer_id") as string,
-        issuedAt: new Date(data.get("date") as string),
-        expiredAt: new Date(data.get("due_date") as string),
+        issuedAt,
+        expiredAt,
         description: data.get("description") as string,
         amount: parseFloat(data.get("amount") as string),
       });
 
-      // form.reset();
+      window.open(`/invoice/${response.id}`, "_blank");
+
+      form.reset();
     } catch (e) {
       alert(e);
     }
@@ -89,11 +115,11 @@ export default function InvoiceGenerate() {
 
           <select
             className="select select-bordered w-full"
-            value={receiverId}
+            value={receiverId || ""}
             name="receiver_id"
             onChange={(e) => setReceiverId(e.target.value)}
           >
-            {companies.data?.map((company) => (
+            {receivers.map((company) => (
               <option key={company.id} value={company.id}>
                 {company.name}
               </option>
@@ -108,20 +134,15 @@ export default function InvoiceGenerate() {
 
           <select
             className="select select-bordered w-full"
-            value={payerId}
+            value={payerId || ""}
             name="payer_id"
-            onChange={(e) => {
-              setPayerId(e.target.value);
-            }}
+            onChange={(e) => setPayerId(e.target.value)}
           >
-            <option></option>
-            {companies.data
-              ?.filter((company) => company.id !== receiverId)
-              .map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
+            {payers.map((company) => (
+              <option key={company.id} value={company.id}>
+                {company.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -137,21 +158,34 @@ export default function InvoiceGenerate() {
             label="Due Date"
             name="due_date"
             type="number"
-            value={dueDateDays}
-            onChange={(e) => setDueDateDays(parseInt(e.target.value))}
+            value={dueDateDays || ""}
+            onChange={(e) => {
+              const value = parseInt(e.target.value || "");
+              setDueDateDays(value || 0);
+            }}
             helper={dueDate}
             trailing={<span>days</span>}
           />
         </div>
 
-        <Input label="Description" name="description" type="textarea" />
+        <Input
+          key={payerId + "-description"}
+          label="Description"
+          name="description"
+          type="textarea"
+          defaultValue={latest.data?.description || ""}
+        />
 
         <Input
+          key={payerId + "-amount"}
           label="Amount"
           name="amount"
           type="number"
+          defaultValue={latest.data?.amount || ""}
           leading={<span>{payer?.currency}</span>}
         />
+
+        <div className="divider"></div>
 
         <button className="btn btn-primary" disabled={invoice.isLoading}>
           Confirm

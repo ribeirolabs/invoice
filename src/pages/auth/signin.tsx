@@ -23,7 +23,7 @@ export default function SignIn({
           className="btn btn-lg btn-primary"
           onClick={() =>
             signIn(provider.id, {
-              callbackUrl: router.query.callbackUrl ?? '/',
+              callbackUrl: (router.query.callbackUrl as string | null) ?? "/",
             })
           }
         >

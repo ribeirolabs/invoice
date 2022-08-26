@@ -10,6 +10,7 @@ export const companyRouter = createProtectedRouter()
       currency: z.string(),
       address: z.string(),
       invoiceNumberPattern: z.string(),
+      owner: z.boolean(),
     }),
     resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
@@ -21,7 +22,22 @@ export const companyRouter = createProtectedRouter()
 
       if (input.id) {
         return ctx.prisma.company.update({
-          data,
+          data: {
+            ...data,
+            users: {
+              update: {
+                data: {
+                  owner: input.owner,
+                },
+                where: {
+                  userId_companyId: {
+                    userId: ctx.session.user.id,
+                    companyId: input.id,
+                  },
+                },
+              },
+            },
+          },
           where: {
             id: input.id,
           },
@@ -32,8 +48,13 @@ export const companyRouter = createProtectedRouter()
         data: {
           ...data,
           users: {
-            connect: {
-              id: ctx.session.user.id,
+            create: {
+              owner: input.owner,
+              user: {
+                connect: {
+                  id: ctx.session.user.id,
+                },
+              },
             },
           },
         },
@@ -45,10 +66,13 @@ export const companyRouter = createProtectedRouter()
       return ctx.prisma.company.findMany({
         where: {
           users: {
-            every: {
-              id: ctx.session.user.id,
+            some: {
+              userId: ctx.session.user.id,
             },
           },
+        },
+        include: {
+          users: true,
         },
       });
     },
@@ -62,11 +86,22 @@ export const companyRouter = createProtectedRouter()
         return Promise.resolve();
       }
 
-      console.log({ input });
-
       return ctx.prisma.company.findFirst({
         where: {
           id: input.id,
+        },
+        select: {
+          id: true,
+          address: true,
+          currency: true,
+          name: true,
+          invoiceNumberPattern: true,
+          users: {
+            select: {
+              userId: true,
+              owner: true,
+            },
+          },
         },
       });
     },

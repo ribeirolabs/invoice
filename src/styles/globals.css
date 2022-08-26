@@ -7,3 +7,11 @@
     font-family: "JetBrains Mono", monospace;
   }
 }
+
+@layer components {
+  .toggle-xl {
+    --handleoffset: 2.5rem;
+    height: 3rem;
+    width: 5rem;
+  }
+}

@@ -1,10 +1,11 @@
-import { signOut, useSession } from "next-auth/react";
+import { trpc } from "@/utils/trpc";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 
 export function Header() {
-  const { data } = useSession();
+  const { data } = trpc.useQuery(["auth.getSession"]);
 
-  if (data?.user == null) {
+  if (!data?.user) {
     return null;
   }
 

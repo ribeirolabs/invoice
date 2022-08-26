@@ -1,11 +1,10 @@
-import { Header } from "@/components/Header";
 import { Input } from "@/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
 import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
-import { FormEvent } from "react";
+import { FormEvent, useMemo } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -20,6 +19,15 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 };
 
 const NewCompanyPage: NextPage = () => {
+  return (
+    <ProtectedPage>
+      <NewCompanyForm />
+    </ProtectedPage>
+  );
+};
+
+const NewCompanyForm = () => {
+  const session = trpc.useQuery(["auth.getSession"]);
   const router = useRouter();
   const createCompany = trpc.useMutation(["company.upsert"]);
   const company = trpc.useQuery([
@@ -28,6 +36,12 @@ const NewCompanyPage: NextPage = () => {
       id: router.query.id as string,
     },
   ]);
+
+  const owner = useMemo(() => {
+    return company.data?.users.find(
+      (user) => user.userId === session.data?.user?.id && user.owner
+    );
+  }, [company.data, session.data]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +57,7 @@ const NewCompanyPage: NextPage = () => {
         address: data.get("address") as string,
         currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
+        owner: Boolean(data.get("owner") as string),
       });
 
       if (company.data?.id) {
@@ -54,7 +69,7 @@ const NewCompanyPage: NextPage = () => {
   }
 
   return (
-    <ProtectedPage>
+    <>
       <h1>{company.data ? company.data.name : "New Company"}</h1>
 
       <form className="form max-w-lg" onSubmit={onSubmit}>
@@ -69,11 +84,27 @@ const NewCompanyPage: NextPage = () => {
           defaultValue={company.data?.address}
         />
 
-        <Input
-          label="Currency"
-          name="currency"
-          defaultValue={company.data?.currency}
-        />
+        <div className="flex">
+          <div className="form-control flex-1">
+            <label className="label cursor-pointer">
+              <span className="label-text mr-4">Owner</span>
+            </label>
+            <input
+              type="checkbox"
+              className="toggle toggle-xl"
+              name="owner"
+              defaultChecked={Boolean(owner)}
+            />
+          </div>
+
+          <div className="flex-1">
+            <Input
+              label="Currency"
+              name="currency"
+              defaultValue={company.data?.currency}
+            />
+          </div>
+        </div>
 
         <Input
           label="Invoice Number Pattern"
@@ -94,11 +125,13 @@ const NewCompanyPage: NextPage = () => {
           </ul>
         </ul>
 
+        <div className="divider"></div>
+
         <button className="btn btn-primary" disabled={createCompany.isLoading}>
-          Confirm
+          SavE
         </button>
       </form>
-    </ProtectedPage>
+    </>
   );
 };
 

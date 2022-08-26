@@ -17,6 +17,7 @@ import { KEYS } from "@/utils/local-storage";
 import format from "date-fns/format";
 import addDays from "date-fns/addDays";
 import { getLocale } from "@/utils/locale";
+import { getSeparators } from "@/utils/currency";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -93,25 +94,34 @@ export default function InvoiceGenerate() {
     deleting.current = e.key === "Backspace";
   }
 
-  function onChangeAmount(e: ChangeEvent<HTMLInputElement>) {
-    let value = e.target.value.replace(/,/g, "");
+  const separators = useMemo(() => {
+    return getSeparators(payer?.currency);
+  }, [payer]);
 
-    if (/\.$/.test(value) && !deleting.current) {
+  function onChangeAmount(e: ChangeEvent<HTMLInputElement>) {
+    let value = e.target.value.replace(
+      new RegExp(`\\${separators.group}`, "g"),
+      ""
+    );
+
+    if (
+      new RegExp(`\\${separators.decimal}$`).test(value) &&
+      !deleting.current
+    ) {
       waitingForDecimal.current = true;
       return;
     }
 
     if (waitingForDecimal.current) {
-      value = value.replace(/(\d)$/, ".$1");
+      value = value.replace(/(\d)$/, `${separators.decimal}$1`);
       waitingForDecimal.current = false;
     }
 
-    rawAmount.current = parseFloat(value || "0");
+    rawAmount.current = parseFloat(value.replace(",", ".") || "0");
 
     setAmount(
       new Intl.NumberFormat(getLocale(), {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
       }).format(rawAmount.current)
     );
   }

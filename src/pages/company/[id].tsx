@@ -1,10 +1,11 @@
 import { Input } from "@/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
+import { parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
-import { FormEvent, useMemo } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -37,11 +38,21 @@ const NewCompanyForm = () => {
     },
   ]);
 
+  const [pattern, setPattern] = useState("");
+
   const owner = useMemo(() => {
     return company.data?.users.find(
       (user) => user.userId === session.data?.user?.id && user.owner
     );
   }, [company.data, session.data]);
+
+  useEffect(() => {
+    if (company.data == null) {
+      return;
+    }
+
+    setPattern(company.data.invoiceNumberPattern);
+  }, [company.data]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -110,7 +121,8 @@ const NewCompanyForm = () => {
           label="Invoice Number Pattern"
           name="invoice_number_pattern"
           placeholder="INV-%Y/%0[4]"
-          helper="GALLEY-2022/0001"
+          helper={parseInvoicePattern(pattern, { INCREMENT: 0 })}
+          onChange={(e) => setPattern(e.target.value)}
           defaultValue={company.data?.invoiceNumberPattern}
         />
 

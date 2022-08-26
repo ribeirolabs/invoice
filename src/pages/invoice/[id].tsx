@@ -1,9 +1,10 @@
 import { ssp } from "@/server/ssp";
 import { formatCurrency } from "@/utils/currency";
-import { getCurrency } from "@/utils/invoice";
+import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
@@ -83,7 +84,7 @@ const InvoicePage: NextPage = () => {
 
           <div>
             <h3>Amount</h3>
-            <p className="text-end">{amount}</p>
+            <Amount amount={amount} />
           </div>
         </div>
 
@@ -115,5 +116,9 @@ const InvoicePage: NextPage = () => {
     </div>
   );
 };
+
+const Amount = noSSR<{ amount: string }>(({ amount }) => (
+  <p className="text-end">{amount}</p>
+));
 
 export default InvoicePage;

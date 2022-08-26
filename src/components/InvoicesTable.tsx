@@ -1,4 +1,5 @@
 import { formatCurrency } from "@/utils/currency";
+import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { AddIcon, ViewDocumentIcon } from "./Icons";
@@ -38,7 +39,10 @@ export const InvoicesTable = () => {
                   <th>{i + 1}</th>
                   <td>{invoice.number}</td>
                   <td>
-                    {formatCurrency(invoice.amount, invoice.payer.currency)}
+                    <Amount
+                      amount={invoice.amount}
+                      currency={invoice.payer.currency}
+                    />
                   </td>
                   <td>{invoice.receiver.name}</td>
                   <td>{invoice.payer.name}</td>
@@ -65,3 +69,8 @@ export const InvoicesTable = () => {
     </>
   );
 };
+
+const Amount = noSSR<{
+  amount: number;
+  currency: string;
+}>(({ amount, currency }) => <span>{formatCurrency(amount, currency)}</span>);

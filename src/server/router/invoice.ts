@@ -125,4 +125,25 @@ export const invoiceRouter = createProtectedRouter()
         take: 5,
       });
     },
+  })
+  .query("countByCompany", {
+    async resolve({ ctx }) {
+      return ctx.prisma.$queryRaw<
+        {
+          payerId: string;
+          receiverId: string;
+          count: bigint;
+        }[]
+      >`
+      SELECT payerId, NULL AS receiverId, COUNT(payerId) AS count FROM Invoice
+      WHERE userId = ${ctx.session.user.id}
+      GROUP BY payerId
+
+      UNION ALL
+
+      SELECT NULL AS payerId, receiverId, COUNT(receiverId) AS count FROM Invoice
+      WHERE userId = ${ctx.session.user.id}
+      GROUP BY receiverId
+      `;
+    },
   });

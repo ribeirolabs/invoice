@@ -110,7 +110,7 @@ model Invoice {
   payer   Company @relation("payer", fields: [payerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   payerId String
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
   @@unique([number, receiverId, payerId])

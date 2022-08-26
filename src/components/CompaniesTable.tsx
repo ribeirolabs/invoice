@@ -6,7 +6,7 @@ import { AddIcon, EditIcon, ShareIcon } from "./Icons";
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
-  const invoiceCounts = trpc.useQuery(["company.getAllInvoiceCounts"]);
+  const invoiceCounts = trpc.useQuery(["invoice.countByCompany"]);
 
   function copyShareLink(companyId: string) {
     if (!session.data?.user) {

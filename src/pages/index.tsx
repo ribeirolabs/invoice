@@ -8,6 +8,7 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     return [
       ssr.prefetchQuery("company.getAll"),
+      ssr.prefetchQuery("invoice.countByCompany"),
       ssr.prefetchQuery("invoice.recent"),
     ];
   });

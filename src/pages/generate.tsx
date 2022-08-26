@@ -172,11 +172,13 @@ export default function InvoiceGenerate() {
             onChange={(e) => setReceiverId(e.target.value)}
           >
             <option></option>
-            {receivers.map((company) => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
+            {receivers.map((company) => {
+              return (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -192,11 +194,17 @@ export default function InvoiceGenerate() {
             onChange={(e) => setPayerId(e.target.value)}
           >
             <option></option>
-            {payers.map((company) => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
+            {payers.map((company) => {
+              const user = company.users.find(
+                (user) => user.userId === session.data?.user?.id
+              );
+
+              return (
+                <option key={company.id} value={company.id}>
+                  {company.name} {user?.type === "SHARED" && "(shared)"}
+                </option>
+              );
+            })}
           </select>
         </div>
 

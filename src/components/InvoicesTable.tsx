@@ -10,7 +10,7 @@ export const InvoicesTable = () => {
   return (
     <>
       <h1 className="text-xl leading-normal font-extrabold flex gap-6">
-        Recent Invoices (5)
+        Recent Invoices
         <Link href="/generate">
           <a className="btn btn-outline btn-sm">
             <AddIcon size={16} /> new

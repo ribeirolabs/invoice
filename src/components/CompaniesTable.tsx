@@ -1,18 +1,50 @@
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { useMemo } from "react";
 import { AddIcon, EditIcon, ShareIcon } from "./Icons";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
+  const invoiceCounts = trpc.useQuery(["company.getAllInvoiceCounts"]);
 
   function copyShareLink(companyId: string) {
+    if (!session.data?.user) {
+      return;
+    }
+
+    const base = `${window.location.protocol}//${window.location.host}`;
+    const url = new URL("/api/share", base);
+
+    url.searchParams.set("type", "company");
+    url.searchParams.set("value", companyId);
+    url.searchParams.set("sharedBy", session.data.user.id);
+
     navigator.clipboard
-      .writeText(
-        `${window.location.protocol}//${window.location.host}/api/share?type=company&value=${companyId}`
-      )
+      .writeText(url.toString())
       .then(() => alert("Link copied"));
   }
+
+  const countByInvoice = useMemo(() => {
+    const counts: Record<"payer" | "receiver", Record<string, number>> = {
+      payer: {},
+      receiver: {},
+    };
+
+    for (const item of invoiceCounts.data ?? []) {
+      const count = Number(item.count);
+
+      if (item.payerId) {
+        counts.payer[item.payerId] = count;
+      }
+
+      if (item.receiverId) {
+        counts.receiver[item.receiverId] = count;
+      }
+    }
+
+    return counts;
+  }, [invoiceCounts.data]);
 
   return (
     <>
@@ -49,8 +81,8 @@ export const CompaniesTable = () => {
                 <tr key={company.id}>
                   <th>{i + 1}</th>
                   <td>{company.name}</td>
-                  <td>{company._count.receiverInvoices}</td>
-                  <td>{company._count.payerInvoices}</td>
+                  <td>{countByInvoice.receiver?.[company.id] ?? 0}</td>
+                  <td>{countByInvoice.payer?.[company.id] ?? 0}</td>
                   <td>
                     <div className="input-group">
                       <input

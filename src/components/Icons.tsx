@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 
 type IconProps = PropsWithChildren<{ size?: number }>;
 
-export const Icon = ({ size = 24, children }: IconProps) => {
+export const Icon = ({ size = 18, children }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -61,6 +61,18 @@ export const ViewDocumentIcon = (props: IconProps) => {
         clipRule="evenodd"
       />
       <path d="M14.25 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0016.5 7.5h-1.875a.375.375 0 01-.375-.375V5.25z" />
+    </Icon>
+  );
+};
+
+export const ChevronDownIcon = (props: IconProps) => {
+  return (
+    <Icon {...props}>
+      <path
+        fillRule="evenodd"
+        d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z"
+        clipRule="evenodd"
+      />
     </Icon>
   );
 };

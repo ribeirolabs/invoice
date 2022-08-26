@@ -50,6 +50,7 @@ export const companyRouter = createProtectedRouter()
           users: {
             create: {
               owner: input.owner,
+              type: "OWNED",
               user: {
                 connect: {
                   id: ctx.session.user.id,
@@ -65,23 +66,13 @@ export const companyRouter = createProtectedRouter()
     input: z.object({
       companyId: z.string().cuid(),
       userId: z.string().cuid(),
+      sharedById: z.string().cuid(),
     }),
     async resolve({ input, ctx }) {
-      const { id, ...company } = await ctx.prisma.company.findFirstOrThrow({
-        where: {
-          id: input.companyId,
-        },
-      });
-
-      return ctx.prisma.company.create({
+      return ctx.prisma.companiesOnUsers.create({
         data: {
-          ...company,
-          users: {
-            create: {
-              userId: input.userId,
-              owner: false,
-            },
-          },
+          ...input,
+          type: "SHARED",
         },
       });
     },
@@ -108,6 +99,27 @@ export const companyRouter = createProtectedRouter()
       });
     },
   })
+  .query("getAllInvoiceCounts", {
+    async resolve({ ctx }) {
+      return ctx.prisma.$queryRaw<
+        {
+          payerId: string;
+          receiverId: string;
+          count: bigint;
+        }[]
+      >`
+        SELECT payerId, NULL AS receiverId, COUNT(payerId) AS count FROM Invoice
+        WHERE userId = ${ctx.session.user.id}
+        GROUP BY payerId
+
+        UNION ALL
+
+        SELECT NULL AS payerId, receiverId, COUNT(receiverId) AS count FROM Invoice
+        WHERE userId = ${ctx.session.user.id}
+        GROUP BY receiverId
+      `;
+    },
+  })
   .query("get", {
     input: z.object({
       id: z.string(),
@@ -121,19 +133,66 @@ export const companyRouter = createProtectedRouter()
         where: {
           id: input.id,
         },
-        select: {
-          id: true,
-          address: true,
-          currency: true,
-          name: true,
-          invoiceNumberPattern: true,
+        include: {
           users: {
-            select: {
-              userId: true,
-              owner: true,
+            include: {
+              sharedBy: true,
+              company: false,
             },
           },
         },
       });
+    },
+  })
+  .mutation("detach", {
+    input: z.object({
+      companyId: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const userId = ctx.session.user.id;
+
+      const { id, ...company } = await ctx.prisma.company.findFirstOrThrow({
+        where: {
+          id: input.companyId,
+        },
+      });
+
+      const createdCompany = await ctx.prisma.company.create({
+        data: {
+          ...company,
+          users: {
+            create: {
+              userId,
+              owner: false,
+              type: "OWNED",
+            },
+          },
+        },
+      });
+
+      await Promise.all([
+        // remove connection with old company
+        ctx.prisma.companiesOnUsers.delete({
+          where: {
+            userId_companyId: {
+              companyId: input.companyId,
+              userId,
+            },
+          },
+        }),
+
+        // update invoices from old company
+        ctx.prisma.invoice.updateMany({
+          data: {
+            payerId: createdCompany.id,
+          },
+          where: {
+            payerId: input.companyId,
+            userId,
+          },
+        }),
+      ]);
+
+      return createdCompany;
     },
   });

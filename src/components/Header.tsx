@@ -1,6 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { ChevronDownIcon } from "./Icons";
 
 export function Header() {
   const { data } = trpc.useQuery(["auth.getSession"]);
@@ -10,7 +11,7 @@ export function Header() {
   }
 
   return (
-    <header className="not-prose navbar bg-base-200 justify-between">
+    <header className="not-prose navbar bg-base-300 justify-between sticky top-0 z-50">
       <div className="items-baseline text-secondary">
         <span>ribeirolabs</span>
         <span className="mx-1">/</span>
@@ -27,8 +28,9 @@ export function Header() {
 
       <div className="flex-none">
         <div className="dropdown dropdown-end">
-          <button tabIndex={0} className="btn btn-ghost">
-            <a>{data.user.name}</a>
+          <button tabIndex={0} className="btn btn-ghost gap-2">
+            {data.user.name}
+            <ChevronDownIcon />
           </button>
 
           <ul

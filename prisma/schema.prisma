@@ -47,8 +47,9 @@ model User {
 
   accounts  Account[]
   sessions  Session[]
-  companies CompaniesOnUsers[]
   invoices  Invoice[]
+  companies CompaniesOnUsers[] @relation("user")
+  shared    CompaniesOnUsers[] @relation("sharedBy")
 }
 
 model VerificationToken {
@@ -71,16 +72,26 @@ model Company {
   payerInvoices    Invoice[]          @relation("payer")
 }
 
+enum UserType {
+  OWNED
+  SHARED
+}
+
 model CompaniesOnUsers {
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User   @relation("user", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+
+  sharedBy   User?   @relation("sharedBy", fields: [sharedById], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sharedById String?
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   companyId String
 
-  owner Boolean @default(false)
+  owner Boolean  @default(false)
+  type  UserType
 
   @@id([userId, companyId])
+  @@unique([userId, companyId])
 }
 
 model Invoice {

@@ -17,9 +17,14 @@ export default async function restricted(
     return;
   }
 
-  const { type, value } = req.query as {
+  const {
+    type,
+    value,
+    sharedBy: sharedById,
+  } = req.query as {
     type: string;
     value: string;
+    sharedBy: string;
   };
 
   if (type !== "company") {
@@ -38,6 +43,7 @@ export default async function restricted(
   await ssr.fetchQuery("company.share", {
     companyId: value,
     userId: session.user.id,
+    sharedById: sharedById,
   });
 
   res.redirect(`/company/${value}`);

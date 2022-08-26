@@ -7,7 +7,7 @@ export function formatCurrency(amount: number, currency: string) {
   }).format(amount);
 }
 
-export function getSeparators(currency: string = 'USD') {
+export function getSeparators(currency = "USD") {
   const parts = new Intl.NumberFormat(getLocale(), {
     style: "currency",
     currency,

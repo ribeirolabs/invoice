@@ -4,6 +4,7 @@ import { ssp } from "@/server/ssp";
 import { parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -30,7 +31,9 @@ const NewCompanyPage: NextPage = () => {
 const NewCompanyForm = () => {
   const session = trpc.useQuery(["auth.getSession"]);
   const router = useRouter();
-  const createCompany = trpc.useMutation(["company.upsert"]);
+
+  const upsert = trpc.useMutation(["company.upsert"]);
+  const detach = trpc.useMutation(["company.detach"]);
   const company = trpc.useQuery([
     "company.get",
     {
@@ -40,11 +43,13 @@ const NewCompanyForm = () => {
 
   const [pattern, setPattern] = useState("");
 
-  const owner = useMemo(() => {
+  const user = useMemo(() => {
     return company.data?.users.find(
-      (user) => user.userId === session.data?.user?.id && user.owner
+      (user) => user.userId === session.data?.user?.id
     );
   }, [company.data, session.data]);
+
+  const canEdit = user?.type === "OWNED" || !company.data;
 
   useEffect(() => {
     if (company.data == null) {
@@ -54,6 +59,18 @@ const NewCompanyForm = () => {
     setPattern(company.data.invoiceNumberPattern);
   }, [company.data]);
 
+  async function onDetach() {
+    if (!company.data) {
+      return;
+    }
+
+    const newCompany = await detach.mutateAsync({
+      companyId: company.data.id,
+    });
+
+    router.replace(`/company/${newCompany.id}`);
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -62,7 +79,7 @@ const NewCompanyForm = () => {
     const data = new FormData(form);
 
     try {
-      await createCompany.mutateAsync({
+      await upsert.mutateAsync({
         id: data.get("id") as string,
         name: data.get("name") as string,
         address: data.get("address") as string,
@@ -81,18 +98,36 @@ const NewCompanyForm = () => {
 
   return (
     <>
-      <h1>{company.data ? company.data.name : "New Company"}</h1>
+      {user?.sharedBy && (
+        <>
+          <div className="flex gap-4 items-center">
+            <p className="m-0">Shared by: {user.sharedBy.name}</p>
+            <button className="btn btn-secondary btn-sm" onClick={onDetach}>
+              Detach
+            </button>
+          </div>
+          <div className="divider"></div>
+        </>
+      )}
+
+      <h1>{company.data?.name ?? "New Company"}</h1>
 
       <form className="form max-w-lg" onSubmit={onSubmit}>
         <input type="hidden" name="id" value={company.data?.id} />
 
-        <Input label="Name" name="name" defaultValue={company.data?.name} />
+        <Input
+          label="Name"
+          name="name"
+          defaultValue={company.data?.name}
+          readOnly={!canEdit}
+        />
 
         <Input
           label="Address"
           name="address"
           placeholder="Street, number - city/state, country"
           defaultValue={company.data?.address}
+          readOnly={!canEdit}
         />
 
         <div className="flex">
@@ -104,7 +139,8 @@ const NewCompanyForm = () => {
               type="checkbox"
               className="toggle toggle-xl"
               name="owner"
-              defaultChecked={Boolean(owner)}
+              defaultChecked={Boolean(user?.owner)}
+              disabled={!canEdit}
             />
           </div>
 
@@ -113,6 +149,7 @@ const NewCompanyForm = () => {
               label="Currency"
               name="currency"
               defaultValue={company.data?.currency}
+              readOnly={!canEdit}
             />
           </div>
         </div>
@@ -124,6 +161,7 @@ const NewCompanyForm = () => {
           helper={parseInvoicePattern(pattern, { INCREMENT: 0 })}
           onChange={(e) => setPattern(e.target.value)}
           defaultValue={company.data?.invoiceNumberPattern}
+          readOnly={!canEdit}
         />
 
         <ul className="leading-4 text-xs">
@@ -139,12 +177,23 @@ const NewCompanyForm = () => {
 
         <div className="divider"></div>
 
-        <button
-          className="btn btn-primary btn-wide"
-          disabled={createCompany.isLoading}
-        >
-          Save
-        </button>
+        <div className="flex gap-4 justify-between">
+          {canEdit ? (
+            <button
+              className={`btn btn-primary btn-wide ${
+                upsert.isLoading ? "loading" : ""
+              }`}
+              type="submit"
+            >
+              Save
+            </button>
+          ) : (
+            <span>&nbsp;</span>
+          )}
+          <Link href="/">
+            <a className="btn btn-secondary btn-wide">Cancel</a>
+          </Link>
+        </div>
       </form>
     </>
   );

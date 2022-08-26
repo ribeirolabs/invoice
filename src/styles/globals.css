@@ -14,4 +14,19 @@
     height: 3rem;
     width: 5rem;
   }
+
+  .btn {
+    @apply no-animation;
+  }
+
+  .btn:active,
+  .btn:active:focus {
+    transform: translateY(2px);
+  }
+
+  .btn-wide {
+    width: auto;
+    padding-left: 4em;
+    padding-right: 4em;
+  }
 }

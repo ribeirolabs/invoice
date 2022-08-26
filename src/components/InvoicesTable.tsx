@@ -1,11 +1,9 @@
 import { formatCurrency } from "@/utils/currency";
 import { trpc } from "@/utils/trpc";
-import format from "date-fns/format";
 import Link from "next/link";
-import { AddIcon, EditIcon, ShareIcon, ViewDocumentIcon } from "./Icons";
+import { AddIcon, ViewDocumentIcon } from "./Icons";
 
 export const InvoicesTable = () => {
-  const session = trpc.useQuery(["auth.getSession"]);
   const invoices = trpc.useQuery(["invoice.recent"]);
 
   return (

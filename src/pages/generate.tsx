@@ -3,11 +3,20 @@ import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
 import { trpc } from "@/utils/trpc";
 import { GetServerSideProps } from "next";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLocalStorage } from "@ribeirolabs/local-storage/react";
 import { KEYS } from "@/utils/local-storage";
 import format from "date-fns/format";
 import addDays from "date-fns/addDays";
+import { getLocale } from "@/utils/locale";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -20,6 +29,8 @@ export default function InvoiceGenerate() {
   const [payerId, setPayerId] = useLocalStorage(KEYS.payer, "");
   const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [dueDateDays, setDueDateDays] = useLocalStorage(KEYS.dueDateDays, 5);
+
+  const [amount, setAmount] = useState("");
 
   const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
@@ -74,6 +85,37 @@ export default function InvoiceGenerate() {
     });
   }, [receiverId, payerId, invoiceNumber.mutateAsync, invoiceNumber.reset]);
 
+  const waitingForDecimal = useRef(false);
+  const deleting = useRef(false);
+  const rawAmount = useRef(0);
+
+  function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    deleting.current = e.key === "Backspace";
+  }
+
+  function onChangeAmount(e: ChangeEvent<HTMLInputElement>) {
+    let value = e.target.value.replace(/,/g, "");
+
+    if (/\.$/.test(value) && !deleting.current) {
+      waitingForDecimal.current = true;
+      return;
+    }
+
+    if (waitingForDecimal.current) {
+      value = value.replace(/(\d)$/, ".$1");
+      waitingForDecimal.current = false;
+    }
+
+    rawAmount.current = parseFloat(value || "0");
+
+    setAmount(
+      new Intl.NumberFormat(getLocale(), {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
+      }).format(rawAmount.current)
+    );
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -92,7 +134,7 @@ export default function InvoiceGenerate() {
         issuedAt,
         expiredAt,
         description: data.get("description") as string,
-        amount: parseFloat(data.get("amount") as string),
+        amount: rawAmount.current,
       });
 
       window.open(`/invoice/${response.id}`, "_blank");
@@ -182,8 +224,10 @@ export default function InvoiceGenerate() {
           key={payerId + "-amount"}
           label="Amount"
           name="amount"
-          type="number"
           defaultValue={latest.data?.amount || ""}
+          value={amount}
+          onKeyDown={onKeyDown}
+          onChange={onChangeAmount}
           leading={<span>{payer?.currency}</span>}
         />
 

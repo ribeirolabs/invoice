@@ -1,4 +1,5 @@
 import { ssp } from "@/server/ssp";
+import { formatCurrency } from "@/utils/currency";
 import { getCurrency } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import format from "date-fns/format";
@@ -41,23 +42,13 @@ const InvoicePage: NextPage = () => {
   }, []);
 
   const amount = useMemo(() => {
-    const { amount } = invoice.data ?? {};
+    const { amount, payer } = invoice.data ?? {};
 
-    if (amount == null) {
+    if (amount == null || payer == null) {
       return "";
     }
 
-    return new Intl.NumberFormat("en-US", {
-      currency: "USD",
-    }).format(amount);
-  }, [invoice.data]);
-
-  const currency = useMemo(() => {
-    if (!invoice.data?.payer) {
-      return "";
-    }
-
-    return getCurrency(invoice.data.payer.currency);
+    return formatCurrency(amount, payer.currency);
   }, [invoice.data]);
 
   if (invoice.data == null) {
@@ -92,10 +83,7 @@ const InvoicePage: NextPage = () => {
 
           <div>
             <h3>Amount</h3>
-            <p className="text-end">
-              {currency}
-              {amount}
-            </p>
+            <p className="text-end">{amount}</p>
           </div>
         </div>
 

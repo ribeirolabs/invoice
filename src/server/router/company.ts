@@ -5,7 +5,7 @@ import { createProtectedRouter } from "./protected-router";
 export const companyRouter = createProtectedRouter()
   .mutation("upsert", {
     input: z.object({
-      id: z.string().cuid().nullish(),
+      id: z.string().nullish(),
       name: z.string(),
       currency: z.string(),
       address: z.string(),
@@ -67,7 +67,6 @@ export const companyRouter = createProtectedRouter()
       userId: z.string().cuid(),
     }),
     async resolve({ input, ctx }) {
-      // eslint-ignore
       const { id, ...company } = await ctx.prisma.company.findFirstOrThrow({
         where: {
           id: input.companyId,
@@ -99,13 +98,19 @@ export const companyRouter = createProtectedRouter()
         },
         include: {
           users: true,
+          _count: {
+            select: {
+              payerInvoices: true,
+              receiverInvoices: true,
+            },
+          },
         },
       });
     },
   })
   .query("get", {
     input: z.object({
-      id: z.string().cuid(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       if (input.id === "new") {

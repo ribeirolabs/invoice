@@ -12,7 +12,7 @@ export const ssp = async (
   ctx: GetServerSidePropsContext,
   cb: (
     srr: ReturnType<typeof createSSGHelpers<typeof appRouter>>
-  ) => Promise<any>
+  ) => Promise<any> | Promise<any>[]
 ): Promise<GetServerSidePropsResult<Props>> => {
   const session = await unstable_getServerSession(
     ctx.req,
@@ -32,7 +32,10 @@ export const ssp = async (
   });
 
   try {
-    await Promise.all([ssr.fetchQuery("auth.getSession"), cb(ssr)]);
+    await Promise.all([
+      ssr.prefetchQuery("auth.getSession"),
+      ...([] as Promise<any>[]).concat(cb(ssr)),
+    ]);
   } catch (e: any) {
     if (e.code === "UNAUTHORIZED") {
       return {

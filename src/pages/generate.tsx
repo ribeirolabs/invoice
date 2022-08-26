@@ -11,7 +11,7 @@ import addDays from "date-fns/addDays";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("company.getAll");
+    return ssr.prefetchQuery("company.getAll");
   });
 };
 
@@ -119,6 +119,7 @@ export default function InvoiceGenerate() {
             name="receiver_id"
             onChange={(e) => setReceiverId(e.target.value)}
           >
+            <option></option>
             {receivers.map((company) => (
               <option key={company.id} value={company.id}>
                 {company.name}
@@ -138,6 +139,7 @@ export default function InvoiceGenerate() {
             name="payer_id"
             onChange={(e) => setPayerId(e.target.value)}
           >
+            <option></option>
             {payers.map((company) => (
               <option key={company.id} value={company.id}>
                 {company.name}
@@ -187,7 +189,10 @@ export default function InvoiceGenerate() {
 
         <div className="divider"></div>
 
-        <button className="btn btn-primary" disabled={invoice.isLoading}>
+        <button
+          className="btn btn-primary btn-wide"
+          disabled={invoice.isLoading}
+        >
           Confirm
         </button>
       </form>

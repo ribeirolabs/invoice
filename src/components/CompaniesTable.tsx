@@ -1,7 +1,9 @@
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { AddIcon, EditIcon, ShareIcon } from "./Icons";
 
 export const CompaniesTable = () => {
+  const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
 
   function copyShareLink(companyId: string) {
@@ -14,7 +16,14 @@ export const CompaniesTable = () => {
 
   return (
     <>
-      <h1 className="text-xl leading-normal font-extrabold">Companies</h1>
+      <h1 className="text-xl leading-normal font-extrabold flex gap-6">
+        Companies
+        <Link href="/company/new">
+          <a className="btn btn-outline btn-sm">
+            <AddIcon size={16} /> new
+          </a>
+        </Link>
+      </h1>
 
       <div className="border border-base-300 rounded-md mt-4">
         <table className="table table-zebra w-full m-0">
@@ -28,31 +37,54 @@ export const CompaniesTable = () => {
             </tr>
           </thead>
           <tbody>
-            {companies.data?.map((company, i) => (
-              <tr key={company.id}>
-                <th>{i + 1}</th>
-                <td>{company.name}</td>
-                <td>2</td>
-                <td>
-                  <div className="input-group">
-                    <input type="checkbox" className="toggle" checked={false} />
-                  </div>
-                </td>
-                <td>
-                  <div className="flex gap-1 justify-end">
-                    <Link href={`/company/${company.id}`}>
-                      <a className="btn btn-xs btn-primary">e</a>
-                    </Link>
-                    <button
-                      className="btn btn-xs btn-primary"
-                      onClick={() => copyShareLink(company.id)}
-                    >
-                      s
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {companies.data?.map((company, i) => {
+              const isOwned = Boolean(
+                company.users.find(
+                  (user) => user.userId === session.data?.user?.id && user.owner
+                )
+              );
+
+              const invoices = isOwned
+                ? company._count.receiverInvoices
+                : company._count.payerInvoices;
+
+              return (
+                <tr key={company.id}>
+                  <th>{i + 1}</th>
+                  <td>{company.name}</td>
+                  <td>{invoices}</td>
+                  <td>
+                    <div className="input-group">
+                      <input
+                        type="checkbox"
+                        className="toggle"
+                        checked={isOwned}
+                        readOnly
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex gap-1 justify-end">
+                      <Link href={`/company/${company.id}`}>
+                        <a
+                          className="btn btn-sm btn-ghost btn-circle"
+                          title="Edit"
+                        >
+                          <EditIcon size={18} />
+                        </a>
+                      </Link>
+                      <button
+                        className="btn btn-sm btn-ghost btn-circle"
+                        onClick={() => copyShareLink(company.id)}
+                        title="Share"
+                      >
+                        <ShareIcon size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

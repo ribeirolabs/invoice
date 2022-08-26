@@ -48,6 +48,7 @@ model User {
   accounts  Account[]
   sessions  Session[]
   companies CompaniesOnUsers[]
+  invoices  Invoice[]
 }
 
 model VerificationToken {
@@ -97,6 +98,9 @@ model Invoice {
 
   payer   Company @relation("payer", fields: [payerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   payerId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   @@unique([number, receiverId, payerId])
 }

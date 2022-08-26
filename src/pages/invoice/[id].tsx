@@ -1,5 +1,5 @@
 import { ssp } from "@/server/ssp";
-import { CURRENCY_SYMBOL, getCurrency } from "@/utils/invoice";
+import { getCurrency } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
@@ -9,7 +9,7 @@ import { useEffect, useMemo } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("invoice.public.get", {
+    return ssr.prefetchQuery("invoice.public.get", {
       id: ctx.params?.id as string,
     });
   });

@@ -9,7 +9,7 @@ import { FormEvent, useMemo } from "react";
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     if (ctx.params?.id && ctx.params.id !== "new") {
-      return ssr.fetchQuery("company.get", {
+      return ssr.prefetchQuery("company.get", {
         id: ctx.params.id as string,
       });
     }
@@ -127,7 +127,10 @@ const NewCompanyForm = () => {
 
         <div className="divider"></div>
 
-        <button className="btn btn-primary" disabled={createCompany.isLoading}>
+        <button
+          className="btn btn-primary btn-wide"
+          disabled={createCompany.isLoading}
+        >
           Save
         </button>
       </form>

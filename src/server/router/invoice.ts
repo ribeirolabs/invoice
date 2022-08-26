@@ -53,6 +53,7 @@ export const invoiceRouter = createProtectedRouter()
       const response = await ctx.prisma.invoice.create({
         data: {
           ...input,
+          userId: ctx.session.user.id,
           number: invoiceNumber,
           currency: payer.currency,
         },
@@ -105,6 +106,23 @@ export const invoiceRouter = createProtectedRouter()
         orderBy: {
           createdAt: "desc",
         },
+      });
+    },
+  })
+  .query("recent", {
+    async resolve({ ctx }) {
+      return ctx.prisma.invoice.findMany({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        include: {
+          payer: true,
+          receiver: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 5,
       });
     },
   });

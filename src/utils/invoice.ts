@@ -19,7 +19,7 @@ export function parseInvoicePattern(
       key === "YEAR"
         ? data.getFullYear()
         : key === "MONTH"
-        ? String(data.getMonth()).padStart(2, "0")
+        ? String(data.getMonth() + 1).padStart(2, "0")
         : key === "INCREMENT"
         ? opts.INCREMENT + 1
         : "";

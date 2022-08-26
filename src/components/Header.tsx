@@ -10,12 +10,18 @@ export function Header() {
   }
 
   return (
-    <header className="not-prose navbar bg-base-200">
-      <div className="flex-1 items-baseline text-secondary">
+    <header className="not-prose navbar bg-base-200 justify-between">
+      <div className="items-baseline text-secondary">
         <span>ribeirolabs</span>
         <span className="mx-1">/</span>
         <Link href="/">
           <a className="text-primary font-bold normal-case"> invoice</a>
+        </Link>
+      </div>
+
+      <div>
+        <Link href="/generate">
+          <a className="btn btn-sm btn-primary btn-outline">Generate</a>
         </Link>
       </div>
 

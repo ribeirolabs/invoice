@@ -128,7 +128,7 @@ const NewCompanyForm = () => {
         <div className="divider"></div>
 
         <button className="btn btn-primary" disabled={createCompany.isLoading}>
-          SavE
+          Save
         </button>
       </form>
     </>

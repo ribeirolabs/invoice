@@ -3,6 +3,7 @@ import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
 import { parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";

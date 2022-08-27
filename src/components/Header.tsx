@@ -1,11 +1,15 @@
 import { trpc } from "@/utils/trpc";
 import { signOut } from "next-auth/react";
+import { setLogger } from "next-auth/utils/logger";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronDownIcon } from "./Icons";
 
 export function Header() {
+  const router = useRouter();
   const session = trpc.useQuery(["auth.getSession"]);
+  const [loading, setLoading] = useState(false);
 
   const user = session.data?.user;
 
@@ -19,6 +23,24 @@ export function Header() {
     return [parts[0]?.[0] ?? "", parts.at(-1)?.[0] ?? ""].join("");
   }, [user]);
 
+  useEffect(() => {
+    function onStart() {
+      setLoading(true);
+    }
+
+    function onComplete() {
+      setLoading(false);
+    }
+
+    router.events.on("routeChangeStart", onStart);
+    router.events.on("routeChangeComplete", onComplete);
+
+    return () => {
+      router.events.off("routeChangeStart", onStart);
+      router.events.off("routeChangeComplete", onComplete);
+    };
+  }, []);
+
   if (!user) {
     return null;
   }
@@ -31,7 +53,13 @@ export function Header() {
           <span className="lg:hidden">r</span>
           <span className="mx-1">/</span>
           <Link href="/">
-            <a className="text-primary font-bold normal-case"> invoice</a>
+            <a className="text-primary font-bold normal-case">
+              <span>invoice</span>
+              <button
+                className="btn btn-ghost btn-xs ml-2"
+                data-loading={loading}
+              ></button>
+            </a>
           </Link>
         </div>
 

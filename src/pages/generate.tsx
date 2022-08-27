@@ -7,6 +7,7 @@ import {
   ChangeEvent,
   FormEvent,
   KeyboardEvent,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -87,13 +88,19 @@ export default function InvoiceGenerate() {
     });
   }, [receiverId, payerId, invoiceNumber.mutateAsync, invoiceNumber.reset]);
 
+  const formatAmount = useCallback((amount: number) => {
+    return new Intl.NumberFormat(getLocale(), {
+      maximumFractionDigits: 2,
+    }).format(amount);
+  }, []);
+
   useEffect(() => {
     if (!latest.data || !payer) {
       return;
     }
 
-    setAmount(formatCurrency(latest.data.amount, payer.currency));
-  }, [latest.data, payer]);
+    setAmount(formatAmount(latest.data.amount));
+  }, [latest.data, payer, formatAmount]);
 
   const waitingForDecimal = useRef(false);
   const deleting = useRef(false);
@@ -128,11 +135,7 @@ export default function InvoiceGenerate() {
 
     rawAmount.current = parseFloat(value.replace(",", ".") || "0");
 
-    setAmount(
-      new Intl.NumberFormat(getLocale(), {
-        maximumFractionDigits: 2,
-      }).format(rawAmount.current)
-    );
+    setAmount(formatAmount(rawAmount.current));
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {

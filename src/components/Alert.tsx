@@ -23,16 +23,24 @@ const ICONS: Record<AlertType, ComponentType<IconProps>> = {
 
 export type AlertProps = {
   type?: AlertType;
-  message: string;
   onClick?: () => void;
+  children: ReactNode;
+  fluid?: boolean;
 };
 
-export const Alert = ({ type = "info", message, onClick }: AlertProps) => {
+export const Alert = ({
+  type = "info",
+  onClick,
+  children,
+  fluid,
+}: AlertProps) => {
   const Icon = ICONS[type];
 
   return (
     <div
-      className={`alert ${CLASSES[type]} cursor-pointer max-w-[400px]`}
+      className={`alert ${CLASSES[type]} cursor-pointer min-w-[400px] ${
+        fluid ? "w-full" : ""
+      }`}
       onClick={onClick}
     >
       <div>
@@ -40,7 +48,7 @@ export const Alert = ({ type = "info", message, onClick }: AlertProps) => {
           <Icon size={24} />
         </div>
 
-        <span className="leading-4">{message}</span>
+        <span className="leading-4">{children}</span>
       </div>
     </div>
   );

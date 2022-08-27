@@ -78,7 +78,7 @@ export const CompaniesTable = () => {
               );
 
               const isShared = company.users.some(
-                (user) => user.type === "SHARED" && user.userId === authUser?.id
+                (user) => user.type === "SHARED"
               );
 
               return (

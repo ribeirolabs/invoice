@@ -3,7 +3,7 @@ import { useEvent } from "@ribeirolabs/events/react";
 import { Alert, AlertProps } from "./Alert";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 
-type ToastWithId = Pick<AlertProps, "type" | "message"> & { id: string };
+type ToastWithId = Pick<AlertProps, "type"> & { id: string; message: string };
 
 const TOAST_TIMEOUT = 3000;
 
@@ -51,7 +51,9 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
 
       <div className="toast">
         {toasts.map(({ id, ...props }) => (
-          <Alert key={id} {...props} onClick={() => remove(id)} />
+          <Alert key={id} type={props.type} onClick={() => remove(id)}>
+            {props.message}
+          </Alert>
         ))}
       </div>
     </>

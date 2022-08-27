@@ -1,3 +1,4 @@
+import pluralize from "pluralize";
 import { Input } from "@/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
 import { addToast } from "@/components/Toast";
@@ -42,6 +43,8 @@ const NewCompanyForm = () => {
     },
   ]);
 
+  const authUser = session.data?.user;
+
   const [pattern, setPattern] = useState("");
 
   const user = useMemo(() => {
@@ -49,6 +52,13 @@ const NewCompanyForm = () => {
       (user) => user.userId === session.data?.user?.id
     );
   }, [company.data, session.data]);
+
+  const sharedWith = useMemo(() => {
+    return (
+      company.data?.users?.filter((user) => user.sharedById === authUser?.id) ??
+      []
+    );
+  }, [authUser, company.data]);
 
   const canEdit = user?.type === "OWNED" || !company.data;
 
@@ -111,12 +121,20 @@ const NewCompanyForm = () => {
   }
 
   return (
-    <>
+    <div className="max-w-lg mx-auto">
+      <h1>Company</h1>
+
       {user?.sharedBy && (
         <>
           <div className="flex gap-4 items-center">
-            <p className="m-0">Shared by: {user.sharedBy.name}</p>
-            <button className="btn btn-secondary btn-sm" onClick={onDetach}>
+            <p className="m-0 text-sm">
+              Shared by: <b>{user.sharedBy.name}</b>
+            </p>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={onDetach}
+              data-loading={detach.isLoading}
+            >
               Detach
             </button>
           </div>
@@ -124,7 +142,15 @@ const NewCompanyForm = () => {
         </>
       )}
 
-      <h1>Company</h1>
+      {sharedWith.length > 0 && (
+        <>
+          <p className="m-0 text-sm">
+            Shared with {sharedWith.length}{" "}
+            {pluralize("company", sharedWith.length)}
+          </p>
+          <div className="divider"></div>
+        </>
+      )}
 
       <form className="form max-w-lg" onSubmit={onSubmit}>
         <input type="hidden" name="id" value={company.data?.id} />
@@ -245,7 +271,7 @@ const NewCompanyForm = () => {
           </Link>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

@@ -18,6 +18,7 @@ import { getLocale } from "@/utils/locale";
 import { formatCurrency, getSeparators } from "@/utils/currency";
 import Link from "next/link";
 import { addToast } from "@/components/Toast";
+import { Alert } from "@/components/Alert";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -166,115 +167,136 @@ export default function InvoiceGenerate() {
 
   return (
     <ProtectedPage>
-      <div className="mb-4">
-        <h1 className="m-0">Invoice</h1>
-        <h2 className="m-0">{invoiceNumber.data}</h2>
+      <div className="max-w-lg mx-auto">
+        {(!receivers.length || !payers.length) && (
+          <div className="mb-4">
+            <Alert type="error" fluid>
+              {!receivers.length
+                ? "You need to own at least one company to generate an invoice."
+                : !payers.length
+                ? "You have no payer companies to generate an invoice."
+                : ""}
+              <Link href="/company/create">
+                <a className="text-error-content font-bold ml-2">Create one</a>
+              </Link>
+            </Alert>
+          </div>
+        )}
+
+        <div className="mb-4">
+          <h1 className="m-0">Invoice</h1>
+          <h2 className="m-0">{invoiceNumber.data}</h2>
+        </div>
+
+        <form className="form max-w-lg" onSubmit={onSubmit}>
+          <div className="form-control w-full mb-2">
+            <label className="label">
+              <span className="label-text">Receiver</span>
+            </label>
+
+            <select
+              className={`select select-bordered w-full ${
+                !receivers.length ? "select-error" : ""
+              }`}
+              value={receiverId || ""}
+              name="receiver_id"
+              onChange={(e) => setReceiverId(e.target.value)}
+            >
+              <option></option>
+              {receivers.map((company) => {
+                return (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div className="form-control w-full mb-2">
+            <label className="label">
+              <span className="label-text">Payer</span>
+            </label>
+
+            <select
+              className={`select select-bordered w-full ${
+                !payers.length ? "select-error" : ""
+              }`}
+              value={payerId || ""}
+              name="payer_id"
+              onChange={(e) => setPayerId(e.target.value)}
+            >
+              <option></option>
+              {payers.map((company) => {
+                const user = company.users.find(
+                  (user) => user.userId === session.data?.user?.id
+                );
+
+                return (
+                  <option key={company.id} value={company.id}>
+                    {company.name} {user?.type === "SHARED" && "(shared)"}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Date"
+              name="date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+            <Input
+              label="Due Date"
+              name="due_date"
+              type="number"
+              value={dueDateDays || 0}
+              onChange={(e) => {
+                const value = parseInt(e.target.value || "");
+                setDueDateDays(value || 0);
+              }}
+              helper={dueDate}
+              trailing={<span>days</span>}
+            />
+          </div>
+
+          <Input
+            key={payerId + "-description"}
+            label="Description"
+            name="description"
+            type="textarea"
+            defaultValue={latest.data?.description || ""}
+          />
+
+          <Input
+            key={payerId + "-amount"}
+            label="Amount"
+            name="amount"
+            value={amount}
+            onKeyDown={onKeyDown}
+            onChange={onChangeAmount}
+            leading={<span>{payer?.currency}</span>}
+            disabled={!payer}
+          />
+
+          <div className="divider"></div>
+
+          <div className="btn-form-group">
+            <button
+              className="btn btn-primary btn-wide"
+              data-loading={invoice.isLoading}
+            >
+              Confirm
+            </button>
+            <Link href="/">
+              <a className="btn btn-ghost btn-wide">Cancel</a>
+            </Link>
+          </div>
+        </form>
       </div>
-
-      <form className="form max-w-lg" onSubmit={onSubmit}>
-        <div className="form-control w-full mb-2">
-          <label className="label">
-            <span className="label-text">Receiver</span>
-          </label>
-
-          <select
-            className="select select-bordered w-full"
-            value={receiverId || ""}
-            name="receiver_id"
-            onChange={(e) => setReceiverId(e.target.value)}
-          >
-            <option></option>
-            {receivers.map((company) => {
-              return (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-
-        <div className="form-control w-full mb-2">
-          <label className="label">
-            <span className="label-text">Payer</span>
-          </label>
-
-          <select
-            className="select select-bordered w-full"
-            value={payerId || ""}
-            name="payer_id"
-            onChange={(e) => setPayerId(e.target.value)}
-          >
-            <option></option>
-            {payers.map((company) => {
-              const user = company.users.find(
-                (user) => user.userId === session.data?.user?.id
-              );
-
-              return (
-                <option key={company.id} value={company.id}>
-                  {company.name} {user?.type === "SHARED" && "(shared)"}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Date"
-            name="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-          <Input
-            label="Due Date"
-            name="due_date"
-            type="number"
-            value={dueDateDays || 0}
-            onChange={(e) => {
-              const value = parseInt(e.target.value || "");
-              setDueDateDays(value || 0);
-            }}
-            helper={dueDate}
-            trailing={<span>days</span>}
-          />
-        </div>
-
-        <Input
-          key={payerId + "-description"}
-          label="Description"
-          name="description"
-          type="textarea"
-          defaultValue={latest.data?.description || ""}
-        />
-
-        <Input
-          key={payerId + "-amount"}
-          label="Amount"
-          name="amount"
-          value={amount}
-          onKeyDown={onKeyDown}
-          onChange={onChangeAmount}
-          leading={<span>{payer?.currency}</span>}
-          disabled={!payer}
-        />
-
-        <div className="divider"></div>
-
-        <div className="btn-form-group">
-          <button
-            className="btn btn-primary btn-wide"
-            data-loading={invoice.isLoading}
-          >
-            Confirm
-          </button>
-          <Link href="/">
-            <a className="btn btn-ghost btn-wide">Cancel</a>
-          </Link>
-        </div>
-      </form>
     </ProtectedPage>
   );
 }

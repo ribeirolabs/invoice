@@ -1,10 +1,19 @@
 import { PropsWithChildren, useCallback, useState } from "react";
 import { useEvent } from "@ribeirolabs/events/react";
 import { Alert, AlertProps } from "./Alert";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
 
 type ToastWithId = Pick<AlertProps, "type" | "message"> & { id: string };
 
 const TOAST_TIMEOUT = 3000;
+
+export const addToast = (message: string, type: AlertType, id?: string) => {
+  dispatchCustomEvent("toast", {
+    id,
+    message,
+    type,
+  });
+};
 
 export const ToastProvider = ({ children }: PropsWithChildren) => {
   const [toasts, setToasts] = useState<ToastWithId[]>([]);
@@ -17,11 +26,13 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
     "toast",
     useCallback(
       (e) => {
-        const id = window.crypto.randomUUID();
+        const id = e.detail.id ?? window.crypto.randomUUID();
 
-        if (/success|info/.test(e.detail.type)) {
-          setTimeout(() => remove(id), TOAST_TIMEOUT);
+        if (e.detail.id) {
+          remove(id);
         }
+
+        setTimeout(() => remove(id), TOAST_TIMEOUT);
 
         setToasts((toasts) =>
           toasts.concat({

@@ -102,6 +102,7 @@ export const invoiceRouter = createProtectedRouter()
       return ctx.prisma.invoice.findFirst({
         where: {
           payerId: input.payer_id,
+          userId: ctx.session.user.id,
         },
         orderBy: {
           createdAt: "desc",

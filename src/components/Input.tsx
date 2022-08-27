@@ -15,7 +15,7 @@ export function Input<T = HTMLInputElement>({
   ...props
 }: InputProps<T>) {
   return (
-    <div className="form-control w-full mb-4">
+    <div className="form-control w-full mb-2">
       <label className="label">
         <span className="label-text">{label}</span>
       </label>

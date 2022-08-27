@@ -4,7 +4,6 @@ import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
-import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";

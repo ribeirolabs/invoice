@@ -2,7 +2,7 @@ import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
-import { AddIcon, ViewDocumentIcon } from "./Icons";
+import { ViewDocumentIcon } from "./Icons";
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
@@ -11,11 +11,6 @@ export const InvoicesTable = () => {
     <>
       <h1 className="text-xl leading-normal font-extrabold flex gap-6">
         Recent Invoices
-        <Link href="/generate">
-          <a className="btn btn-outline btn-sm">
-            <AddIcon size={16} /> new
-          </a>
-        </Link>
       </h1>
 
       <div className="border border-base-300 rounded-md mt-4 overflow-x-auto">
@@ -33,6 +28,14 @@ export const InvoicesTable = () => {
           </thead>
 
           <tbody>
+            {!invoices.data?.length && (
+              <tr>
+                <td colSpan={7}>
+                  No invoices. <Link href="/generate">Generate</Link> your first
+                  one.
+                </td>
+              </tr>
+            )}
             {invoices.data?.map((invoice, i) => {
               return (
                 <tr key={invoice.id}>
@@ -50,12 +53,8 @@ export const InvoicesTable = () => {
                   <td>
                     <div className="flex gap-1 justify-end">
                       <Link href={`/invoice/${invoice.id}`}>
-                        <a
-                          className="btn btn-sm btn-ghost btn-circle"
-                          target="_blank"
-                          title="view"
-                        >
-                          <ViewDocumentIcon size={18} />
+                        <a className="btn-action" target="_blank" title="view">
+                          <ViewDocumentIcon />
                         </a>
                       </Link>
                     </div>

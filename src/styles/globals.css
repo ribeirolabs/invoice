@@ -29,4 +29,22 @@
     padding-left: 4em;
     padding-right: 4em;
   }
+
+  .btn-action {
+    @apply btn btn-ghost btn-circle;
+  }
+
+  .btn-form-group {
+    @apply flex justify-between gap-2;
+  }
+}
+
+@layer utilities {
+  .w-content {
+    @apply container mx-auto;
+  }
+}
+
+[data-loading="true"] {
+  @apply loading;
 }

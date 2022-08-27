@@ -1,7 +1,15 @@
+export const INVOICE_PATTERN_SYMBOLS = {
+  YEAR: "%Y",
+  MONTH: "%M",
+  DAY: "%D",
+  INCREMENT: "%0",
+};
+
 const PATTERNS = {
-  YEAR: /(%Y)/,
-  MONTH: /(%M)/,
-  INCREMENT: /(%0)(\[\d\])?/,
+  YEAR: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.YEAR})`),
+  MONTH: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.MONTH})`),
+  DAY: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.DAY})`),
+  INCREMENT: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.INCREMENT})(\\[\\d\\])?`),
 };
 
 export function parseInvoicePattern(
@@ -20,6 +28,8 @@ export function parseInvoicePattern(
         ? data.getFullYear()
         : key === "MONTH"
         ? String(data.getMonth() + 1).padStart(2, "0")
+        : key === "DAY"
+        ? String(data.getDate()).padStart(2, "0")
         : key === "INCREMENT"
         ? opts.INCREMENT + 1
         : "";

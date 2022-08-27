@@ -1,9 +1,9 @@
 import { Input } from "@/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
+import { addToast } from "@/components/Toast";
 import { ssp } from "@/server/ssp";
-import { parseInvoicePattern } from "@/utils/invoice";
+import { INVOICE_PATTERN_SYMBOLS, parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
-import { dispatchCustomEvent } from "@ribeirolabs/events";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -60,6 +60,12 @@ const NewCompanyForm = () => {
     setPattern(company.data.invoiceNumberPattern);
   }, [company.data]);
 
+  function insertInvoicePatternSymbol(
+    symbol: keyof typeof INVOICE_PATTERN_SYMBOLS
+  ) {
+    setPattern((pattern) => pattern + INVOICE_PATTERN_SYMBOLS[symbol]);
+  }
+
   async function onDetach() {
     if (!company.data) {
       return;
@@ -79,6 +85,8 @@ const NewCompanyForm = () => {
 
     const data = new FormData(form);
 
+    const action = company.data?.id ? "update" : "create";
+
     try {
       await upsert.mutateAsync({
         id: data.get("id") as string,
@@ -89,12 +97,17 @@ const NewCompanyForm = () => {
         owner: Boolean(data.get("owner") as string),
       });
 
-      if (company.data?.id) {
+      if (action === "update") {
         company.refetch();
       } else {
         form.reset();
       }
-    } catch (e) {}
+
+      addToast(`Company ${action}d`, "success");
+    } catch (e) {
+      console.error(e);
+      addToast(`Unable to ${action} company`, "error");
+    }
   }
 
   return (
@@ -111,7 +124,7 @@ const NewCompanyForm = () => {
         </>
       )}
 
-      <h1>{company.data?.name ?? "New Company"}</h1>
+      <h1>Company</h1>
 
       <form className="form max-w-lg" onSubmit={onSubmit}>
         <input type="hidden" name="id" value={company.data?.id} />
@@ -160,16 +173,52 @@ const NewCompanyForm = () => {
           name="invoice_number_pattern"
           placeholder="INV-%Y/%0[4]"
           helper={parseInvoicePattern(pattern, { INCREMENT: 0 })}
+          value={pattern}
           onChange={(e) => setPattern(e.target.value)}
-          defaultValue={company.data?.invoiceNumberPattern}
           readOnly={!canEdit}
         />
 
         <ul className="leading-4 text-xs">
-          <li>%Y = year</li>
-          <li>%M = month</li>
-          <li>%D = day</li>
-          <li>%0 = increment. Use [n] to specify number of leading zeros</li>
+          <li>
+            <button
+              className="btn btn-xs btn-secondary"
+              type="button"
+              onClick={() => insertInvoicePatternSymbol("YEAR")}
+            >
+              {INVOICE_PATTERN_SYMBOLS.YEAR}
+            </button>{" "}
+            = year
+          </li>
+          <li>
+            <button
+              className="btn btn-xs btn-secondary"
+              type="button"
+              onClick={() => insertInvoicePatternSymbol("MONTH")}
+            >
+              %M
+            </button>{" "}
+            = month
+          </li>
+          <li>
+            <button
+              className="btn btn-xs btn-secondary"
+              type="button"
+              onClick={() => insertInvoicePatternSymbol("DAY")}
+            >
+              %D
+            </button>{" "}
+            = day
+          </li>
+          <li>
+            <button
+              className="btn btn-xs btn-secondary"
+              type="button"
+              onClick={() => insertInvoicePatternSymbol("INCREMENT")}
+            >
+              %0
+            </button>{" "}
+            = increment. Use [n] to specify number of leading zeros
+          </li>
 
           <ul className="not-prose leading-4 text-xs">
             <li>%0[3] = 001, 002, 003...</li>
@@ -178,12 +227,11 @@ const NewCompanyForm = () => {
 
         <div className="divider"></div>
 
-        <div className="flex gap-4 justify-between">
+        <div className="btn-form-group">
           {canEdit ? (
             <button
-              className={`btn btn-primary btn-wide ${
-                upsert.isLoading ? "loading" : ""
-              }`}
+              className="btn btn-primary btn-wide"
+              data-loading={upsert.isLoading}
               type="submit"
             >
               Save
@@ -191,8 +239,9 @@ const NewCompanyForm = () => {
           ) : (
             <span>&nbsp;</span>
           )}
+
           <Link href="/">
-            <a className="btn btn-secondary btn-wide">Cancel</a>
+            <a className="btn btn-ghost btn-wide">Cancel</a>
           </Link>
         </div>
       </form>

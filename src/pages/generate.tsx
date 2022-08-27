@@ -12,12 +12,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { useLocalStorage } from "@ribeirolabs/local-storage/react";
-import { KEYS } from "@/utils/local-storage";
 import format from "date-fns/format";
 import addDays from "date-fns/addDays";
 import { getLocale } from "@/utils/locale";
-import { getSeparators } from "@/utils/currency";
+import { formatCurrency, getSeparators } from "@/utils/currency";
+import Link from "next/link";
+import { addToast } from "@/components/Toast";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -26,10 +26,10 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 };
 
 export default function InvoiceGenerate() {
-  const [receiverId, setReceiverId] = useLocalStorage(KEYS.receiver, "");
-  const [payerId, setPayerId] = useLocalStorage(KEYS.payer, "");
+  const [receiverId, setReceiverId] = useState("");
+  const [payerId, setPayerId] = useState("");
   const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
-  const [dueDateDays, setDueDateDays] = useLocalStorage(KEYS.dueDateDays, 5);
+  const [dueDateDays, setDueDateDays] = useState(5);
 
   const [amount, setAmount] = useState("");
 
@@ -85,6 +85,14 @@ export default function InvoiceGenerate() {
       payerId: payerId,
     });
   }, [receiverId, payerId, invoiceNumber.mutateAsync, invoiceNumber.reset]);
+
+  useEffect(() => {
+    if (!latest.data || !payer) {
+      return;
+    }
+
+    setAmount(formatCurrency(latest.data.amount, payer.currency));
+  }, [latest.data, payer]);
 
   const waitingForDecimal = useRef(false);
   const deleting = useRef(false);
@@ -151,13 +159,17 @@ export default function InvoiceGenerate() {
 
       form.reset();
     } catch (e) {
-      alert(e);
+      console.error(e);
+      addToast("Unable to generate invoice", "error");
     }
   }
 
   return (
     <ProtectedPage>
-      <h1>Generate Invoice: {invoiceNumber.data}</h1>
+      <div className="mb-4">
+        <h1 className="m-0">Invoice</h1>
+        <h2 className="m-0">{invoiceNumber.data}</h2>
+      </div>
 
       <form className="form max-w-lg" onSubmit={onSubmit}>
         <div className="form-control w-full mb-2">
@@ -220,7 +232,7 @@ export default function InvoiceGenerate() {
             label="Due Date"
             name="due_date"
             type="number"
-            value={dueDateDays || ""}
+            value={dueDateDays || 0}
             onChange={(e) => {
               const value = parseInt(e.target.value || "");
               setDueDateDays(value || 0);
@@ -242,21 +254,26 @@ export default function InvoiceGenerate() {
           key={payerId + "-amount"}
           label="Amount"
           name="amount"
-          defaultValue={latest.data?.amount || ""}
           value={amount}
           onKeyDown={onKeyDown}
           onChange={onChangeAmount}
           leading={<span>{payer?.currency}</span>}
+          disabled={!payer}
         />
 
         <div className="divider"></div>
 
-        <button
-          className="btn btn-primary btn-wide"
-          disabled={invoice.isLoading}
-        >
-          Confirm
-        </button>
+        <div className="btn-form-group">
+          <button
+            className="btn btn-primary btn-wide"
+            data-loading={invoice.isLoading}
+          >
+            Confirm
+          </button>
+          <Link href="/">
+            <a className="btn btn-ghost btn-wide">Cancel</a>
+          </Link>
+        </div>
       </form>
     </ProtectedPage>
   );

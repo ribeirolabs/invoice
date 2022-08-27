@@ -56,9 +56,13 @@ export function Header() {
             <a className="text-primary font-bold normal-case">
               <span>invoice</span>
               <button
-                className="btn btn-ghost btn-xs ml-2"
-                data-loading={loading}
-              ></button>
+                className={`btn btn-ghost btn-xs ml-2 ${
+                  loading ? "opacity-1" : "opacity-0"
+                }`}
+                data-loading={true}
+              >
+                &nbsp;
+              </button>
             </a>
           </Link>
         </div>

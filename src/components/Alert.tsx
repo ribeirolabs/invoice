@@ -1,4 +1,4 @@
-import { ComponentType, ReactElement, ReactNode } from "react";
+import { ComponentType, ReactElement, ReactNode, useMemo } from "react";
 import {
   ErrorIcon,
   IconProps,
@@ -7,11 +7,19 @@ import {
   WarningIcon,
 } from "./Icons";
 
-const CLASSES: Record<AlertType, string> = {
-  info: "alert-info",
-  success: "alert-success",
-  warning: "alert-warning",
-  error: "alert-error",
+const CLASSES = {
+  alert: {
+    info: "alert-info",
+    success: "alert-success",
+    warning: "alert-warning",
+    error: "alert-error",
+  },
+  text: {
+    info: "text-info",
+    success: "text-success",
+    warning: "text-warning",
+    error: "text-error",
+  },
 };
 
 const ICONS: Record<AlertType, ComponentType<IconProps>> = {
@@ -26,6 +34,7 @@ export type AlertProps = {
   onClick?: () => void;
   children: ReactNode;
   fluid?: boolean;
+  inverse?: boolean;
 };
 
 export const Alert = ({
@@ -33,12 +42,17 @@ export const Alert = ({
   onClick,
   children,
   fluid,
+  inverse,
 }: AlertProps) => {
   const Icon = ICONS[type];
 
+  const className = useMemo(() => {
+    return inverse ? CLASSES.text[type] : CLASSES.alert[type];
+  }, [type, inverse]);
+
   return (
     <div
-      className={`alert ${CLASSES[type]} cursor-pointer min-w-[400px] ${
+      className={`alert ${className} cursor-pointer min-w-[400px] ${
         fluid ? "w-full" : ""
       }`}
       onClick={onClick}

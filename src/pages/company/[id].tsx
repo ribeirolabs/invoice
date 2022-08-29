@@ -117,7 +117,6 @@ const NewCompanyForm = () => {
         currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
         owner: Boolean(data.get("owner") as string),
-        updateIssuedInvoices: Boolean(data.get("update_invoices") as string),
       });
 
       if (action === "update") {
@@ -268,33 +267,11 @@ const NewCompanyForm = () => {
           </ul>
         </ul>
 
+        <Alert type="info" inverse>
+          The update will only affect future invoices
+        </Alert>
+
         <div className="divider"></div>
-
-        {(invoiceIssued.data ?? 0) > 0 && (
-          <>
-            <Alert type="warning">
-              This compnay has {invoiceIssued.data}{" "}
-              {pluralize("invoice", invoiceIssued.data)} issued before today
-            </Alert>
-
-            <div className="form-control flex-1 mt-4">
-              <label className="label cursor-pointer">
-                <span className="label-text mr-4">Update issued invoices?</span>
-              </label>
-              <div className="toggle-container">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-xl"
-                  name="update_invoices"
-                />
-                <span className="toggle-no-label">NO</span>
-                <span className="toggle-yes-label">YES</span>
-              </div>
-            </div>
-
-            <div className="divider"></div>
-          </>
-        )}
 
         <div className="btn-form-group">
           {canEdit ? (

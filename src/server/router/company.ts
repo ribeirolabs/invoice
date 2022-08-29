@@ -11,7 +11,6 @@ export const companyRouter = createProtectedRouter()
       address: z.string(),
       invoiceNumberPattern: z.string(),
       owner: z.boolean(),
-      updateIssuedInvoices: z.boolean(),
     }),
     async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
@@ -26,6 +25,9 @@ export const companyRouter = createProtectedRouter()
       if (input.id) {
         const where: Prisma.InvoiceWhereInput = {
           userId,
+          issuedAt: {
+            gt: new Date(),
+          },
         };
 
         const invoiceData = {
@@ -33,12 +35,6 @@ export const companyRouter = createProtectedRouter()
           address: input.address,
           currency: input.currency,
         };
-
-        if (!input.updateIssuedInvoices) {
-          where.issuedAt = {
-            gt: new Date(),
-          };
-        }
 
         const [company] = await Promise.all([
           ctx.prisma.company.update({

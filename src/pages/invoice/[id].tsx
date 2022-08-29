@@ -1,4 +1,4 @@
-import { ssp } from "@/server/ssp";
+import { ssp } from "@common/server/ssp";
 import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";

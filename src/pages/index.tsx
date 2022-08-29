@@ -1,7 +1,7 @@
 import { CompaniesTable } from "@/components/CompaniesTable";
 import { InvoicesTable } from "@/components/InvoicesTable";
 import { ProtectedPage } from "@/components/ProtectedPage";
-import { ssp } from "@/server/ssp";
+import { ssp } from "@common/server/ssp";
 import type { GetServerSideProps, NextPage } from "next";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {

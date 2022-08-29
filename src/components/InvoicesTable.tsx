@@ -38,6 +38,7 @@ export const InvoicesTable = () => {
                 </td>
               </tr>
             )}
+
             {invoices.data?.map((invoice, i) => {
               return (
                 <InvoiceRow
@@ -75,10 +76,14 @@ const InvoiceRow = ({
     },
   });
 
+  const invoiceUrl = `/invoice/${invoice.id}`;
+
   return (
     <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
       <th>{index}</th>
-      <td>{invoice.number}</td>
+      <td>
+        <Link href={invoiceUrl}>{invoice.number}</Link>
+      </td>
       <td>
         <Amount amount={invoice.amount} currency={invoice.payer.currency} />
       </td>
@@ -87,11 +92,6 @@ const InvoiceRow = ({
       <td>{invoice.issuedAt.toLocaleDateString()}</td>
       <td>
         <div className="flex gap-1 justify-end">
-          <Link href={`/invoice/${invoice.id}`}>
-            <a className="btn-action" target="_blank" title="view">
-              <ViewDocumentIcon />
-            </a>
-          </Link>
           <button
             className="btn-action"
             onClick={() => deleteInvoice.mutateAsync(invoice.id)}

@@ -1,7 +1,7 @@
 import pluralize from "pluralize";
 import { ProtectedPage } from "@/components/ProtectedPage";
 import { addToast } from "@common/components/Toast";
-import { ssp } from "@/server/ssp";
+import { ssp } from "@common/server/ssp";
 import { INVOICE_PATTERN_SYMBOLS, parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";

@@ -81,11 +81,13 @@ export const CompaniesTable = () => {
                 (user) => user.type === "SHARED"
               );
 
+              const companyUrl = `/company/${company.id}`;
+
               return (
                 <tr key={company.id}>
                   <th>{i + 1}</th>
                   <td>
-                    {company.name}
+                    <Link href={companyUrl}>{company.name}</Link>
                     {isShared && (
                       <span className="badge badge-secondary badge-sm ml-2">
                         shared
@@ -101,11 +103,6 @@ export const CompaniesTable = () => {
                   <td>{countByInvoice.payer?.[company.id] ?? 0}</td>
                   <td>
                     <div className="flex gap-1 justify-end">
-                      <Link href={`/company/${company.id}`}>
-                        <a className="btn-action" title="Edit">
-                          <EditIcon />
-                        </a>
-                      </Link>
                       <button
                         className="btn-action"
                         onClick={() => copyShareLink(company.id)}

@@ -4,7 +4,7 @@ import { setLogger } from "next-auth/utils/logger";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDownIcon } from "./Icons";
+import { ChevronDownIcon } from "@common/components/Icons";
 
 export function Header() {
   const router = useRouter();

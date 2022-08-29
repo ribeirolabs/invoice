@@ -1,8 +1,8 @@
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useMemo } from "react";
-import { AddIcon, EditIcon, ShareIcon } from "./Icons";
-import { addToast } from "./Toast";
+import { AddIcon, EditIcon, ShareIcon } from "@common/components/Icons";
+import { addToast } from "@common/components/Toast";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);

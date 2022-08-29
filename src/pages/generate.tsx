@@ -1,4 +1,4 @@
-import { Input } from "@/components/Input";
+import { Input } from "@common/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
 import { ssp } from "@/server/ssp";
 import { trpc } from "@/utils/trpc";
@@ -16,10 +16,10 @@ import {
 import format from "date-fns/format";
 import addDays from "date-fns/addDays";
 import { getLocale } from "@/utils/locale";
-import { formatCurrency, getSeparators } from "@/utils/currency";
+import { getSeparators } from "@/utils/currency";
 import Link from "next/link";
-import { addToast } from "@/components/Toast";
-import { Alert } from "@/components/Alert";
+import { addToast } from "@common/components/Toast";
+import { Alert } from "@common/components/Alert";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {

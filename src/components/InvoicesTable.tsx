@@ -3,8 +3,8 @@ import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { DeleteIcon, ViewDocumentIcon } from "./Icons";
-import { addToast } from "./Toast";
+import { DeleteIcon, ViewDocumentIcon } from "@common/components/Icons";
+import { addToast } from "@common/components/Toast";
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);

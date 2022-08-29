@@ -1,7 +1,6 @@
 import pluralize from "pluralize";
-import { Input } from "@/components/Input";
 import { ProtectedPage } from "@/components/ProtectedPage";
-import { addToast } from "@/components/Toast";
+import { addToast } from "@common/components/Toast";
 import { ssp } from "@/server/ssp";
 import { INVOICE_PATTERN_SYMBOLS, parseInvoicePattern } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
@@ -9,7 +8,8 @@ import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Alert } from "@/components/Alert";
+import { Alert } from "@common/components/Alert";
+import { Input } from "@common/components/Input";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {

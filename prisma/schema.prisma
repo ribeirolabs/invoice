@@ -103,6 +103,7 @@ model Invoice {
   createdAt   DateTime @default(now())
   issuedAt    DateTime
   expiredAt   DateTime
+  data        Json?
 
   receiver   Company @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   receiverId String

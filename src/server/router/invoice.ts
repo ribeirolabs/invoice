@@ -8,7 +8,7 @@ export const invoicePublicRouter = createRouter().query("get", {
     id: z.string().cuid(),
   }),
   async resolve({ ctx, input }) {
-    return ctx.prisma.invoice.findFirstOrThrow({
+    const invoice = await ctx.prisma.invoice.findFirstOrThrow({
       where: {
         id: input.id,
       },
@@ -17,6 +17,27 @@ export const invoicePublicRouter = createRouter().query("get", {
         receiver: true,
       },
     });
+
+    const data = invoice.data as Record<
+      "payer" | "receiver",
+      {
+        name: string;
+        address: string;
+        currency: string;
+      }
+    >;
+
+    return {
+      ...invoice,
+      payer: {
+        ...invoice.payer,
+        ...(data?.payer ?? {}),
+      },
+      receiver: {
+        ...invoice.receiver,
+        ...(data?.receiver ?? {}),
+      },
+    };
   },
 });
 
@@ -31,10 +52,16 @@ export const invoiceRouter = createProtectedRouter()
       amount: z.number(),
     }),
     async resolve({ input, ctx }) {
-      const [payer, totalInvoices] = await Promise.all([
+      const [payer, receiver, totalInvoices] = await Promise.all([
         ctx.prisma.company.findFirstOrThrow({
           where: {
             id: input.payerId,
+          },
+        }),
+
+        ctx.prisma.company.findFirstOrThrow({
+          where: {
+            id: input.receiverId,
           },
         }),
 
@@ -56,6 +83,18 @@ export const invoiceRouter = createProtectedRouter()
           userId: ctx.session.user.id,
           number: invoiceNumber,
           currency: payer.currency,
+          data: {
+            receiver: {
+              name: receiver.name,
+              address: receiver.address,
+              currency: receiver.currency,
+            },
+            payer: {
+              name: payer.name,
+              address: payer.address,
+              currency: payer.currency,
+            },
+          },
         },
       });
 

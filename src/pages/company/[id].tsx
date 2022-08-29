@@ -18,9 +18,6 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
         ssr.prefetchQuery("company.get", {
           id: ctx.params.id as string,
         }),
-        ssr.prefetchQuery("invoice.getIssuedCount", {
-          companyId: ctx.params.id as string,
-        }),
       ];
     }
 
@@ -46,12 +43,6 @@ const NewCompanyForm = () => {
     "company.get",
     {
       id: router.query.id as string,
-    },
-  ]);
-  const invoiceIssued = trpc.useQuery([
-    "invoice.getIssuedCount",
-    {
-      companyId: router.query.id as string,
     },
   ]);
 

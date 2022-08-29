@@ -149,15 +149,25 @@ export default function InvoiceGenerate() {
     const issuedAt = new Date(`${data.get("date") as string} ${time}`);
     const expiredAt = new Date(`${dueDate} ${time}`);
 
+    const receiverId = data.get("receiver_id") as string;
+    const payerId = data.get("payer_id") as string;
+
     try {
       const response = await invoice.mutateAsync({
-        receiverId: data.get("receiver_id") as string,
-        payerId: data.get("payer_id") as string,
+        receiverId,
+        payerId,
         issuedAt,
         expiredAt,
         description: data.get("description") as string,
         amount: rawAmount.current,
       });
+
+      invoiceNumber.mutateAsync({
+        receiverId,
+        payerId,
+      });
+
+      latest.refetch();
 
       window.open(`/invoice/${response.id}`, "_blank");
 

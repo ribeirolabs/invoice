@@ -1,8 +1,10 @@
 import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
+import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { ViewDocumentIcon } from "./Icons";
+import { DeleteIcon, ViewDocumentIcon } from "./Icons";
+import { addToast } from "./Toast";
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
@@ -38,34 +40,68 @@ export const InvoicesTable = () => {
             )}
             {invoices.data?.map((invoice, i) => {
               return (
-                <tr key={invoice.id}>
-                  <th>{i + 1}</th>
-                  <td>{invoice.number}</td>
-                  <td>
-                    <Amount
-                      amount={invoice.amount}
-                      currency={invoice.payer.currency}
-                    />
-                  </td>
-                  <td>{invoice.receiver.name}</td>
-                  <td>{invoice.payer.name}</td>
-                  <td>{invoice.issuedAt.toLocaleDateString()}</td>
-                  <td>
-                    <div className="flex gap-1 justify-end">
-                      <Link href={`/invoice/${invoice.id}`}>
-                        <a className="btn-action" target="_blank" title="view">
-                          <ViewDocumentIcon />
-                        </a>
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
+                <InvoiceRow
+                  key={invoice.id}
+                  invoice={invoice}
+                  index={i + 1}
+                  onDelete={invoices.refetch}
+                />
               );
             })}
           </tbody>
         </table>
       </div>
     </>
+  );
+};
+
+const InvoiceRow = ({
+  invoice,
+  index,
+  onDelete = () => void {},
+}: {
+  invoice: Invoice & {
+    payer: Company;
+    receiver: Company;
+  };
+  index: number;
+  onDelete?: () => void;
+}) => {
+  const deleteInvoice = trpc.useMutation("invoice.delete", {
+    onSuccess(data) {
+      addToast(`Invoice ${data.number} deleted`, "success");
+
+      onDelete();
+    },
+  });
+
+  return (
+    <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
+      <th>{index}</th>
+      <td>{invoice.number}</td>
+      <td>
+        <Amount amount={invoice.amount} currency={invoice.payer.currency} />
+      </td>
+      <td>{invoice.receiver.name}</td>
+      <td>{invoice.payer.name}</td>
+      <td>{invoice.issuedAt.toLocaleDateString()}</td>
+      <td>
+        <div className="flex gap-1 justify-end">
+          <Link href={`/invoice/${invoice.id}`}>
+            <a className="btn-action" target="_blank" title="view">
+              <ViewDocumentIcon />
+            </a>
+          </Link>
+          <button
+            className="btn-action"
+            onClick={() => deleteInvoice.mutateAsync(invoice.id)}
+            disabled={deleteInvoice.isLoading}
+          >
+            <DeleteIcon />
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 };
 

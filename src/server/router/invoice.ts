@@ -187,25 +187,12 @@ export const invoiceRouter = createProtectedRouter()
       `;
     },
   })
-  .query("getIssuedCount", {
-    input: z.object({
-      companyId: z.string().cuid(),
-    }),
-    async resolve({ ctx, input }) {
-      return ctx.prisma.invoice.count({
+  .mutation("delete", {
+    input: z.string().cuid(),
+    resolve({ ctx, input }) {
+      return ctx.prisma.invoice.delete({
         where: {
-          userId: ctx.session.user.id,
-          issuedAt: {
-            lt: new Date(),
-          },
-          OR: [
-            {
-              payerId: input.companyId,
-            },
-            {
-              receiverId: input.companyId,
-            },
-          ],
+          id: input,
         },
       });
     },

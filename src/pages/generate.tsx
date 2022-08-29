@@ -198,7 +198,13 @@ export default function InvoiceGenerate() {
 
         <div className="mb-4">
           <h1 className="m-0">Invoice</h1>
-          <h2 className="m-0">{invoiceNumber.data}</h2>
+          <h2
+            className={`m-0 min-h-[1rem] inline-block min-w-[200px] w-fit-content ${
+              invoiceNumber.data ? "" : "bg-base-300 animate-pulse"
+            }`}
+          >
+            {invoiceNumber.data}&nbsp;
+          </h2>
         </div>
 
         <form className="form max-w-lg" onSubmit={onSubmit}>

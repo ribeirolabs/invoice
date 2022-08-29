@@ -9,6 +9,7 @@ export function createProtectedRouter() {
     if (!ctx.session || !ctx.session.user) {
       throw new trpc.TRPCError({ code: "UNAUTHORIZED" });
     }
+
     return next({
       ctx: {
         ...ctx,

@@ -186,4 +186,27 @@ export const invoiceRouter = createProtectedRouter()
       GROUP BY receiverId
       `;
     },
+  })
+  .query("getIssuedCount", {
+    input: z.object({
+      companyId: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      return ctx.prisma.invoice.count({
+        where: {
+          userId: ctx.session.user.id,
+          issuedAt: {
+            lt: new Date(),
+          },
+          OR: [
+            {
+              payerId: input.companyId,
+            },
+            {
+              receiverId: input.companyId,
+            },
+          ],
+        },
+      });
+    },
   });

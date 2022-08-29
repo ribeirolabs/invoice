@@ -9,13 +9,19 @@ import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { Alert } from "@/components/Alert";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     if (ctx.params?.id && ctx.params.id !== "new") {
-      return ssr.prefetchQuery("company.get", {
-        id: ctx.params.id as string,
-      });
+      return [
+        ssr.prefetchQuery("company.get", {
+          id: ctx.params.id as string,
+        }),
+        ssr.prefetchQuery("invoice.getIssuedCount", {
+          companyId: ctx.params.id as string,
+        }),
+      ];
     }
 
     return Promise.resolve();
@@ -40,6 +46,12 @@ const NewCompanyForm = () => {
     "company.get",
     {
       id: router.query.id as string,
+    },
+  ]);
+  const invoiceIssued = trpc.useQuery([
+    "invoice.getIssuedCount",
+    {
+      companyId: router.query.id as string,
     },
   ]);
 
@@ -105,6 +117,7 @@ const NewCompanyForm = () => {
         currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
         owner: Boolean(data.get("owner") as string),
+        updateIssuedInvoices: Boolean(data.get("update_invoices") as string),
       });
 
       if (action === "update") {
@@ -175,13 +188,17 @@ const NewCompanyForm = () => {
             <label className="label cursor-pointer">
               <span className="label-text mr-4">Owner</span>
             </label>
-            <input
-              type="checkbox"
-              className="toggle toggle-xl"
-              name="owner"
-              defaultChecked={Boolean(user?.owner)}
-              disabled={!canEdit}
-            />
+            <div className="toggle-container">
+              <input
+                type="checkbox"
+                className="toggle toggle-xl"
+                name="owner"
+                defaultChecked={Boolean(user?.owner)}
+                disabled={!canEdit}
+              />
+              <span className="toggle-no-label">NO</span>
+              <span className="toggle-yes-label">YES</span>
+            </div>
           </div>
 
           <div className="flex-1">
@@ -252,6 +269,32 @@ const NewCompanyForm = () => {
         </ul>
 
         <div className="divider"></div>
+
+        {(invoiceIssued.data ?? 0) > 0 && (
+          <>
+            <Alert type="warning">
+              This compnay has {invoiceIssued.data}{" "}
+              {pluralize("invoice", invoiceIssued.data)} issued before today
+            </Alert>
+
+            <div className="form-control flex-1 mt-4">
+              <label className="label cursor-pointer">
+                <span className="label-text mr-4">Update issued invoices?</span>
+              </label>
+              <div className="toggle-container">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-xl"
+                  name="update_invoices"
+                />
+                <span className="toggle-no-label">NO</span>
+                <span className="toggle-yes-label">YES</span>
+              </div>
+            </div>
+
+            <div className="divider"></div>
+          </>
+        )}
 
         <div className="btn-form-group">
           {canEdit ? (

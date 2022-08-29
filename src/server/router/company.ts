@@ -11,8 +11,9 @@ export const companyRouter = createProtectedRouter()
       address: z.string(),
       invoiceNumberPattern: z.string(),
       owner: z.boolean(),
+      updateIssuedInvoices: z.boolean(),
     }),
-    resolve({ input, ctx }) {
+    async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
         name: input.name,
         currency: input.currency,
@@ -20,28 +21,74 @@ export const companyRouter = createProtectedRouter()
         invoiceNumberPattern: input.invoiceNumberPattern,
       };
 
+      const userId = ctx.session.user.id;
+
       if (input.id) {
-        return ctx.prisma.company.update({
-          data: {
-            ...data,
-            users: {
-              update: {
-                data: {
-                  owner: input.owner,
-                },
-                where: {
-                  userId_companyId: {
-                    userId: ctx.session.user.id,
-                    companyId: input.id,
+        const where: Prisma.InvoiceWhereInput = {
+          userId,
+        };
+
+        const invoiceData = {
+          name: input.name,
+          address: input.address,
+          currency: input.currency,
+        };
+
+        if (!input.updateIssuedInvoices) {
+          where.issuedAt = {
+            gt: new Date(),
+          };
+        }
+
+        const [company] = await Promise.all([
+          ctx.prisma.company.update({
+            data: {
+              ...data,
+              users: {
+                update: {
+                  data: {
+                    owner: input.owner,
+                  },
+                  where: {
+                    userId_companyId: {
+                      userId,
+                      companyId: input.id,
+                    },
                   },
                 },
               },
             },
-          },
-          where: {
-            id: input.id,
-          },
-        });
+            where: {
+              id: input.id,
+            },
+          }),
+
+          ctx.prisma.invoice.updateMany({
+            data: {
+              data: {
+                receiver: invoiceData,
+              },
+            },
+            where: {
+              ...where,
+              receiverId: input.id,
+            },
+          }),
+
+          ctx.prisma.invoice.updateMany({
+            data: {
+              data: {
+                payer: invoiceData,
+              },
+            },
+            where: {
+              ...where,
+              payerId: input.id,
+            },
+          }),
+        ]);
+
+        return company;
       }
 
       return ctx.prisma.company.create({
@@ -53,7 +100,7 @@ export const companyRouter = createProtectedRouter()
               type: "OWNED",
               user: {
                 connect: {
-                  id: ctx.session.user.id,
+                  id: userId,
                 },
               },
             },

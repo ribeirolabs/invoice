@@ -48,7 +48,7 @@ export const Alert = ({
           <Icon size={24} />
         </div>
 
-        <span className="leading-4">{children}</span>
+        <span className="leading-4 text-sm">{children}</span>
       </div>
     </div>
   );

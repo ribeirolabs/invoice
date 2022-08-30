@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "dev": "PORT=3300 next dev",
+    "prod:install": "node ./init-submodule.js && npm i",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -7,9 +7,9 @@ import type { GetServerSideProps, NextPage } from "next";
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     return [
-      ssr.prefetchQuery("company.getAll"),
-      ssr.prefetchQuery("invoice.countByCompany"),
-      ssr.prefetchQuery("invoice.recent"),
+      ssr.fetchQuery("company.getAll"),
+      ssr.fetchQuery("invoice.countByCompany"),
+      ssr.fetchQuery("invoice.recent"),
     ];
   });
 };

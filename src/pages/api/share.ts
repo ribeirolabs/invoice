@@ -13,7 +13,7 @@ export default async function restricted(
   const session = await getServerSession(req, res, nextAuthOptions);
 
   if (!session?.user) {
-    res.redirect(`/auth/signin?callbackUrl=${encodeURIComponent(req.url)}`);
+    res.redirect(`/auth/signin?callbackUrl=${encodeURIComponent(req.url!)}`);
     return;
   }
 

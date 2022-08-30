@@ -6,6 +6,7 @@ import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
 import { ToastProvider } from "@common/components/Toast";
 import "@common/styles/globals.css";
+import "@/styles/globals.css";
 
 const MyApp: AppType = ({
   Component,

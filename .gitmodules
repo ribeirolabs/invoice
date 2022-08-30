@@ -1,3 +1,0 @@
-[submodule "app-common"]
-	path = app-common
-	url = git@github.com:ribeirolabs/app-common.git

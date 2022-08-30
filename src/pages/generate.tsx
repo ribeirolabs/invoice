@@ -1,5 +1,5 @@
 import { Input } from "@common/components/Input";
-import { ProtectedPage } from "@/components/ProtectedPage";
+import { ProtectedPage } from "@common/components/ProtectedPage";
 import { ssp } from "@common/server/ssp";
 import { trpc } from "@/utils/trpc";
 import { GetServerSideProps } from "next";

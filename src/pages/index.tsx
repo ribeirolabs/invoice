@@ -1,6 +1,6 @@
 import { CompaniesTable } from "@/components/CompaniesTable";
 import { InvoicesTable } from "@/components/InvoicesTable";
-import { ProtectedPage } from "@/components/ProtectedPage";
+import { ProtectedPage } from "@common/components/ProtectedPage";
 import { ssp } from "@common/server/ssp";
 import type { GetServerSideProps, NextPage } from "next";
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { AddIcon, EditIcon, ShareIcon } from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
+import { copyToClipboard } from "@common/utils/clipboard";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
@@ -23,9 +24,9 @@ export const CompaniesTable = () => {
     url.searchParams.set("value", companyId);
     url.searchParams.set("sharedBy", authUser.id);
 
-    navigator.clipboard
-      .writeText(url.toString())
-      .then(() => addToast("Link copied to clipboard", "info"));
+    copyToClipboard(url.toString()).then(() =>
+      addToast("Link copied to clipboard", "info")
+    );
   }
 
   const countByInvoice = useMemo(() => {

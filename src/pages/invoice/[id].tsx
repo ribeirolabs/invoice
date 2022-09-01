@@ -8,6 +8,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
+import { Senstive } from "@/components/Sensitive";
+import { Header } from "@/components/Header";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -57,79 +59,85 @@ const InvoicePage: NextPage = () => {
   }
 
   return (
-    <div className="invoice-print p-4 flex flex-col h-screen">
-      <Head>
-        <title>{invoice.data.number}</title>
-      </Head>
-      <div>
-        <div className="flex justify-between mb-8 gap-4">
-          <h2 className="flex-none inline-block">{invoice.data.number}</h2>
-          <h2>
-            <Amount amount={amount} />
-          </h2>
-        </div>
+    <>
+      <Header />
 
-        <div className="invoice-divider"></div>
-
-        <div className="invoice-section">
-          <div className="flex justify-between mb-4">
-            <div>
-              <h3>Date</h3>
-              <p className="m-0">
-                {format(invoice.data.issuedAt, "yyyy/MM/dd")}
-              </p>
-            </div>
-
-            <div>
-              <h3>Due Date</h3>
-              <p className="m-0">
-                {format(invoice.data.expiredAt, "yyyy/MM/dd")}
-              </p>
-            </div>
-
-            <div className="w-fit hidden">
-              <h3>Amount</h3>
-              <p className="m-0 text-end">
+      <div className="invoice-print p-4 flex flex-col h-screen w-content">
+        <Head>
+          <title>{invoice.data.number}</title>
+        </Head>
+        <div>
+          <div className="flex justify-between mb-8 gap-4">
+            <h2 className="flex-none inline-block">{invoice.data.number}</h2>
+            <h2>
+              <Senstive>
                 <Amount amount={amount} />
-              </p>
+              </Senstive>
+            </h2>
+          </div>
+
+          <div className="invoice-divider"></div>
+
+          <div className="invoice-section">
+            <div className="flex justify-between mb-4">
+              <div>
+                <h3>Date</h3>
+                <p className="m-0">
+                  {format(invoice.data.issuedAt, "yyyy/MM/dd")}
+                </p>
+              </div>
+
+              <div>
+                <h3>Due Date</h3>
+                <p className="m-0">
+                  {format(invoice.data.expiredAt, "yyyy/MM/dd")}
+                </p>
+              </div>
+
+              <div className="w-fit hidden">
+                <h3>Amount</h3>
+                <p className="m-0 text-end">
+                  <Amount amount={amount} />
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3>Description</h3>
+              <p>{invoice.data.description}</p>
             </div>
           </div>
 
-          <div>
-            <h3>Description</h3>
-            <p>{invoice.data.description}</p>
+          <div className="invoice-divider"></div>
+
+          <div className="invoice-section">
+            <h3>Receiver</h3>
+            <p className="font-bold">{invoice.data.receiver.name}</p>
+            <p>{invoice.data.receiver.address}</p>
+          </div>
+
+          <div className="invoice-divider"></div>
+
+          <div className="invoice-section">
+            <h3>Bill to</h3>
+            <p className="font-bold">{invoice.data.payer.name}</p>
+            <p>{invoice.data.payer.address}</p>
           </div>
         </div>
 
-        <div className="invoice-divider"></div>
+        <footer className="flex-1 flex items-end justify-center text-xs">
+          <Link href="/" target="_blank">
+            ribeirolabs/invoice
+          </Link>
 
-        <div className="invoice-section">
-          <h3>Receiver</h3>
-          <p className="font-bold">{invoice.data.receiver.name}</p>
-          <p>{invoice.data.receiver.address}</p>
-        </div>
+          <span className="mx-4">|</span>
 
-        <div className="invoice-divider"></div>
-
-        <div className="invoice-section">
-          <h3>Bill to</h3>
-          <p className="font-bold">{invoice.data.payer.name}</p>
-          <p>{invoice.data.payer.address}</p>
-        </div>
+          <Link target="_blank" href={`/invoice/${invoice.data.id}`}>
+            {invoice.data.id}
+          </Link>
+        </footer>
       </div>
-
-      <footer className="flex-1 flex items-end justify-center text-xs">
-        <Link href="/" target="_blank">
-          ribeirolabs/invoice
-        </Link>
-
-        <span className="mx-4">|</span>
-
-        <Link target="_blank" href={`/invoice/${invoice.data.id}`}>
-          {invoice.data.id}
-        </Link>
-      </footer>
-    </div>
+    </>
   );
 };
 

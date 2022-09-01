@@ -3,6 +3,7 @@ function key(name: string): string {
 }
 
 export const KEYS = {
+  sensitiveInformation: key("sensitiveInformation"),
   receiver: key("receiver"),
   payer: key("payer"),
   dueDateDays: key("dueDateDays"),

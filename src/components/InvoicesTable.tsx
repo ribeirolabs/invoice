@@ -3,8 +3,9 @@ import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { DeleteIcon, ViewDocumentIcon } from "@common/components/Icons";
+import { DeleteIcon } from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
+import { Senstive } from "./Sensitive";
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
@@ -85,7 +86,9 @@ const InvoiceRow = ({
         <Link href={invoiceUrl}>{invoice.number}</Link>
       </td>
       <td>
-        <Amount amount={invoice.amount} currency={invoice.payer.currency} />
+        <Senstive>
+          <Amount amount={invoice.amount} currency={invoice.payer.currency} />
+        </Senstive>
       </td>
       <td>{invoice.receiver.name}</td>
       <td>{invoice.payer.name}</td>

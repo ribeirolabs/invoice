@@ -20,6 +20,7 @@ import { getSeparators } from "@/utils/currency";
 import Link from "next/link";
 import { addToast } from "@common/components/Toast";
 import { Alert } from "@common/components/Alert";
+import { useSettingsValue } from "@common/components/Settings";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -45,6 +46,8 @@ export default function InvoiceGenerate() {
       payer_id: payerId || null,
     },
   ]);
+
+  const sensitiveInformation = useSettingsValue("sensitiveInformation");
 
   const receivers = useMemo(() => {
     return (
@@ -288,6 +291,7 @@ export default function InvoiceGenerate() {
             key={payerId + "-amount"}
             label="Amount"
             name="amount"
+            type={sensitiveInformation ? "text" : "password"}
             value={amount}
             onKeyDown={onKeyDown}
             onChange={onChangeAmount}

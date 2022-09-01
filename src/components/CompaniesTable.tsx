@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { AddIcon, EditIcon, ShareIcon } from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
 import { copyToClipboard } from "@common/utils/clipboard";
+import { Company } from "@prisma/client";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
@@ -12,7 +13,7 @@ export const CompaniesTable = () => {
 
   const authUser = session.data?.user;
 
-  function copyShareLink(companyId: string) {
+  function copyShareLink(company: Company) {
     if (!authUser) {
       return;
     }
@@ -21,12 +22,21 @@ export const CompaniesTable = () => {
     const url = new URL("/api/share", base);
 
     url.searchParams.set("type", "company");
-    url.searchParams.set("value", companyId);
+    url.searchParams.set("value", company.id);
     url.searchParams.set("sharedBy", authUser.id);
 
-    copyToClipboard(url.toString()).then(() =>
-      addToast("Link copied to clipboard", "info")
-    );
+    const data: Required<Pick<ShareData, "url" | "text">> = {
+      url: url.toString(),
+      text: `Sharing ${company.name}`,
+    };
+
+    if (!navigator.canShare) {
+      copyToClipboard(data.url).then(() =>
+        addToast("Link copied to clipboard", "info")
+      );
+    } else if (navigator.canShare(data)) {
+      navigator.share(data);
+    }
   }
 
   const countByInvoice = useMemo(() => {
@@ -105,8 +115,8 @@ export const CompaniesTable = () => {
                   <td>
                     <div className="flex gap-1 justify-end">
                       <button
-                        className="btn-action"
-                        onClick={() => copyShareLink(company.id)}
+                        className="btn btn-action"
+                        onClick={() => copyShareLink(company)}
                         title="Share"
                       >
                         <ShareIcon />

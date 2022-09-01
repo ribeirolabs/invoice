@@ -7,9 +7,12 @@ import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "@common/components/Alert";
 import { Input } from "@common/components/Input";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
+import { useEvent } from "@ribeirolabs/events/react";
+import { Company, User } from "@prisma/client";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -58,8 +61,9 @@ const NewCompanyForm = () => {
 
   const sharedWith = useMemo(() => {
     return (
-      company.data?.users?.filter((user) => user.sharedById === authUser?.id) ??
-      []
+      company.data?.users
+        ?.filter((user) => user.sharedById === authUser?.id)
+        ?.map((share) => share.user) ?? []
     );
   }, [authUser, company.data]);
 
@@ -148,8 +152,18 @@ const NewCompanyForm = () => {
       {sharedWith.length > 0 && (
         <>
           <p className="m-0 text-sm">
-            Shared with {sharedWith.length}{" "}
-            {pluralize("company", sharedWith.length)}
+            Shared with
+            <button
+              className="btn btn-sm mx-2 btn"
+              onClick={() => {
+                dispatchCustomEvent("modal", {
+                  action: "open",
+                  id: "company-shared-with",
+                });
+              }}
+            >
+              {sharedWith.length} {pluralize("user", sharedWith.length)}
+            </button>
           </p>
           <div className="divider"></div>
         </>
@@ -205,7 +219,7 @@ const NewCompanyForm = () => {
           label="Invoice Number Pattern"
           name="invoice_number_pattern"
           placeholder="INV-%Y/%0[4]"
-          helper={parseInvoicePattern(pattern, { INCREMENT: 0 })}
+          helper={parseInvoicePattern(pattern, { INCREMENT: 0 }) || "-"}
           value={pattern}
           onChange={(e) => setPattern(e.target.value)}
           readOnly={!canEdit}
@@ -282,6 +296,61 @@ const NewCompanyForm = () => {
           </Link>
         </div>
       </form>
+
+      <Modal users={sharedWith} />
+    </div>
+  );
+};
+
+const Modal = ({ users }: { users: User[] }) => {
+  const [opened, setOpened] = useState(false);
+
+  useEvent(
+    "modal",
+    useCallback((e) => {
+      if (e.detail.id !== "company-shared-with") {
+        return;
+      }
+
+      setOpened(e.detail.action === "open");
+    }, [])
+  );
+
+  return (
+    <div
+      className="modal modal-bottom sm:modal-middle"
+      data-open={opened}
+      onClick={() => setOpened(false)}
+    >
+      <div className="modal-box border border-base-300 relative">
+        <h3 className="font-bold text-lg">Shared with</h3>
+
+        <div className="overflow-x-auto">
+          <table className="table table-zebra m-0 w-full border border-base-300 table-compact">
+            <thead>
+              <tr>
+                <th className="w-[5ch]"></th>
+                <th>Name</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {users.map((user, i) => (
+                <tr key={user.id}>
+                  <td>{i + 1}</td>
+                  <td>{user.name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="modal-action">
+          <button className="btn btn-ghost" onClick={() => setOpened(false)}>
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

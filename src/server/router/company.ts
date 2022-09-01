@@ -159,7 +159,7 @@ export const companyRouter = createProtectedRouter()
           users: {
             include: {
               sharedBy: true,
-              company: false,
+              user: true,
             },
           },
         },

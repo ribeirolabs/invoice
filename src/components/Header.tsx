@@ -1,5 +1,9 @@
 import { AppHeader } from "@common/components/Header";
-import { EyeClosedIcon, EyeIcon } from "@common/components/Icons";
+import {
+  EyeClosedIcon,
+  EyeIcon,
+  CreateDocumentIcon,
+} from "@common/components/Icons";
 import { useSettings } from "@common/components/Settings";
 import Link from "next/link";
 
@@ -8,13 +12,18 @@ export const Header = () => {
 
   return (
     <AppHeader>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <div></div>
         <Link href="/generate">
-          <a className="btn btn-sm btn-primary btn-outline">Generate</a>
+          <a className="btn btn-md btn-circle btn-primary btn-outline">
+            <CreateDocumentIcon size={26} />
+          </a>
         </Link>
 
         <button
-          className="btn btn-circle btn-sm btn-ghost"
+          className={`btn btn-md btn-circle ${
+            sensitiveInformation ? "btn-ghost" : ""
+          }`}
           onClick={() => {
             update((current) => !current);
           }}

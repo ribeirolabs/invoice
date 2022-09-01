@@ -4,6 +4,7 @@ import {
   EyeIcon,
   CreateDocumentIcon,
 } from "@common/components/Icons";
+import { InvoiceIcon } from "./Icons";
 import { useSettings } from "@common/components/Settings";
 import Link from "next/link";
 
@@ -16,7 +17,7 @@ export const Header = () => {
         <div></div>
         <Link href="/generate">
           <a className="btn btn-md btn-circle btn-primary btn-outline">
-            <CreateDocumentIcon size={26} />
+            <InvoiceIcon size={26} />
           </a>
         </Link>
 

@@ -1,10 +1,10 @@
 import { AppHeader } from "@common/components/Header";
 import { EyeClosedIcon, EyeIcon } from "@common/components/Icons";
+import { useSettings } from "@common/components/Settings";
 import Link from "next/link";
-import { useState } from "react";
 
 export const Header = () => {
-  const [sensitiveInformation, setSenstiveInformation] = useState(true);
+  const [sensitiveInformation, update] = useSettings("sensitiveInformation");
 
   return (
     <AppHeader>
@@ -15,11 +15,9 @@ export const Header = () => {
 
         <button
           className="btn btn-circle btn-sm btn-ghost"
-          onClick={() =>
-            setSenstiveInformation((current) => {
-              return !current;
-            })
-          }
+          onClick={() => {
+            update((current) => !current);
+          }}
         >
           {sensitiveInformation ? <EyeIcon /> : <EyeClosedIcon />}
         </button>

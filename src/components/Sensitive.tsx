@@ -1,8 +1,8 @@
-import { sensitiveInformationAtom } from "@/atoms/settings";
+import { useSettings, useSettingsValue } from "@common/components/Settings";
 import { PropsWithChildren, useState } from "react";
 
 export const Senstive = ({ children }: PropsWithChildren) => {
-  const [sensitiveInformation] = useState(true);
+  const sensitiveInformation = useSettingsValue("sensitiveInformation");
 
   return (
     <div

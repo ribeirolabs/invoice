@@ -1,47 +1,50 @@
 import { parseInvoicePattern } from "@/utils/invoice";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createRouter } from "./context";
 import { createProtectedRouter } from "./protected-router";
 
-export const invoicePublicRouter = createRouter().query("get", {
-  input: z.object({
-    id: z.string().cuid(),
-  }),
-  async resolve({ ctx, input }) {
-    const invoice = await ctx.prisma.invoice.findFirstOrThrow({
-      where: {
-        id: input.id,
-      },
-      include: {
-        payer: true,
-        receiver: true,
-      },
-    });
-
-    const data = invoice.data as Record<
-      "payer" | "receiver",
-      {
-        name: string;
-        address: string;
-        currency: string;
-      }
-    >;
-
-    return {
-      ...invoice,
-      payer: {
-        ...invoice.payer,
-        ...(data?.payer ?? {}),
-      },
-      receiver: {
-        ...invoice.receiver,
-        ...(data?.receiver ?? {}),
-      },
-    };
-  },
-});
-
 export const invoiceRouter = createProtectedRouter()
+  .query("get", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const invoice = await ctx.prisma.invoice.findFirstOrThrow({
+        where: {
+          id: input.id,
+        },
+        include: {
+          payer: true,
+          receiver: true,
+        },
+      });
+
+      if (invoice.userId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
+      const data = invoice.data as Record<
+        "payer" | "receiver",
+        {
+          name: string;
+          address: string;
+          currency: string;
+        }
+      >;
+
+      return {
+        ...invoice,
+        payer: {
+          ...invoice.payer,
+          ...(data?.payer ?? {}),
+        },
+        receiver: {
+          ...invoice.receiver,
+          ...(data?.receiver ?? {}),
+        },
+      };
+    },
+  })
   .mutation("generate", {
     input: z.object({
       receiverId: z.string().cuid(),

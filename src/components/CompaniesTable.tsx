@@ -1,10 +1,9 @@
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { useMemo } from "react";
-import { AddIcon, EditIcon, ShareIcon } from "@common/components/Icons";
-import { addToast } from "@common/components/Toast";
-import { copyToClipboard } from "@common/utils/clipboard";
+import { AddIcon, ShareIcon } from "@common/components/Icons";
 import { Company } from "@prisma/client";
+import { shareOrCopy } from "@common/utils/share";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
@@ -30,13 +29,7 @@ export const CompaniesTable = () => {
       text: `Sharing ${company.name}`,
     };
 
-    if (!navigator.canShare) {
-      copyToClipboard(data.url).then(() =>
-        addToast("Link copied to clipboard", "info")
-      );
-    } else if (navigator.canShare(data)) {
-      navigator.share(data);
-    }
+    shareOrCopy(data);
   }
 
   const countByInvoice = useMemo(() => {

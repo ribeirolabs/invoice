@@ -10,8 +10,6 @@ import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
-import { TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
-import { ForbiddenError, GenericError } from "@common/components/Errors";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -22,21 +20,9 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 };
 
 const InvoicePage: NextPage = () => {
-  const router = useRouter();
-
-  const { error } = router.query as {
-    error: TRPC_ERROR_CODE_KEY;
-  };
-
   return (
     <ProtectedPage>
-      {error == null ? (
-        <InvoicePrint />
-      ) : error === "FORBIDDEN" ? (
-        <ForbiddenError resource="invoice" />
-      ) : (
-        <GenericError />
-      )}
+      <InvoicePrint />
     </ProtectedPage>
   );
 };

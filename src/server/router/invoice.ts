@@ -9,7 +9,7 @@ export const invoiceRouter = createProtectedRouter()
       id: z.string().cuid(),
     }),
     async resolve({ ctx, input }) {
-      const invoice = await ctx.prisma.invoice.findFirstOrThrow({
+      const invoice = await ctx.prisma.invoice.findFirst({
         where: {
           id: input.id,
         },
@@ -18,6 +18,10 @@ export const invoiceRouter = createProtectedRouter()
           receiver: true,
         },
       });
+
+      if (invoice == null) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
       if (invoice.userId !== ctx.session.user.id) {
         throw new TRPCError({ code: "FORBIDDEN" });

@@ -11,4 +11,5 @@ module.exports = {
       neutral: "#111",
     },
   },
+  translations: {},
 };

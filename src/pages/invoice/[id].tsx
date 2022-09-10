@@ -48,10 +48,6 @@ const InvoicePrint = () => {
     window.onafterprint = () => {
       html.dataset.theme = "dark";
     };
-
-    return () => {
-      html.dataset.theme = "dark";
-    };
   }, []);
 
   const amount = useMemo(() => {

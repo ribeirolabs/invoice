@@ -183,7 +183,7 @@ export default function InvoiceGenerate() {
 
   return (
     <ProtectedPage>
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-lg">
         {(!receivers.length || !payers.length) && (
           <div className="mb-4">
             <Alert type="error" fluid>

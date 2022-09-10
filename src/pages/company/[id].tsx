@@ -12,7 +12,7 @@ import { Alert } from "@common/components/Alert";
 import { Input } from "@common/components/Input";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { useEvent } from "@ribeirolabs/events/react";
-import { Company, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -128,7 +128,7 @@ const NewCompanyForm = () => {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg">
       <h1>Company</h1>
 
       {user?.sharedBy && (

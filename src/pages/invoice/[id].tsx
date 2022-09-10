@@ -45,10 +45,12 @@ const InvoicePrint = () => {
       html.dataset.theme = "light";
     };
 
+    window.onafterprint = () => {
+      html.dataset.theme = "dark";
+    };
+
     return () => {
-      window.onafterprint = () => {
-        html.dataset.theme = "dark";
-      };
+      html.dataset.theme = "dark";
     };
   }, []);
 
@@ -67,12 +69,12 @@ const InvoicePrint = () => {
   }
 
   return (
-    <div className="invoice-print p-4 flex flex-col h-screen w-content">
+    <div className="invoice-print flex flex-col h-full">
       <Head>
         <title>{invoice.data.number}</title>
       </Head>
       <div>
-        <div className="flex justify-between mb-8 gap-4">
+        <div className="flex flex-wrap justify-between mb-8 gap-4">
           <h2 className="flex-none inline-block">{invoice.data.number}</h2>
           <h2>
             <Senstive>

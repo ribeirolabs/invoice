@@ -17,11 +17,9 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 const Home: NextPage = () => {
   return (
     <ProtectedPage>
-      <div className="w-content">
-        <InvoicesTable />
-        <div className="divider my-6"></div>
-        <CompaniesTable />
-      </div>
+      <InvoicesTable />
+      <div className="divider my-6"></div>
+      <CompaniesTable />
     </ProtectedPage>
   );
 };

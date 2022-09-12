@@ -10,15 +10,25 @@ export const Sidebar = () => {
   return (
     <AppSidebar>
       <li>
-        <button
-          onClick={() => {
-            update((current) => !current);
-            closeSidebar();
-          }}
-        >
-          {sensitiveInformation ? <EyeIcon /> : <EyeClosedIcon />}
+        <label>
+          <span className="swap swap-rotate">
+            <input
+              type="checkbox"
+              checked={sensitiveInformation}
+              onChange={(e) => {
+                update(e.target.checked);
+                closeSidebar();
+              }}
+            />
+            <span className="swap-on">
+              <EyeIcon />
+            </span>
+            <span className="swap-off">
+              <EyeClosedIcon />
+            </span>
+          </span>
           Sensitive Information
-        </button>
+        </label>
       </li>
       <li>
         <Link href="/generate">

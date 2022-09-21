@@ -15,4 +15,18 @@ function defineNextConfig(config) {
 export default defineNextConfig({
   reactStrictMode: true,
   swcMinify: true,
+  async rewrites() {
+    return [
+      {
+        source: "/(.*)",
+        has: [
+          {
+            type: "host",
+            value: "app.invoice.ribeiro.app",
+          },
+        ],
+        destination: "/app",
+      },
+    ];
+  },
 });

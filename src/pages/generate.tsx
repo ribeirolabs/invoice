@@ -183,7 +183,7 @@ export default function InvoiceGenerate() {
 
   return (
     <ProtectedPage>
-      <div className="max-w-lg">
+      <div className="flex flex-col items-center">
         {(!receivers.length || !payers.length) && (
           <div className="mb-4">
             <Alert type="error" fluid>
@@ -199,12 +199,18 @@ export default function InvoiceGenerate() {
           </div>
         )}
 
-        <div className="mb-4">
+        <div className="flex w-full max-w-lg justify-between items-end">
           <h1 className="m-0">Invoice</h1>
-          <h2 className="m-0">{invoiceNumber.data}&nbsp;</h2>
+          {invoiceNumber.data ? (
+            <div className="badge badge-primary badge-lg text-xl font-bold">
+              {invoiceNumber.data}
+            </div>
+          ) : null}
         </div>
 
-        <form className="form max-w-lg" onSubmit={onSubmit}>
+        <form className="form w-form" onSubmit={onSubmit}>
+          <div className="divider"></div>
+
           <div className="form-control w-full mb-2">
             <label className="label">
               <span className="label-text">Receiver</span>
@@ -302,15 +308,15 @@ export default function InvoiceGenerate() {
           <div className="divider"></div>
 
           <div className="btn-form-group">
+            <Link href="/">
+              <a className="btn btn-outline btn-wide">Cancel</a>
+            </Link>
             <button
               className="btn btn-primary btn-wide"
               data-loading={invoice.isLoading}
             >
               Confirm
             </button>
-            <Link href="/">
-              <a className="btn btn-ghost btn-wide">Cancel</a>
-            </Link>
           </div>
         </form>
       </div>

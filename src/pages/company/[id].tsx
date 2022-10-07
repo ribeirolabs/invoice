@@ -31,12 +31,12 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
 const NewCompanyPage: NextPage = () => {
   return (
     <ProtectedPage>
-      <NewCompanyForm />
+      <CompanyForm />
     </ProtectedPage>
   );
 };
 
-const NewCompanyForm = () => {
+const CompanyForm = () => {
   const session = trpc.useQuery(["auth.getSession"]);
   const router = useRouter();
 
@@ -128,29 +128,32 @@ const NewCompanyForm = () => {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1>Company</h1>
+    <div className="flex flex-col items-center">
+      <div className="py-2 max-w-lg text-center w-full">
+        {user?.sharedBy && (
+          <span className="badge badge-secondary mb-2">read-only</span>
+        )}
 
-      {user?.sharedBy && (
-        <>
-          <div className="flex gap-4 items-center">
-            <p className="m-0 text-sm">
-              Shared by: <b>{user.sharedBy.name}</b>
-            </p>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={onDetach}
-              data-loading={detach.isLoading}
-            >
-              Detach
-            </button>
-          </div>
-          <div className="divider"></div>
-        </>
-      )}
+        <h1>{company.data?.name ?? "Company"}</h1>
 
-      {sharedWith.length > 0 && (
-        <>
+        {user?.sharedBy && (
+          <>
+            <div className="flex gap-4 justify-center items-center">
+              <p className="m-0 text-sm">
+                Shared by: <b>{user.sharedBy.name}</b>
+              </p>
+              <button
+                className="btn btn-sm"
+                onClick={onDetach}
+                data-loading={detach.isLoading}
+              >
+                Detach
+              </button>
+            </div>
+          </>
+        )}
+
+        {sharedWith.length > 0 && (
           <p className="m-0 text-sm">
             Shared with
             <button
@@ -165,11 +168,12 @@ const NewCompanyForm = () => {
               {sharedWith.length} {pluralize("user", sharedWith.length)}
             </button>
           </p>
-          <div className="divider"></div>
-        </>
-      )}
+        )}
 
-      <form className="form max-w-lg" onSubmit={onSubmit}>
+        <div className="divider"></div>
+      </div>
+
+      <form className="form w-form" onSubmit={onSubmit}>
         <input type="hidden" name="id" value={company.data?.id} />
 
         <Input
@@ -228,7 +232,7 @@ const NewCompanyForm = () => {
         <ul className="leading-4 text-xs">
           <li>
             <button
-              className="btn btn-xs btn-secondary"
+              className="btn btn-xs"
               type="button"
               onClick={() => insertInvoicePatternSymbol("YEAR")}
             >
@@ -238,7 +242,7 @@ const NewCompanyForm = () => {
           </li>
           <li>
             <button
-              className="btn btn-xs btn-secondary"
+              className="btn btn-xs"
               type="button"
               onClick={() => insertInvoicePatternSymbol("MONTH")}
             >
@@ -248,7 +252,7 @@ const NewCompanyForm = () => {
           </li>
           <li>
             <button
-              className="btn btn-xs btn-secondary"
+              className="btn btn-xs"
               type="button"
               onClick={() => insertInvoicePatternSymbol("DAY")}
             >
@@ -258,7 +262,7 @@ const NewCompanyForm = () => {
           </li>
           <li>
             <button
-              className="btn btn-xs btn-secondary"
+              className="btn btn-xs"
               type="button"
               onClick={() => insertInvoicePatternSymbol("INCREMENT")}
             >
@@ -279,6 +283,10 @@ const NewCompanyForm = () => {
         <div className="divider"></div>
 
         <div className="btn-form-group">
+          <Link href="/">
+            <a className="btn btn-wide btn-outline">Cancel</a>
+          </Link>
+
           {canEdit ? (
             <button
               className="btn btn-primary btn-wide"
@@ -290,10 +298,6 @@ const NewCompanyForm = () => {
           ) : (
             <span>&nbsp;</span>
           )}
-
-          <Link href="/">
-            <a className="btn btn-ghost btn-wide">Cancel</a>
-          </Link>
         </div>
       </form>
 

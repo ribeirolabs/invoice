@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { AddIcon, ShareIcon } from "@common/components/Icons";
 import { Company } from "@prisma/client";
 import { shareOrCopy } from "@common/utils/share";
+import { formatCurrency } from "@/utils/currency";
+import pluralize from "pluralize";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
@@ -32,34 +34,50 @@ export const CompaniesTable = () => {
     shareOrCopy(data);
   }
 
-  const countByInvoice = useMemo(() => {
-    const counts: Record<"payer" | "receiver", Record<string, number>> = {
+  const reportByInvoice = useMemo(() => {
+    const report: Record<
+      "payer" | "receiver",
+      Record<
+        string,
+        {
+          count: number;
+          amount: number;
+        }
+      >
+    > = {
       payer: {},
       receiver: {},
     };
 
     for (const item of invoiceCounts.data ?? []) {
       const count = Number(item.count);
+      const amount = Number(item.amount);
 
       if (item.payerId) {
-        counts.payer[item.payerId] = count;
+        report.payer[item.payerId] = {
+          count,
+          amount,
+        };
       }
 
       if (item.receiverId) {
-        counts.receiver[item.receiverId] = count;
+        report.receiver[item.receiverId] = {
+          count,
+          amount,
+        };
       }
     }
 
-    return counts;
+    return report;
   }, [invoiceCounts.data]);
 
   return (
     <>
-      <h1 className="text-xl leading-normal font-extrabold flex gap-6">
+      <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Companies
         <Link href="/company/new">
           <a className="btn btn-outline btn-sm gap-2">
-            <AddIcon /> new
+            <AddIcon size={18} /> add
           </a>
         </Link>
       </h1>
@@ -70,8 +88,7 @@ export const CompaniesTable = () => {
             <tr>
               <th></th>
               <th>Name</th>
-              <th>As Receiver</th>
-              <th>As Payer</th>
+              <th>Total</th>
               <th></th>
             </tr>
           </thead>
@@ -87,24 +104,36 @@ export const CompaniesTable = () => {
 
               const companyUrl = `/company/${company.id}`;
 
+              const asReceiver = reportByInvoice.receiver?.[company.id];
+              const asPayer = reportByInvoice.payer?.[company.id];
+
+              const countReceived = asReceiver?.count ?? 0;
+              const countPaid = asPayer?.count ?? 0;
+
               return (
                 <tr key={company.id}>
                   <th>{i + 1}</th>
                   <td>
-                    <Link href={companyUrl}>{company.name}</Link>
+                    <div className="align-middle max-w-[300px] md:max-w-none text-ellipsis overflow-hidden">
+                      <Link href={companyUrl}>{company.name}</Link>
+                    </div>
+
+                    {isOwned && (
+                      <span className="badge badge-info badge-sm">owned</span>
+                    )}
+
                     {isShared && (
-                      <span className="badge badge-secondary badge-sm ml-2">
+                      <span className="badge badge-secondary badge-sm">
                         shared
                       </span>
                     )}
-                    {isOwned && (
-                      <span className="badge badge-primary badge-sm ml-2">
-                        onwed
-                      </span>
-                    )}
                   </td>
-                  <td>{countByInvoice.receiver?.[company.id] ?? 0}</td>
-                  <td>{countByInvoice.payer?.[company.id] ?? 0}</td>
+
+                  <td>
+                    {countReceived > 0 && `${countReceived} received`}
+                    {countPaid > 0 && `${countPaid} paid`}
+                  </td>
+
                   <td>
                     <div className="flex gap-1 justify-end">
                       <button

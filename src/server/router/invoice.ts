@@ -180,15 +180,16 @@ export const invoiceRouter = createProtectedRouter()
           payerId: string;
           receiverId: string;
           count: bigint;
+          amount: bigint;
         }[]
       >`
-      SELECT payerId, NULL AS receiverId, COUNT(payerId) AS count FROM Invoice
+      SELECT payerId, NULL AS receiverId, COUNT(payerId) AS count, SUM(amount) as amount FROM Invoice
       WHERE userId = ${ctx.session.user.id}
       GROUP BY payerId
 
       UNION ALL
 
-      SELECT NULL AS payerId, receiverId, COUNT(receiverId) AS count FROM Invoice
+      SELECT NULL AS payerId, receiverId, COUNT(receiverId) AS count, SUM(amount) as amount FROM Invoice
       WHERE userId = ${ctx.session.user.id}
       GROUP BY receiverId
       `;

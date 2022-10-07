@@ -3,28 +3,35 @@ import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { DeleteIcon } from "@common/components/Icons";
+import { ArrowDownIcon, DeleteIcon } from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
 import { Senstive } from "./Sensitive";
+import { InvoiceIcon } from "./Icons";
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
 
   return (
     <>
-      <h1 className="text-xl leading-normal font-extrabold flex gap-6">
-        Recent Invoices
+      <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
+        Invoices
+        <Link href="/company/new">
+          <a className="btn btn-outline btn-sm gap-2">
+            <InvoiceIcon /> generate
+          </a>
+        </Link>
       </h1>
 
       <div className="border border-base-300 rounded-md mt-4 overflow-x-auto">
         <table className="table table-zebra w-full m-0">
           <thead>
             <tr>
-              <th></th>
-              <th>Number</th>
-              <th>Amount</th>
-              <th>Receiver</th>
-              <th>Payer</th>
+              <th>Invoice</th>
+              <th>
+                <div className="flex gap-3 items-center">
+                  <span>Payer</span>/<span>Receiver</span>
+                </div>
+              </th>
               <th>Date</th>
               <th></th>
             </tr>
@@ -40,12 +47,11 @@ export const InvoicesTable = () => {
               </tr>
             )}
 
-            {invoices.data?.map((invoice, i) => {
+            {invoices.data?.map((invoice) => {
               return (
                 <InvoiceRow
                   key={invoice.id}
                   invoice={invoice}
-                  index={i + 1}
                   onDelete={invoices.refetch}
                 />
               );
@@ -59,14 +65,12 @@ export const InvoicesTable = () => {
 
 const InvoiceRow = ({
   invoice,
-  index,
   onDelete = () => void {},
 }: {
   invoice: Invoice & {
     payer: Company;
     receiver: Company;
   };
-  index: number;
   onDelete?: () => void;
 }) => {
   const deleteInvoice = trpc.useMutation("invoice.delete", {
@@ -81,19 +85,34 @@ const InvoiceRow = ({
 
   return (
     <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
-      <th>{index}</th>
+      <th className="font-normal align-top">
+        <div className="flex flex-col gap-2">
+          <Link href={invoiceUrl}>
+            <a className="font-black">{invoice.number}</a>
+          </Link>
+          <Senstive>
+            <div className="badge badge-primary">
+              <Amount
+                amount={invoice.amount}
+                currency={invoice.payer.currency}
+              />
+            </div>
+          </Senstive>
+        </div>
+      </th>
       <td>
-        <Link href={invoiceUrl}>{invoice.number}</Link>
+        <div>{invoice.payer.name}</div>
+
+        <div className="pl-8">
+          <ArrowDownIcon />
+        </div>
+
+        <div className="max-w-[200px] md:max-w-none text-ellipsis overflow-hidden">
+          {invoice.receiver.name}
+        </div>
       </td>
-      <td>
-        <Senstive>
-          <Amount amount={invoice.amount} currency={invoice.payer.currency} />
-        </Senstive>
-      </td>
-      <td>{invoice.receiver.name}</td>
-      <td>{invoice.payer.name}</td>
-      <td>{invoice.issuedAt.toLocaleDateString()}</td>
-      <td>
+      <td className="align-top">{invoice.issuedAt.toLocaleDateString()}</td>
+      <th>
         <div className="flex gap-1 justify-end">
           <button
             className="btn-action"
@@ -103,7 +122,7 @@ const InvoiceRow = ({
             <DeleteIcon />
           </button>
         </div>
-      </td>
+      </th>
     </tr>
   );
 };

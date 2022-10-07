@@ -15,7 +15,7 @@ export const InvoicesTable = () => {
     <>
       <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Invoices
-        <Link href="/company/new">
+        <Link href="/generate">
           <a className="btn btn-outline btn-sm gap-2">
             <InvoiceIcon /> generate
           </a>
@@ -26,6 +26,7 @@ export const InvoicesTable = () => {
         <table className="table table-zebra w-full m-0">
           <thead>
             <tr>
+              <td className="w-[1ch]"></td>
               <th>Invoice</th>
               <th>
                 <div className="flex gap-3 items-center">
@@ -85,7 +86,7 @@ const InvoiceRow = ({
 
   return (
     <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
-      <th className="font-normal align-top">
+      <td colSpan={2} className="font-normal align-top">
         <div className="flex flex-col gap-2">
           <Link href={invoiceUrl}>
             <a className="font-black">{invoice.number}</a>
@@ -99,11 +100,11 @@ const InvoiceRow = ({
             </div>
           </Senstive>
         </div>
-      </th>
+      </td>
       <td>
         <div>{invoice.payer.name}</div>
 
-        <div className="pl-8">
+        <div className="pl-8 text-xs">
           <ArrowDownIcon />
         </div>
 
@@ -111,8 +112,8 @@ const InvoiceRow = ({
           {invoice.receiver.name}
         </div>
       </td>
-      <td className="align-top">{invoice.issuedAt.toLocaleDateString()}</td>
-      <th>
+      <td>{invoice.issuedAt.toLocaleDateString()}</td>
+      <td>
         <div className="flex gap-1 justify-end">
           <button
             className="btn-action"
@@ -122,7 +123,7 @@ const InvoiceRow = ({
             <DeleteIcon />
           </button>
         </div>
-      </th>
+      </td>
     </tr>
   );
 };

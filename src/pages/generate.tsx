@@ -199,8 +199,9 @@ export default function InvoiceGenerate() {
           </div>
         )}
 
-        <div className="flex w-full max-w-lg justify-between items-end">
+        <div className="flex flex-wrap gap-2 w-full max-w-lg justify-between items-end">
           <h1 className="m-0">Invoice</h1>
+
           {invoiceNumber.data ? (
             <div className="badge badge-primary badge-lg text-xl font-bold">
               {invoiceNumber.data}

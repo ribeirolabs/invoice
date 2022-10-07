@@ -10,8 +10,8 @@ export const Senstive = ({ children }: PropsWithChildren) => {
       <div
         className={`absolute top-0 left-0 w-full h-full bg-base-300 transition-opacity ${
           sensitiveInformation
-            ? "opacity-1 select-none"
-            : "opacity-0 pointer-events-none"
+            ? "opacity-0 pointer-events-none"
+            : "opacity-1 select-none"
         } `}
       ></div>
     </div>

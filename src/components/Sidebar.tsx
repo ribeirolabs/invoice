@@ -9,7 +9,7 @@ export const Sidebar = () => {
 
   return (
     <AppSidebar>
-      <li>
+      <li className={sensitiveInformation ? "" : "bg-base-300"}>
         <label>
           <span className="swap swap-rotate">
             <input

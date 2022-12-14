@@ -28,6 +28,7 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     value: req.cookies[name] as string,
     path: "/",
     domain: new URL(body.data.url).hostname,
+    secure: true,
   }));
 
   console.log("cookies", cookies);

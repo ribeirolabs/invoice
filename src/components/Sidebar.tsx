@@ -1,11 +1,19 @@
 import { AppSidebar, closeSidebar } from "@common/components/AppSidebar";
 import { EyeClosedIcon, EyeIcon } from "@common/components/Icons";
 import { useSettings } from "@common/components/Settings";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { InvoiceIcon } from "./Icons";
 
 export const Sidebar = () => {
   const [sensitiveInformation, update] = useSettings("sensitiveInformation");
+  const { route } = useRouter();
+  const showPrint = route === "/invoice/[id]";
+
+  function onExport() {
+    dispatchCustomEvent("export-invoice", {});
+  }
 
   return (
     <AppSidebar>
@@ -32,12 +40,20 @@ export const Sidebar = () => {
       </li>
       <li>
         <Link href="/generate">
-          <a className="">
+          <a>
             <InvoiceIcon />
             Generate Invoice
           </a>
         </Link>
       </li>
+      {showPrint && (
+        <li>
+          <button onClick={onExport}>
+            <InvoiceIcon />
+            Export Invoice
+          </button>
+        </li>
+      )}
     </AppSidebar>
   );
 };

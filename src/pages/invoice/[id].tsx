@@ -6,10 +6,12 @@ import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
+import { useEvent } from "@ribeirolabs/events/react";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -59,6 +61,47 @@ const InvoicePrint = () => {
 
     return formatCurrency(amount, payer.currency);
   }, [invoice.data]);
+
+  useEvent(
+    "export-invoice",
+    useCallback(async () => {
+      if (invoice.data == null) {
+        return null;
+      }
+
+      try {
+        const response = await fetch("/api/pdf", {
+          method: "post",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/pdf",
+          },
+          body: JSON.stringify({
+            url: window.location.href,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+
+        const file = await response.arrayBuffer();
+
+        const blob = new Blob([file], { type: "application/pdf" });
+        const a = document.createElement("a");
+        a.href = window.URL.createObjectURL(blob);
+        a.download = `${invoice.data.number}.pdf`;
+        a.click();
+      } catch (e) {
+        console.error(e);
+        dispatchCustomEvent("toast", {
+          type: "error",
+          message: "Unable to export invoice",
+        });
+      }
+    }, [invoice.data])
+  );
 
   if (invoice.data == null) {
     return null;

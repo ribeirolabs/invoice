@@ -31,8 +31,6 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     secure: true,
   }));
 
-  console.log("cookies", cookies);
-
   context.addCookies(cookies);
 
   const page = await context.newPage();
@@ -43,6 +41,8 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     format: "a4",
     printBackground: true,
   });
+
+  page.on("console", console.log);
 
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Length", pdf.length);

@@ -30,6 +30,8 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     domain: new URL(body.data.url).hostname,
   }));
 
+  console.log("cookies", cookies);
+
   context.addCookies(cookies);
 
   const page = await context.newPage();
@@ -39,8 +41,6 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
   const pdf = await page.pdf({
     format: "a4",
     printBackground: true,
-    displayHeaderFooter: true,
-    path: "server.pdf",
   });
 
   res.setHeader("Content-Type", "application/pdf");

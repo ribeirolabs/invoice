@@ -75,44 +75,51 @@ const InvoicePrint = () => {
 
   useEvent(
     "export-invoice",
-    useCallback(async () => {
-      if (invoice.data == null) {
-        return null;
-      }
-
-      try {
-        const response = await fetch("/api/pdf", {
-          method: "post",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/pdf",
-          },
-          body: JSON.stringify({
-            url: window.location.href,
-            locale: getLocale(),
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(response.statusText);
+    useCallback(
+      async ({ detail }) => {
+        if (invoice.data == null) {
+          return null;
         }
 
-        const file = await response.arrayBuffer();
+        try {
+          const response = await fetch("/api/pdf", {
+            method: "post",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/pdf",
+            },
+            body: JSON.stringify({
+              url: window.location.href,
+              locale: getLocale(),
+            }),
+          });
 
-        const blob = new Blob([file], { type: "application/pdf" });
-        const a = document.createElement("a");
-        a.href = window.URL.createObjectURL(blob);
-        a.download = `${invoice.data.number}.pdf`;
-        a.click();
-      } catch (e) {
-        console.error(e);
-        dispatchCustomEvent("toast", {
-          type: "error",
-          message: "Unable to export invoice",
-        });
-      }
-    }, [invoice.data])
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+
+          const file = await response.arrayBuffer();
+
+          const blob = new Blob([file], { type: "application/pdf" });
+          const a = document.createElement("a");
+          a.href = window.URL.createObjectURL(blob);
+          a.download = `${invoice.data.number}.pdf`;
+          a.click();
+
+          if (detail.onDone) {
+            detail.onDone();
+          }
+        } catch (e) {
+          console.error(e);
+          dispatchCustomEvent("toast", {
+            type: "error",
+            message: "Unable to export invoice",
+          });
+        }
+      },
+      [invoice.data]
+    )
   );
 
   if (invoice.data == null) {

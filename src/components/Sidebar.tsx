@@ -1,18 +1,23 @@
 import { AppSidebar, closeSidebar } from "@common/components/AppSidebar";
-import { EyeClosedIcon, EyeIcon } from "@common/components/Icons";
+import { DownloadIcon, EyeClosedIcon, EyeIcon } from "@common/components/Icons";
 import { useSettings } from "@common/components/Settings";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { InvoiceIcon } from "./Icons";
 
 export const Sidebar = () => {
   const [sensitiveInformation, update] = useSettings("sensitiveInformation");
   const { route } = useRouter();
   const showPrint = route === "/invoice/[id]";
+  const [exporting, setExporting] = useState(false);
 
   function onExport() {
-    dispatchCustomEvent("export-invoice", {});
+    setExporting(true);
+    dispatchCustomEvent("export-invoice", {
+      onDone: () => setExporting(false),
+    });
   }
 
   return (
@@ -48,8 +53,15 @@ export const Sidebar = () => {
       </li>
       {showPrint && (
         <li>
-          <button onClick={onExport}>
-            <InvoiceIcon />
+          <button onClick={onExport} disabled={exporting}>
+            {exporting ? (
+              <div
+                className="btn btn-ghost btn-only-loader w-[1em] h-[1em] min-h-[1em] p-0"
+                data-loading={true}
+              ></div>
+            ) : (
+              <DownloadIcon />
+            )}
             Export Invoice
           </button>
         </li>

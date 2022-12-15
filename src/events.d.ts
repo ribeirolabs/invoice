@@ -1,3 +1,5 @@
 interface Events {
-  "export-invoice": unknown;
+  "export-invoice": {
+    onDone?: () => void;
+  };
 }

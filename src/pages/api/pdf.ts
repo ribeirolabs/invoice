@@ -41,6 +41,7 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
   const pdf = await page.pdf({
     format: "a4",
     printBackground: true,
+    height: "100px",
   });
 
   page.on("console", console.log);

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   url: z.string(),
+  locale: z.string(),
 });
 
 export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
@@ -22,7 +23,7 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
   const browser = await launchChromium({
     headless: true,
   });
-  const context = await browser.newContext({});
+  const context = await browser.newContext({ locale: body.data.locale });
   const cookies = Object.keys(req.cookies).map((name) => ({
     name,
     value: req.cookies[name] as string,

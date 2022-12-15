@@ -20,6 +20,7 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json(body.error.errors);
     return;
   }
+
   const options = process.env.AWS_REGION
     ? {
         args: chrome.args,
@@ -35,16 +36,9 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
             ? "/usr/bin/google-chrome"
             : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
       };
+
   const browser = await puppeteer.launch(options);
 
-  // const browser = await chromium.puppeteer.launch({
-  //   args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
-  //   defaultViewport: chromium.defaultViewport,
-  //   executablePath: await chromium.executablePath,
-  //   headless: true,
-  //   ignoreHTTPSErrors: true,
-  // });
-  // const context = await browser.newContext({ locale: body.data.locale });
   const cookies = Object.keys(req.cookies).map((name) => ({
     name,
     value: req.cookies[name] as string,
@@ -53,16 +47,18 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     secure: true,
   }));
 
-  // context.addCookies(cookies);
-
   const page = await browser.newPage();
   await page.setCookie(...cookies);
-
   await page.goto(body.data.url, { waitUntil: "networkidle0" });
-  // await page.emulateMedia({ media: "print" });
   const pdf = await page.pdf({
     format: "a4",
     printBackground: true,
+    margin: {
+      top: 40,
+      bottom: 40,
+      left: 40,
+      right: 40,
+    },
   });
 
   res.setHeader("Content-Type", "application/pdf");

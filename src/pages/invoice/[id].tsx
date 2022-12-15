@@ -6,12 +6,13 @@ import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { useEvent } from "@ribeirolabs/events/react";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
+import { ErrorBoundary } from "react-error-boundary";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -21,11 +22,20 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
   });
 };
 
+const ErrorFallback = ({ error }: { error: Error }) => (
+  <>
+    <h1>Something went wrong</h1>
+    <pre>{error.stack}</pre>
+  </>
+);
+
 const InvoicePage: NextPage = () => {
   return (
-    <ProtectedPage>
-      <InvoicePrint />
-    </ProtectedPage>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ProtectedPage>
+        <InvoicePrint />
+      </ProtectedPage>
+    </ErrorBoundary>
   );
 };
 

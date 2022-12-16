@@ -4,8 +4,6 @@ import { useMemo } from "react";
 import { AddIcon, ShareIcon } from "@common/components/Icons";
 import { Company } from "@prisma/client";
 import { shareOrCopy } from "@common/utils/share";
-import { formatCurrency } from "@/utils/currency";
-import pluralize from "pluralize";
 
 export const CompaniesTable = () => {
   const session = trpc.useQuery(["auth.getSession"]);
@@ -86,14 +84,13 @@ export const CompaniesTable = () => {
         <table className="table table-zebra w-full m-0">
           <thead>
             <tr>
-              <th></th>
               <th>Name</th>
-              <th>Total</th>
+              <th>Invoices</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {companies.data?.map((company, i) => {
+            {companies.data?.map((company) => {
               const isOwned = company.users.some(
                 (user) => user.userId === authUser?.id && user.owner
               );
@@ -112,10 +109,11 @@ export const CompaniesTable = () => {
 
               return (
                 <tr key={company.id}>
-                  <th>{i + 1}</th>
                   <td>
                     <div className="align-middle max-w-[300px] md:max-w-none text-ellipsis overflow-hidden">
-                      <Link href={companyUrl}>{company.name}</Link>
+                      <Link href={companyUrl}>
+                        <a className="font-bold">{company.name}</a>
+                      </Link>
                     </div>
 
                     {isOwned && (

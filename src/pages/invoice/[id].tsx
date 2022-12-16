@@ -190,7 +190,7 @@ const InvoicePrint = () => {
         </div>
       </div>
 
-      <footer className="flex-1 flex items-end justify-center text-xs">
+      <footer className="font-brand flex-1 flex items-end justify-center text-xs">
         <Link href="/" target="_blank">
           ribeirolabs/invoice
         </Link>

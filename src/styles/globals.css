@@ -3,7 +3,7 @@
 }
 
 .invoice-print h2 {
-  @apply font-bold m-0;
+  @apply font-black m-0;
 }
 
 .invoice-print h3 {

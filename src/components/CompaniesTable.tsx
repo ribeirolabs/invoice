@@ -112,7 +112,9 @@ export const CompaniesTable = () => {
                   <td>
                     <div className="align-middle max-w-[300px] md:max-w-none text-ellipsis overflow-hidden">
                       <Link href={companyUrl}>
-                        <a className="font-bold">{company.name}</a>
+                        <a className="font-bold">
+                          {company.alias ?? company.name}
+                        </a>
                       </Link>
                     </div>
 

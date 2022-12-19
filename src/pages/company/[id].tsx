@@ -131,6 +131,7 @@ const CompanyForm = () => {
       await upsert.mutateAsync({
         id: data.get("id") as string,
         name: data.get("name") as string,
+        alias: data.get("alias") as string,
         address: data.get("address") as string,
         currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
@@ -205,6 +206,13 @@ const CompanyForm = () => {
           label="Name"
           name="name"
           defaultValue={company.data?.name}
+          readOnly={!canEdit}
+        />
+
+        <Input
+          label="Alias"
+          name="alias"
+          defaultValue={company.data?.alias ?? ""}
           readOnly={!canEdit}
         />
 

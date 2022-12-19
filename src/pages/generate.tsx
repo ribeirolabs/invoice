@@ -229,7 +229,7 @@ export default function InvoiceGenerate() {
               {receivers.map((company) => {
                 return (
                   <option key={company.id} value={company.id}>
-                    {company.name}
+                    {company.alias ?? company.name}
                   </option>
                 );
               })}
@@ -257,7 +257,8 @@ export default function InvoiceGenerate() {
 
                 return (
                   <option key={company.id} value={company.id}>
-                    {company.name} {user?.type === "SHARED" && "(shared)"}
+                    {company.alias ?? company.name}{" "}
+                    {user?.type === "SHARED" && "(shared)"}
                   </option>
                 );
               })}

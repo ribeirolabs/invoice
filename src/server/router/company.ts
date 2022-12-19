@@ -7,6 +7,7 @@ export const companyRouter = createProtectedRouter()
     input: z.object({
       id: z.string().nullish(),
       name: z.string(),
+      alias: z.string().optional(),
       currency: z.string(),
       address: z.string(),
       invoiceNumberPattern: z.string(),
@@ -22,6 +23,7 @@ export const companyRouter = createProtectedRouter()
     async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
         name: input.name,
+        alias: input.alias || null,
         currency: input.currency,
         address: input.address,
         invoiceNumberPattern: input.invoiceNumberPattern,

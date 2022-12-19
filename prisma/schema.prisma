@@ -70,6 +70,21 @@ model Company {
   users            CompaniesOnUsers[]
   receiverInvoices Invoice[]          @relation("receiver")
   payerInvoices    Invoice[]          @relation("payer")
+  emails           CompanyEmail[]
+}
+
+model CompanyEmail {
+  id    String  @id @default(cuid())
+  email String
+  alias String?
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, email])
 }
 
 enum UserType {

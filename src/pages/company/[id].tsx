@@ -7,12 +7,20 @@ import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FormEvent,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Alert } from "@common/components/Alert";
 import { Input } from "@common/components/Input";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { useEvent } from "@ribeirolabs/events/react";
-import { User } from "@prisma/client";
+import { CompanyEmail, User } from "@prisma/client";
+import { AddIcon, DeleteIcon } from "@common/components/Icons";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -99,10 +107,25 @@ const CompanyForm = () => {
     e.preventDefault();
 
     const form = e.target as HTMLFormElement;
-
     const data = new FormData(form);
-
     const action = company.data?.id ? "update" : "create";
+
+    const emailsPayload: { email: string; alias: string }[] = [];
+    const emails = data.getAll("email[]") as string[];
+    const aliases = data.getAll("alias[]") as string[];
+
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+
+      if (!email) {
+        continue;
+      }
+
+      emailsPayload.push({
+        email,
+        alias: aliases[i] ?? "",
+      });
+    }
 
     try {
       await upsert.mutateAsync({
@@ -112,6 +135,8 @@ const CompanyForm = () => {
         currency: data.get("currency") as string,
         invoiceNumberPattern: data.get("invoice_number_pattern") as string,
         owner: Boolean(data.get("owner") as string),
+        emails: emailsPayload,
+        deleteEmails: data.getAll("delete_emails[]") as string[],
       });
 
       if (action === "update") {
@@ -229,60 +254,67 @@ const CompanyForm = () => {
           readOnly={!canEdit}
         />
 
-        <ul className="leading-4 text-xs">
-          <li>
-            <button
-              className="btn btn-xs"
-              type="button"
-              onClick={() => insertInvoicePatternSymbol("YEAR")}
-            >
-              {INVOICE_PATTERN_SYMBOLS.YEAR}
-            </button>{" "}
-            = year
-          </li>
-          <li>
-            <button
-              className="btn btn-xs"
-              type="button"
-              onClick={() => insertInvoicePatternSymbol("MONTH")}
-            >
-              %M
-            </button>{" "}
-            = month
-          </li>
-          <li>
-            <button
-              className="btn btn-xs"
-              type="button"
-              onClick={() => insertInvoicePatternSymbol("DAY")}
-            >
-              %D
-            </button>{" "}
-            = day
-          </li>
-          <li>
-            <button
-              className="btn btn-xs"
-              type="button"
-              onClick={() => insertInvoicePatternSymbol("INCREMENT")}
-            >
-              %0
-            </button>{" "}
-            = increment. Use [n] to specify number of leading zeros
-          </li>
+        <div className="not-prose">
+          <ul className="leading-4 text-xs grid gap-1">
+            <li>
+              <button
+                className="btn btn-xs"
+                type="button"
+                onClick={() => insertInvoicePatternSymbol("YEAR")}
+              >
+                {INVOICE_PATTERN_SYMBOLS.YEAR}
+              </button>{" "}
+              = year
+            </li>
+            <li>
+              <button
+                className="btn btn-xs"
+                type="button"
+                onClick={() => insertInvoicePatternSymbol("MONTH")}
+              >
+                %M
+              </button>{" "}
+              = month
+            </li>
+            <li>
+              <button
+                className="btn btn-xs"
+                type="button"
+                onClick={() => insertInvoicePatternSymbol("DAY")}
+              >
+                %D
+              </button>{" "}
+              = day
+            </li>
+            <li>
+              <button
+                className="btn btn-xs"
+                type="button"
+                onClick={() => insertInvoicePatternSymbol("INCREMENT")}
+              >
+                %0
+              </button>{" "}
+              = increment. Use [n] to specify number of leading zeros
+            </li>
 
-          <ul className="not-prose leading-4 text-xs">
-            <li>%0[3] = 001, 002, 003...</li>
+            <ul className="not-prose ml-6 leading-4 text-xs">
+              <li>%0[3] = 001, 002, 003...</li>
+            </ul>
           </ul>
-        </ul>
+        </div>
+
+        <EmailsForm
+          mode={canEdit ? "write" : "readonly"}
+          initial={company.data?.emails ?? []}
+        />
+
+        <div className="divider"></div>
 
         <Alert type="info" inverse>
           The update will only affect future invoices
         </Alert>
 
-        <div className="divider"></div>
-
-        <div className="btn-form-group">
+        <div className="mt-4 btn-form-group">
           <Link href="/">
             <a className="btn btn-wide btn-outline">Cancel</a>
           </Link>
@@ -360,3 +392,113 @@ const Modal = ({ users }: { users: User[] }) => {
 };
 
 export default NewCompanyPage;
+
+let fakeId = 0;
+
+type EmailData = Pick<CompanyEmail, "id" | "email" | "alias">;
+
+function emptyEmail(): EmailData {
+  return { id: `FAKE-${fakeId++}`, email: "", alias: "" };
+}
+
+function EmailsForm({
+  initial,
+  mode,
+}: {
+  mode: "write" | "readonly";
+  initial: EmailData[];
+}) {
+  const [list, setList] = useState<EmailData[]>(() =>
+    initial.length ? initial : mode === "write" ? [emptyEmail()] : []
+  );
+  const [toDelete, setToDelete] = useState<string[]>([]);
+
+  function onAddEmail() {
+    setList((list) => list.concat([emptyEmail()]));
+  }
+
+  function onRemoveEmail(id: string) {
+    setList((list) => {
+      const next = list.filter((email) => email.id !== id);
+
+      return next.length === 0 ? [emptyEmail()] : next;
+    });
+
+    if (id.startsWith("FAKE-")) {
+      return;
+    }
+
+    setToDelete((list) => list.concat([id]));
+  }
+
+  return (
+    <div>
+      <div className="divider"></div>
+      <h3>Emails</h3>
+
+      {toDelete.map((id) => (
+        <Fragment key={id}>
+          <input type="hidden" name="delete_emails[]" value={id} />
+        </Fragment>
+      ))}
+
+      {list.length === 0 ? (
+        <p>No emails yet.</p>
+      ) : mode === "write" ? (
+        <fieldset className="grid grid-cols-[max-content_2fr_1fr_max-content] gap-2 items-center">
+          <div></div>
+          <div className="font-bold">Email</div>
+          <div className="font-bold">Alias</div>
+          <div></div>
+
+          {list.map((data, i) => (
+            <Fragment key={data.id}>
+              <div className="text-center">{i + 1}</div>
+              <input
+                type="email"
+                className="input input-bordered w-full"
+                name="email[]"
+                defaultValue={data.email ?? ""}
+              />
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                name="alias[]"
+                defaultValue={data.alias ?? ""}
+              />
+
+              <div className="align-center">
+                <button
+                  className="btn-action"
+                  onClick={() => onRemoveEmail(data.id)}
+                >
+                  <DeleteIcon />
+                </button>
+              </div>
+            </Fragment>
+          ))}
+
+          <div className="col-span-4 text-center mt-2">
+            <button
+              className="btn btn-sm btn-wide"
+              onClick={onAddEmail}
+              type="button"
+            >
+              <AddIcon />
+              Add new
+            </button>
+          </div>
+        </fieldset>
+      ) : (
+        <ul>
+          {list.map((data) => (
+            <li key={data.id} className="leading-tight">
+              <div className="font-bold">{data.email}</div>
+              <span className="text-sm">{data.alias}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

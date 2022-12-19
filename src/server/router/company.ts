@@ -11,6 +11,13 @@ export const companyRouter = createProtectedRouter()
       address: z.string(),
       invoiceNumberPattern: z.string(),
       owner: z.boolean(),
+      emails: z
+        .object({
+          email: z.string().email(),
+          alias: z.string().optional(),
+        })
+        .array(),
+      deleteEmails: z.string().array(),
     }),
     async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
@@ -23,6 +30,8 @@ export const companyRouter = createProtectedRouter()
       const userId = ctx.session.user.id;
 
       if (input.id) {
+        const companyId = input.id;
+
         const where: Prisma.InvoiceWhereInput = {
           userId,
           issuedAt: {
@@ -48,14 +57,31 @@ export const companyRouter = createProtectedRouter()
                   where: {
                     userId_companyId: {
                       userId,
-                      companyId: input.id,
+                      companyId,
                     },
                   },
                 },
               },
+              emails: {
+                upsert: input.emails.map(({ email, alias }) => ({
+                  create: {
+                    alias,
+                    email,
+                  },
+                  update: {
+                    alias,
+                  },
+                  where: {
+                    companyId_email: {
+                      companyId,
+                      email,
+                    },
+                  },
+                })),
+              },
             },
             where: {
-              id: input.id,
+              id: companyId,
             },
           }),
 
@@ -67,7 +93,7 @@ export const companyRouter = createProtectedRouter()
             },
             where: {
               ...where,
-              receiverId: input.id,
+              receiverId: companyId,
             },
           }),
 
@@ -79,7 +105,15 @@ export const companyRouter = createProtectedRouter()
             },
             where: {
               ...where,
-              payerId: input.id,
+              payerId: companyId,
+            },
+          }),
+
+          ctx.prisma.companyEmail.deleteMany({
+            where: {
+              id: {
+                in: input.deleteEmails,
+              },
             },
           }),
         ]);
@@ -100,6 +134,9 @@ export const companyRouter = createProtectedRouter()
                 },
               },
             },
+          },
+          emails: {
+            create: input.emails,
           },
         },
       });
@@ -160,6 +197,13 @@ export const companyRouter = createProtectedRouter()
             include: {
               sharedBy: true,
               user: true,
+            },
+          },
+          emails: {
+            select: {
+              id: true,
+              email: true,
+              alias: true,
             },
           },
         },

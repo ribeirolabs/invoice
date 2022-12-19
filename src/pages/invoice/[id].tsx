@@ -106,16 +106,16 @@ const InvoicePrint = () => {
           a.href = window.URL.createObjectURL(blob);
           a.download = `${invoice.data.number}.pdf`;
           a.click();
-
-          if (detail.onDone) {
-            detail.onDone();
-          }
         } catch (e) {
           console.error(e);
           dispatchCustomEvent("toast", {
             type: "error",
             message: "Unable to export invoice",
           });
+        } finally {
+          if (detail.onDone) {
+            detail.onDone();
+          }
         }
       },
       [invoice.data]

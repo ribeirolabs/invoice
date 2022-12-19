@@ -7,23 +7,18 @@ export const companyRouter = createProtectedRouter()
     input: z.object({
       id: z.string().nullish(),
       name: z.string(),
+      email: z.string(),
       alias: z.string().optional(),
       currency: z.string(),
       address: z.string(),
       invoiceNumberPattern: z.string(),
       owner: z.boolean(),
-      emails: z
-        .object({
-          email: z.string().email(),
-          alias: z.string().optional(),
-        })
-        .array(),
-      deleteEmails: z.string().array(),
     }),
     async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
         name: input.name,
         alias: input.alias || null,
+        email: input.email,
         currency: input.currency,
         address: input.address,
         invoiceNumberPattern: input.invoiceNumberPattern,
@@ -64,23 +59,6 @@ export const companyRouter = createProtectedRouter()
                   },
                 },
               },
-              emails: {
-                upsert: input.emails.map(({ email, alias }) => ({
-                  create: {
-                    alias,
-                    email,
-                  },
-                  update: {
-                    alias,
-                  },
-                  where: {
-                    companyId_email: {
-                      companyId,
-                      email,
-                    },
-                  },
-                })),
-              },
             },
             where: {
               id: companyId,
@@ -110,14 +88,6 @@ export const companyRouter = createProtectedRouter()
               payerId: companyId,
             },
           }),
-
-          ctx.prisma.companyEmail.deleteMany({
-            where: {
-              id: {
-                in: input.deleteEmails,
-              },
-            },
-          }),
         ]);
 
         return company;
@@ -136,9 +106,6 @@ export const companyRouter = createProtectedRouter()
                 },
               },
             },
-          },
-          emails: {
-            create: input.emails,
           },
         },
       });
@@ -199,13 +166,6 @@ export const companyRouter = createProtectedRouter()
             include: {
               sharedBy: true,
               user: true,
-            },
-          },
-          emails: {
-            select: {
-              id: true,
-              email: true,
-              alias: true,
             },
           },
         },

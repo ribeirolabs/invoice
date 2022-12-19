@@ -74,8 +74,8 @@ export const CompaniesTable = () => {
       <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Companies
         <Link href="/company/new">
-          <a className="btn btn-outline btn-sm gap-2">
-            <AddIcon size={18} /> add
+          <a className="btn btn-outline btn-sm">
+            <AddIcon size={16} /> add
           </a>
         </Link>
       </h1>
@@ -135,7 +135,7 @@ export const CompaniesTable = () => {
                   <td>
                     <div className="flex gap-1 justify-end">
                       <button
-                        className="btn btn-action"
+                        className="btn-action"
                         onClick={() => copyShareLink(company)}
                         title="Share"
                       >

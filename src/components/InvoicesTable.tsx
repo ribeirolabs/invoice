@@ -16,7 +16,7 @@ export const InvoicesTable = () => {
       <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Invoices
         <Link href="/generate">
-          <a className="btn btn-outline btn-sm gap-2">
+          <a className="btn btn-outline btn-sm">
             <InvoiceIcon /> generate
           </a>
         </Link>
@@ -89,7 +89,7 @@ const InvoiceRow = ({
       <td colSpan={2} className="font-normal align-top">
         <div className="flex flex-col gap-2">
           <Link href={invoiceUrl}>
-            <a className="font-black">{invoice.number}</a>
+            <a className="font-bold">{invoice.number}</a>
           </Link>
           <Senstive>
             <div className="badge badge-primary">

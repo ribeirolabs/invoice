@@ -154,7 +154,7 @@ const CompanyForm = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="py-2 max-w-lg text-center w-full">
+      <div className="py-2 w-full md:max-w-lg text-center w-full">
         {user?.sharedBy && (
           <span className="badge badge-secondary mb-2">read-only</span>
         )}
@@ -198,7 +198,7 @@ const CompanyForm = () => {
         <div className="divider"></div>
       </div>
 
-      <form className="form w-form" onSubmit={onSubmit}>
+      <form className="form w-full md:max-w-lg" onSubmit={onSubmit}>
         <input type="hidden" name="id" value={company.data?.id} />
 
         <Input
@@ -456,13 +456,13 @@ function EmailsForm({
               <div className="text-center">{i + 1}</div>
               <input
                 type="email"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full px-1"
                 name="email[]"
                 defaultValue={data.email ?? ""}
               />
               <input
                 type="text"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full px-1"
                 name="alias[]"
                 defaultValue={data.alias ?? ""}
               />

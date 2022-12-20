@@ -25,6 +25,7 @@
     "chrome-aws-lambda": "^10.1.0",
     "daisyui": "^2.24.0",
     "date-fns": "^2.29.2",
+    "mailgun-js": "^0.22.0",
     "next": "^12.3.0",
     "next-auth": "^4.10.3",
     "pluralize": "^8.0.0",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.4",
+    "@types/mailgun-js": "^0.22.13",
     "@types/node": "18.0.0",
     "@types/pluralize": "^0.0.29",
     "@types/react": "^18.0.14",

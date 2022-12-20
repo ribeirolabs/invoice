@@ -1,11 +1,9 @@
+import { generatePdf } from "@/server/services/pdf";
 import { NextApiRequest, NextApiResponse } from "next";
-import chrome from "chrome-aws-lambda";
-import puppeteer from "puppeteer-core";
 import { z } from "zod";
 
 const requestSchema = z.object({
-  url: z.string(),
-  locale: z.string(),
+  id: z.string(),
 });
 
 export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
@@ -21,51 +19,22 @@ export default async function pdf(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const options = process.env.AWS_REGION
-    ? {
-        args: chrome.args,
-        executablePath: await chrome.executablePath,
-        headless: chrome.headless,
-      }
-    : {
-        args: [],
-        executablePath:
-          process.platform === "win32"
-            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-            : process.platform === "linux"
-            ? "/usr/bin/google-chrome"
-            : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      };
+  const domain = req.headers.origin;
 
-  const browser = await puppeteer.launch(options);
+  if (!domain) {
+    res.status(400).send({ error: "Unable to get domain from headers" });
+    return;
+  }
 
-  const cookies = Object.keys(req.cookies).map((name) => ({
-    name,
-    value: req.cookies[name] as string,
-    path: "/",
-    domain: new URL(body.data.url).hostname,
-    secure: true,
-  }));
-
-  const page = await browser.newPage();
-  await page.setCookie(...cookies);
-  await page.goto(body.data.url, { waitUntil: "networkidle0" });
-  const pdf = await page.pdf({
-    format: "a4",
-    printBackground: true,
-    margin: {
-      top: 40,
-      bottom: 40,
-      left: 40,
-      right: 40,
-    },
+  const pdf = await generatePdf({
+    id: body.data.id,
+    cookies: req.cookies,
+    domain,
   });
 
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Length", pdf.length);
   res.send(pdf);
-
-  await browser.close();
 
   res.end();
 }

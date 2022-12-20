@@ -46,6 +46,7 @@ const InvoicePrint = () => {
     "invoice.get",
     { id: router.query.id as string },
   ]);
+  const { mutateAsync } = trpc.useMutation(["invoice.send"]);
 
   useEffect(() => {
     const html = document.body.parentElement;
@@ -90,8 +91,7 @@ const InvoicePrint = () => {
               Accept: "application/pdf",
             },
             body: JSON.stringify({
-              url: window.location.href,
-              locale: getLocale(),
+              id: invoice.data.id,
             }),
           });
 
@@ -119,6 +119,22 @@ const InvoicePrint = () => {
         }
       },
       [invoice.data]
+    )
+  );
+
+  useEvent(
+    "send-invoice",
+    useCallback(
+      ({ detail }) => {
+        if (!invoice.data) {
+          return;
+        }
+
+        mutateAsync({
+          id: invoice.data.id,
+        }).finally(() => detail.onDone?.());
+      },
+      [invoice.data, mutateAsync]
     )
   );
 

@@ -35,6 +35,7 @@ export default async function restricted(
     router: appRouter,
     transformer: superjson,
     ctx: {
+      req: req,
       session: session,
       prisma: prisma,
     },

@@ -1,6 +1,7 @@
 import { parseInvoicePattern } from "@/utils/invoice";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { sendInvoiceEmail } from "../services/email";
 import { createProtectedRouter } from "./protected-router";
 
 export const invoiceRouter = createProtectedRouter()
@@ -203,5 +204,32 @@ export const invoiceRouter = createProtectedRouter()
           id: input,
         },
       });
+    },
+  })
+  .mutation("send", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const invoice = await ctx.prisma.invoice.findUniqueOrThrow({
+        where: { id: input.id },
+        include: {
+          receiver: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          payer: {
+            select: {
+              name: true,
+              email: true,
+              currency: true,
+            },
+          },
+        },
+      });
+
+      return sendInvoiceEmail({ invoice, req: ctx.req });
     },
   });

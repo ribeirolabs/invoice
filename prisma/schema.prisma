@@ -116,5 +116,18 @@ model Invoice {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
+  emailHistory InvoiceEmailHistory[]
+
   @@unique([number, receiverId, payerId])
+}
+
+model InvoiceEmailHistory {
+  id    String @id @default(cuid())
+  email String
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoiceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

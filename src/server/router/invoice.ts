@@ -230,6 +230,25 @@ export const invoiceRouter = createProtectedRouter()
         },
       });
 
-      return sendInvoiceEmail({ invoice, req: ctx.req });
+      await sendInvoiceEmail({ invoice, req: ctx.req });
+
+      return await ctx.prisma.invoiceEmailHistory.create({
+        data: {
+          invoiceId: input.id,
+          email: invoice.payer.email,
+        },
+      });
+    },
+  })
+  .query("emailHistory", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    resolve({ ctx, input }) {
+      return ctx.prisma.invoiceEmailHistory.findMany({
+        where: {
+          invoiceId: input.id,
+        },
+      });
     },
   });

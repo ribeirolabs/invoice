@@ -6,14 +6,20 @@ import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { useEvent } from "@ribeirolabs/events/react";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { ErrorBoundary } from "react-error-boundary";
-import { SendInvoiceModal } from "@/components/SendInvoiceModal";
+import dynamic from "next/dynamic";
+import { Portal } from "@common/components/Portal";
+import { getSendInvoiceModalId } from "@/components/SendInvoiceModal";
+import { DownloadIcon, SendIcon } from "@common/components/Icons";
+import { openModal } from "@common/components/Modal";
+
+const SendInvoiceModal = dynamic(() => import("@/components/SendInvoiceModal"));
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -46,6 +52,7 @@ const InvoicePrint = () => {
     "invoice.get",
     { id: router.query.id as string },
   ]);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     const html = document.body.parentElement;
@@ -73,53 +80,47 @@ const InvoicePrint = () => {
     return formatCurrency(amount, payer.currency);
   }, [invoice.data]);
 
-  useEvent(
-    "export-invoice",
-    useCallback(
-      async ({ detail }) => {
-        if (invoice.data == null) {
-          return null;
-        }
+  async function onExport() {
+    if (invoice.data == null) {
+      return null;
+    }
 
-        try {
-          const response = await fetch("/api/pdf", {
-            method: "post",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/pdf",
-            },
-            body: JSON.stringify({
-              id: invoice.data.id,
-            }),
-          });
+    try {
+      setExporting(true);
 
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
+      const response = await fetch("/api/pdf", {
+        method: "post",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/pdf",
+        },
+        body: JSON.stringify({
+          id: invoice.data.id,
+        }),
+      });
 
-          const file = await response.arrayBuffer();
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
 
-          const blob = new Blob([file], { type: "application/pdf" });
-          const a = document.createElement("a");
-          a.href = window.URL.createObjectURL(blob);
-          a.download = `${invoice.data.number}.pdf`;
-          a.click();
-        } catch (e) {
-          console.error(e);
-          dispatchCustomEvent("toast", {
-            type: "error",
-            message: "Unable to export invoice",
-          });
-        } finally {
-          if (detail.onDone) {
-            detail.onDone();
-          }
-        }
-      },
-      [invoice.data]
-    )
-  );
+      const file = await response.arrayBuffer();
+
+      const blob = new Blob([file], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = `${invoice.data.number}.pdf`;
+      a.click();
+    } catch (e) {
+      console.error(e);
+      dispatchCustomEvent("toast", {
+        type: "error",
+        message: "Unable to export invoice",
+      });
+    } finally {
+      setExporting(false);
+    }
+  }
 
   if (invoice.data == null) {
     return null;
@@ -130,6 +131,31 @@ const InvoicePrint = () => {
       <Head>
         <title>{invoice.data.number}</title>
       </Head>
+
+      <Portal id="sidebar-menu">
+        <li>
+          <button onClick={onExport} disabled={exporting}>
+            {exporting ? (
+              <div
+                className="btn btn-ghost btn-only-loader w-[1em] h-[1em] min-h-[1em] p-0"
+                data-loading
+              ></div>
+            ) : (
+              <DownloadIcon />
+            )}
+            Export Invoice
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => openModal(getSendInvoiceModalId(invoice.data.id))}
+          >
+            <SendIcon />
+            Send Invoice
+          </button>
+        </li>
+      </Portal>
+
       <div>
         <div className="flex flex-wrap justify-between mb-8 gap-4">
           <h2 className="flex-none inline-block">{invoice.data.number}</h2>

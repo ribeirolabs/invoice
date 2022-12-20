@@ -3,10 +3,15 @@ import { noSSR } from "@/utils/no-ssr";
 import { trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { ArrowDownIcon, DeleteIcon } from "@common/components/Icons";
+import { ArrowDownIcon, DeleteIcon, SendIcon } from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
 import { Senstive } from "./Sensitive";
 import { InvoiceIcon } from "./Icons";
+import { openModal } from "@common/components/Modal";
+import { getSendInvoiceModalId } from "./SendInvoiceModal";
+import dynamic from "next/dynamic";
+
+const SendInvoiceModal = dynamic(() => import("./SendInvoiceModal"));
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
@@ -33,7 +38,7 @@ export const InvoicesTable = () => {
                   <span>Payer</span>/<span>Receiver</span>
                 </div>
               </th>
-              <th>Date</th>
+              <th>Due Date</th>
               <th></th>
             </tr>
           </thead>
@@ -92,7 +97,7 @@ const InvoiceRow = ({
             <a className="font-bold">{invoice.number}</a>
           </Link>
           <Senstive>
-            <div className="badge badge-primary">
+            <div className="font-bold">
               <Amount
                 amount={invoice.amount}
                 currency={invoice.payer.currency}
@@ -102,28 +107,36 @@ const InvoiceRow = ({
         </div>
       </td>
       <td>
-        <div>{invoice.payer.name}</div>
+        <div>{invoice.payer.alias ?? invoice.payer.name}</div>
 
-        <div className="pl-8 text-xs">
+        <div className="pl-4 text-xs">
           <ArrowDownIcon />
         </div>
 
         <div className="max-w-[200px] md:max-w-none text-ellipsis overflow-hidden">
-          {invoice.receiver.name}
+          {invoice.receiver.alias ?? invoice.receiver.name}
         </div>
       </td>
-      <td>{invoice.issuedAt.toLocaleDateString()}</td>
+      <td>{invoice.expiredAt.toLocaleDateString()}</td>
       <td>
-        <div className="flex gap-1 justify-end">
+        <div className="flex justify-end">
           <button
+            onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
             className="btn-action"
+          >
+            <SendIcon />
+          </button>
+          <button
             onClick={() => deleteInvoice.mutateAsync(invoice.id)}
             disabled={deleteInvoice.isLoading}
+            className="btn-action"
           >
             <DeleteIcon />
           </button>
         </div>
       </td>
+
+      <SendInvoiceModal invoice={invoice} />
     </tr>
   );
 };

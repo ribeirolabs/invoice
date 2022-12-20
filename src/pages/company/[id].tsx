@@ -28,6 +28,10 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
   });
 };
 
+export const config = {
+  unstable_excludeFiles: ["public/**/*"],
+};
+
 const NewCompanyPage: NextPage = () => {
   return (
     <ProtectedPage>

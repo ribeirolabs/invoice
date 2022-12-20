@@ -1,5 +1,5 @@
 import { generatePdf } from "@/server/services/pdf";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 
 const requestSchema = z.object({

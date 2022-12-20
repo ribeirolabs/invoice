@@ -72,7 +72,7 @@ export default function SendInvoiceModal({
           disabled={history.isLoading}
           autoFocus
         >
-          Confirm
+          Send Email
         </button>
       </div>
     </Modal>

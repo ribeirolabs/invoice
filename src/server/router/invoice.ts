@@ -1,5 +1,6 @@
-import { parseInvoicePattern } from "@/utils/invoice";
+import { InvoiceStatus, parseInvoicePattern } from "@/utils/invoice";
 import { TRPCError } from "@trpc/server";
+import isAfter from "date-fns/isAfter";
 import { z } from "zod";
 import { sendInvoiceEmail } from "../services/email";
 import { createProtectedRouter } from "./protected-router";
@@ -159,18 +160,38 @@ export const invoiceRouter = createProtectedRouter()
   })
   .query("recent", {
     async resolve({ ctx }) {
-      return ctx.prisma.invoice.findMany({
+      const invoices = await ctx.prisma.invoice.findMany({
         where: {
           userId: ctx.session.user.id,
         },
         include: {
           payer: true,
           receiver: true,
+          _count: {
+            select: { emailHistory: true },
+          },
         },
         orderBy: {
           createdAt: "desc",
         },
         take: 5,
+      });
+
+      return invoices.map((invoice) => {
+        let status: InvoiceStatus = "created";
+
+        if (isAfter(new Date(), invoice.expiredAt)) {
+          status = "overdue";
+        }
+
+        if (invoice._count.emailHistory > 0) {
+          status = "sent";
+        }
+
+        return {
+          ...invoice,
+          status,
+        };
       });
     },
   })
@@ -251,4 +272,10 @@ export const invoiceRouter = createProtectedRouter()
         },
       });
     },
+  })
+  .query("status", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {},
   });

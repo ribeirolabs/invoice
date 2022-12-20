@@ -6,11 +6,10 @@ import format from "date-fns/format";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
-import { useEvent } from "@ribeirolabs/events/react";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { ErrorBoundary } from "react-error-boundary";
 import dynamic from "next/dynamic";
@@ -143,7 +142,7 @@ const InvoicePrint = () => {
             ) : (
               <DownloadIcon />
             )}
-            Export Invoice
+            Export PDF
           </button>
         </li>
         <li>
@@ -151,7 +150,7 @@ const InvoicePrint = () => {
             onClick={() => openModal(getSendInvoiceModalId(invoice.data.id))}
           >
             <SendIcon />
-            Send Invoice
+            Send Email
           </button>
         </li>
       </Portal>

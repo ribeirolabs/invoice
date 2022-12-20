@@ -1,3 +1,10 @@
+export type InvoiceStatus =
+  | "created"
+  | "sent"
+  | "overdue"
+  | "received"
+  | "paid";
+
 export const INVOICE_PATTERN_SYMBOLS = {
   YEAR: "%Y",
   MONTH: "%M",

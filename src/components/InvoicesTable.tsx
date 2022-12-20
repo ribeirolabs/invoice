@@ -1,6 +1,6 @@
 import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
-import { trpc } from "@/utils/trpc";
+import { inferQueryOutput, trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
 import { ArrowDownIcon, DeleteIcon, SendIcon } from "@common/components/Icons";
@@ -10,6 +10,7 @@ import { InvoiceIcon } from "./Icons";
 import { openModal } from "@common/components/Modal";
 import { getSendInvoiceModalId } from "./SendInvoiceModal";
 import dynamic from "next/dynamic";
+import { InvoiceStatus } from "@/utils/invoice";
 
 const SendInvoiceModal = dynamic(() => import("./SendInvoiceModal"));
 
@@ -31,7 +32,6 @@ export const InvoicesTable = () => {
         <table className="table table-zebra w-full m-0">
           <thead>
             <tr>
-              <td className="w-[1ch]"></td>
               <th>Invoice</th>
               <th>
                 <div className="flex gap-3 items-center">
@@ -69,14 +69,19 @@ export const InvoicesTable = () => {
   );
 };
 
+const STATUS_CLASS: Record<InvoiceStatus, string> = {
+  created: "",
+  sent: "badge-info",
+  overdue: "badge-error",
+  paid: "badge-primary",
+  received: "badge-primary",
+};
+
 const InvoiceRow = ({
   invoice,
   onDelete = () => void {},
 }: {
-  invoice: Invoice & {
-    payer: Company;
-    receiver: Company;
-  };
+  invoice: inferQueryOutput<"invoice.recent">[number];
   onDelete?: () => void;
 }) => {
   const deleteInvoice = trpc.useMutation("invoice.delete", {
@@ -91,8 +96,8 @@ const InvoiceRow = ({
 
   return (
     <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
-      <td colSpan={2} className="font-normal align-top">
-        <div className="flex flex-col gap-2">
+      <td className="font-normal align-top">
+        <div className="flex flex-col">
           <Link href={invoiceUrl}>
             <a className="font-bold">{invoice.number}</a>
           </Link>
@@ -104,6 +109,9 @@ const InvoiceRow = ({
               />
             </div>
           </Senstive>
+          <div className={`badge badge-sm ${STATUS_CLASS[invoice.status]}`}>
+            {invoice.status}
+          </div>
         </div>
       </td>
       <td>
@@ -120,19 +128,23 @@ const InvoiceRow = ({
       <td>{invoice.expiredAt.toLocaleDateString()}</td>
       <td>
         <div className="flex justify-end">
-          <button
-            onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
-            className="btn-action"
-          >
-            <SendIcon />
-          </button>
-          <button
-            onClick={() => deleteInvoice.mutateAsync(invoice.id)}
-            disabled={deleteInvoice.isLoading}
-            className="btn-action"
-          >
-            <DeleteIcon />
-          </button>
+          <div className="tooltip" data-tip="Send email">
+            <button
+              onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
+              className="btn-action"
+            >
+              <SendIcon />
+            </button>
+          </div>
+          <div className="tooltip tooltip-left" data-tip="Delete">
+            <button
+              onClick={() => deleteInvoice.mutateAsync(invoice.id)}
+              disabled={deleteInvoice.isLoading}
+              className="btn-action"
+            >
+              <DeleteIcon />
+            </button>
+          </div>
         </div>
       </td>
 

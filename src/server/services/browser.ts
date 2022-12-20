@@ -1,22 +1,21 @@
-import chrome from "chrome-aws-lambda";
+import { env } from "@/env/server.mjs";
 import puppeteer from "puppeteer-core";
 
 export async function getBrowser() {
-  const options = process.env.AWS_REGION
-    ? {
-        args: chrome.args,
-        executablePath: await chrome.executablePath,
-        headless: chrome.headless,
-      }
-    : {
-        args: [],
-        executablePath:
-          process.platform === "win32"
-            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-            : process.platform === "linux"
-            ? "/usr/bin/google-chrome"
-            : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-      };
+  if (env.NODE_ENV === "production") {
+    return puppeteer.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${env.BROWSERLESS_API_KEY}`,
+    });
+  }
 
-  return puppeteer.launch(options);
+  return puppeteer.launch({
+    headless: true,
+    args: [],
+    executablePath:
+      process.platform === "win32"
+        ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+        : process.platform === "linux"
+        ? "/usr/bin/google-chrome"
+        : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  });
 }

@@ -15,6 +15,7 @@ export const serverSchema = z.object({
   EMAIL_API_KEY: z.string(),
   EMAIL_API_URL: z.string(),
   EMAIL_API_DOMAIN: z.string(),
+  BROWSERLESS_API_KEY: z.string()
 });
 
 /**

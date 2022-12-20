@@ -37,5 +37,6 @@ export async function generatePdf({
   });
 
   await browser.close();
+
   return pdf;
 }

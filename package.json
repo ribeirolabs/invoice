@@ -22,7 +22,6 @@
     "@trpc/next": "^9.27.0",
     "@trpc/react": "^9.27.0",
     "@trpc/server": "^9.27.0",
-    "chrome-aws-lambda": "^10.1.0",
     "daisyui": "^2.24.0",
     "date-fns": "^2.29.2",
     "form-data": "^4.0.0",

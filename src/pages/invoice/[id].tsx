@@ -13,7 +13,6 @@ import { ProtectedPage } from "@common/components/ProtectedPage";
 import { useEvent } from "@ribeirolabs/events/react";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { ErrorBoundary } from "react-error-boundary";
-import { getLocale } from "@/utils/locale";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -224,3 +223,7 @@ const InvoicePrint = () => {
 const Amount = noSSR<{ amount: string }>(({ amount }) => <span>{amount}</span>);
 
 export default InvoicePage;
+
+export const config = {
+  unstable_excludeFiles: ["public/**/*"],
+};

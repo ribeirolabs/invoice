@@ -1,13 +1,16 @@
 import { env } from "@/env/server.mjs";
 import { Invoice } from "@prisma/client";
 import format from "date-fns/format";
-import mailgun from "mailgun-js";
+import formData from "form-data";
+import Mailgun from "mailgun.js";
 import { NextApiRequest } from "next";
 import { generatePdf } from "./pdf";
 
-const client = mailgun({
-  apiKey: env.EMAIL_API_KEY,
-  domain: env.EMAIL_API_DOMAIN,
+const mg = new Mailgun(formData);
+
+const client = mg.client({
+  username: "api",
+  key: env.EMAIL_API_KEY,
 });
 
 export async function sendInvoiceEmail({
@@ -41,21 +44,12 @@ export async function sendInvoiceEmail({
       receiver_name: invoice.receiver.name,
       receiver_email: invoice.receiver.email,
     }),
-    attachment: new client.Attachment({
+    attachment: {
       data: pdf,
       filename: `${invoice.number}.pdf`,
       contentType: "application/pdf",
-    }),
+    },
   };
 
-  return new Promise((resolve, reject) =>
-    client.messages().send(data, (error, body) => {
-      if (error) {
-        reject(error.message);
-        return;
-      }
-
-      resolve(body.message);
-    })
-  );
+  return await client.messages.create(env.EMAIL_API_DOMAIN, data);
 }

@@ -89,7 +89,7 @@ export default function InvoiceGenerate() {
       receiverId: receiverId,
       payerId: payerId,
     });
-  }, [receiverId, payerId, invoiceNumber.mutateAsync, invoiceNumber.reset]);
+  }, [invoiceNumber, payerId, receiverId]);
 
   const formatAmount = useCallback((amount: number) => {
     return new Intl.NumberFormat(getLocale(), {

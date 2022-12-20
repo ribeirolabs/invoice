@@ -5,47 +5,29 @@ import {
   EyeIcon,
   SendIcon,
 } from "@common/components/Icons";
+import { openModal } from "@common/components/Modal";
 import { useSettings } from "@common/components/Settings";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useReducer } from "react";
+import { useState } from "react";
 import { InvoiceIcon } from "./Icons";
-
-function loadingReducer<Key extends string>(
-  state: Record<Key, boolean>,
-  [action, key]: ["start" | "finish", Key]
-) {
-  return {
-    ...state,
-    [key]: action === "start",
-  };
-}
 
 export const Sidebar = () => {
   const [sensitiveInformation, update] = useSettings("sensitiveInformation");
   const { route } = useRouter();
   const atInvoicePage = route === "/invoice/[id]";
-  const [{ sending, exporting }, loading] = useReducer(
-    loadingReducer<"exporting" | "sending">,
-    {
-      exporting: false,
-      sending: false,
-    }
-  );
+  const [exporting, setExporting] = useState(false);
 
   function onExport() {
-    loading(["start", "exporting"]);
+    setExporting(true);
     dispatchCustomEvent("export-invoice", {
-      onDone: () => loading(["finish", "exporting"]),
+      onDone: () => setExporting(false),
     });
   }
 
   function onSendEmail() {
-    loading(["start", "sending"]);
-    dispatchCustomEvent("send-invoice", {
-      onDone: () => loading(["finish", "sending"]),
-    });
+    openModal("send-invoice");
   }
 
   return (
@@ -95,15 +77,8 @@ export const Sidebar = () => {
             </button>
           </li>
           <li>
-            <button onClick={onSendEmail} disabled={sending}>
-              {sending ? (
-                <div
-                  className="btn btn-ghost btn-only-loader w-[1em] h-[1em] min-h-[1em] p-0"
-                  data-loading
-                ></div>
-              ) : (
-                <SendIcon />
-              )}
+            <button onClick={onSendEmail}>
+              <SendIcon />
               Send Invoice
             </button>
           </li>

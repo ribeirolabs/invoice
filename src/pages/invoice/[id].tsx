@@ -13,6 +13,7 @@ import { ProtectedPage } from "@common/components/ProtectedPage";
 import { useEvent } from "@ribeirolabs/events/react";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { ErrorBoundary } from "react-error-boundary";
+import { SendInvoiceModal } from "@/components/SendInvoiceModal";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -45,7 +46,6 @@ const InvoicePrint = () => {
     "invoice.get",
     { id: router.query.id as string },
   ]);
-  const { mutateAsync } = trpc.useMutation(["invoice.send"]);
 
   useEffect(() => {
     const html = document.body.parentElement;
@@ -118,22 +118,6 @@ const InvoicePrint = () => {
         }
       },
       [invoice.data]
-    )
-  );
-
-  useEvent(
-    "send-invoice",
-    useCallback(
-      ({ detail }) => {
-        if (!invoice.data) {
-          return;
-        }
-
-        mutateAsync({
-          id: invoice.data.id,
-        }).finally(() => detail.onDone?.());
-      },
-      [invoice.data, mutateAsync]
     )
   );
 
@@ -216,6 +200,8 @@ const InvoicePrint = () => {
           {invoice.data.id}
         </Link>
       </footer>
+
+      <SendInvoiceModal invoice={invoice.data} />
     </div>
   );
 };
@@ -223,7 +209,3 @@ const InvoicePrint = () => {
 const Amount = noSSR<{ amount: string }>(({ amount }) => <span>{amount}</span>);
 
 export default InvoicePage;
-
-export const config = {
-  unstable_excludeFiles: ["public/**/*"],
-};

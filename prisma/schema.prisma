@@ -97,15 +97,16 @@ model CompaniesOnUsers {
 }
 
 model Invoice {
-  id          String   @id @default(cuid())
-  number      String
-  description String
-  amount      Float
-  currency    String
-  createdAt   DateTime @default(now())
-  issuedAt    DateTime
-  expiredAt   DateTime
-  data        Json?
+  id           String    @id @default(cuid())
+  number       String
+  description  String
+  amount       Float
+  currency     String
+  createdAt    DateTime  @default(now())
+  issuedAt     DateTime
+  expiredAt    DateTime
+  fullfilledAt DateTime?
+  data         Json?
 
   receiver   Company @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   receiverId String

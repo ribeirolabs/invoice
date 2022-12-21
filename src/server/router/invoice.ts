@@ -178,15 +178,13 @@ export const invoiceRouter = createProtectedRouter()
       });
 
       return invoices.map((invoice) => {
-        let status: InvoiceStatus = "created";
-
-        if (isAfter(new Date(), invoice.expiredAt)) {
-          status = "overdue";
-        }
-
-        if (invoice._count.emailHistory > 0) {
-          status = "sent";
-        }
+        const status: InvoiceStatus = invoice.fullfilledAt
+          ? "fullfilled"
+          : isAfter(new Date(), invoice.expiredAt)
+          ? "overdue"
+          : invoice._count.emailHistory > 0
+          ? "sent"
+          : "created";
 
         return {
           ...invoice,
@@ -273,9 +271,16 @@ export const invoiceRouter = createProtectedRouter()
       });
     },
   })
-  .query("status", {
-    input: z.object({
-      id: z.string().cuid(),
-    }),
-    async resolve({ ctx, input }) {},
+  .mutation("fullfill", {
+    input: z.string().cuid(),
+    resolve({ ctx, input }) {
+      return ctx.prisma.invoice.update({
+        data: {
+          fullfilledAt: new Date(),
+        },
+        where: {
+          id: input,
+        },
+      });
+    },
   });

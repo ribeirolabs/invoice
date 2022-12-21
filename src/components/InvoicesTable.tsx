@@ -3,7 +3,12 @@ import { noSSR } from "@/utils/no-ssr";
 import { inferQueryOutput, trpc } from "@/utils/trpc";
 import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
-import { ArrowDownIcon, DeleteIcon, SendIcon } from "@common/components/Icons";
+import {
+  ArrowDownIcon,
+  CheckIcon,
+  DeleteIcon,
+  SendIcon,
+} from "@common/components/Icons";
 import { addToast } from "@common/components/Toast";
 import { Senstive } from "./Sensitive";
 import { InvoiceIcon } from "./Icons";
@@ -73,8 +78,7 @@ const STATUS_CLASS: Record<InvoiceStatus, string> = {
   created: "",
   sent: "badge-info",
   overdue: "badge-error",
-  paid: "badge-primary",
-  received: "badge-primary",
+  fullfilled: "badge-primary",
 };
 
 const InvoiceRow = ({
@@ -89,6 +93,11 @@ const InvoiceRow = ({
       addToast(`Invoice ${data.number} deleted`, "success");
 
       onDelete();
+    },
+  });
+  const fullfillInvoice = trpc.useMutation("invoice.fullfill", {
+    onSuccess(data) {
+      addToast(`Invoice ${data.number} marked as fullfilled`, "success");
     },
   });
 
@@ -135,6 +144,17 @@ const InvoiceRow = ({
             >
               <SendIcon />
             </button>
+          </div>
+          <div className="flex justify-end">
+            <div className="tooltip" data-tip="Mark as fullfilled">
+              <button
+                onClick={() => fullfillInvoice.mutate(invoice.id)}
+                className="btn btn-action"
+                data-loading={fullfillInvoice.isLoading}
+              >
+                <CheckIcon />
+              </button>
+            </div>
           </div>
           <div className="tooltip tooltip-left" data-tip="Delete">
             <button

@@ -1,7 +1,6 @@
 import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
 import { inferQueryOutput, trpc } from "@/utils/trpc";
-import { Company, Invoice } from "@prisma/client";
 import Link from "next/link";
 import {
   ArrowDownIcon,
@@ -59,13 +58,7 @@ export const InvoicesTable = () => {
             )}
 
             {invoices.data?.map((invoice) => {
-              return (
-                <InvoiceRow
-                  key={invoice.id}
-                  invoice={invoice}
-                  onDelete={invoices.refetch}
-                />
-              );
+              return <InvoiceRow key={invoice.id} invoice={invoice} />;
             })}
           </tbody>
         </table>
@@ -83,21 +76,20 @@ const STATUS_CLASS: Record<InvoiceStatus, string> = {
 
 const InvoiceRow = ({
   invoice,
-  onDelete = () => void {},
 }: {
   invoice: inferQueryOutput<"invoice.recent">[number];
-  onDelete?: () => void;
 }) => {
+  const utils = trpc.useContext();
   const deleteInvoice = trpc.useMutation("invoice.delete", {
     onSuccess(data) {
       addToast(`Invoice ${data.number} deleted`, "success");
-
-      onDelete();
+      utils.invalidateQueries(["invoice.recent"]);
     },
   });
   const fullfillInvoice = trpc.useMutation("invoice.fullfill", {
     onSuccess(data) {
       addToast(`Invoice ${data.number} marked as fullfilled`, "success");
+      utils.invalidateQueries(["invoice.recent"]);
     },
   });
 
@@ -146,11 +138,19 @@ const InvoiceRow = ({
             </button>
           </div>
           <div className="flex justify-end">
-            <div className="tooltip" data-tip="Mark as fullfilled">
+            <div
+              className="tooltip"
+              data-tip={
+                invoice.fullfilledAt
+                  ? "Already fullfilled"
+                  : "Mark as fullfilled"
+              }
+            >
               <button
                 onClick={() => fullfillInvoice.mutate(invoice.id)}
                 className="btn btn-action"
                 data-loading={fullfillInvoice.isLoading}
+                disabled={!!invoice.fullfilledAt}
               >
                 <CheckIcon />
               </button>

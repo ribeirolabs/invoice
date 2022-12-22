@@ -129,10 +129,16 @@ const InvoiceRow = ({
       <td>{invoice.expiredAt.toLocaleDateString()}</td>
       <td>
         <div className="flex justify-end">
-          <div className="tooltip" data-tip="Send email">
+          <div
+            className="tooltip"
+            data-tip={
+              invoice.fullfilledAt ? "Already fullfilled" : "Send email"
+            }
+          >
             <button
               onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
               className="btn-action"
+              disabled={!!invoice.fullfilledAt}
             >
               <SendIcon />
             </button>

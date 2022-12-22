@@ -148,6 +148,7 @@ const InvoicePrint = () => {
         <li>
           <button
             onClick={() => openModal(getSendInvoiceModalId(invoice.data.id))}
+            disabled={!!invoice.data.fullfilledAt}
           >
             <SendIcon />
             Send Email

@@ -37,6 +37,7 @@ export async function sendInvoiceEmail({
     "h:Reply-To": invoice.receiver.email,
     "h:X-Mailgun-Variables": JSON.stringify({
       invoice_number: invoice.number,
+      invoice_date: format(invoice.issuedAt, "yyyy/MM/dd"),
       invoice_due_date: format(invoice.expiredAt, "yyyy/MM/dd"),
       invoice_description: invoice.description,
       payer_name: invoice.payer.name,

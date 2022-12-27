@@ -28,6 +28,12 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
   });
 };
 
+function formatAmount(amount: number) {
+  return new Intl.NumberFormat(getLocale(), {
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
 export default function InvoiceGenerate() {
   const [receiverId, setReceiverId] = useState("");
   const [payerId, setPayerId] = useState("");
@@ -91,23 +97,18 @@ export default function InvoiceGenerate() {
     });
   }, [invoiceNumber.reset, invoiceNumber.mutateAsync, payerId, receiverId]);
 
-  const formatAmount = useCallback((amount: number) => {
-    return new Intl.NumberFormat(getLocale(), {
-      maximumFractionDigits: 2,
-    }).format(amount);
-  }, []);
+  const waitingForDecimal = useRef(false);
+  const deleting = useRef(false);
+  const rawAmount = useRef(0);
 
   useEffect(() => {
     if (!latest.data || !payer) {
       return;
     }
 
+    rawAmount.current = latest.data.amount;
     setAmount(formatAmount(latest.data.amount));
-  }, [latest.data, payer, formatAmount]);
-
-  const waitingForDecimal = useRef(false);
-  const deleting = useRef(false);
-  const rawAmount = useRef(0);
+  }, [latest.data, payer]);
 
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     deleting.current = e.key === "Backspace";
@@ -137,6 +138,7 @@ export default function InvoiceGenerate() {
     }
 
     rawAmount.current = parseFloat(value.replace(",", ".") || "0");
+    console.log("onChange", value, rawAmount.current);
 
     setAmount(formatAmount(rawAmount.current));
   }

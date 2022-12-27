@@ -57,9 +57,9 @@ export const InvoicesTable = () => {
               </tr>
             )}
 
-            {invoices.data?.map((invoice) => {
-              return <InvoiceRow key={invoice.id} invoice={invoice} />;
-            })}
+            {invoices.data?.map((invoice) => (
+              <InvoiceRow key={invoice.id} invoice={invoice} />
+            ))}
           </tbody>
         </table>
       </div>
@@ -128,7 +128,7 @@ const InvoiceRow = ({
       </td>
       <td>{invoice.expiredAt.toLocaleDateString()}</td>
       <td>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-1">
           <div
             className="tooltip"
             data-tip={

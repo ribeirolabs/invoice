@@ -17,6 +17,7 @@ import { Portal } from "@common/components/Portal";
 import { getSendInvoiceModalId } from "@/components/SendInvoiceModal";
 import { DownloadIcon, SendIcon } from "@common/components/Icons";
 import { openModal } from "@common/components/Modal";
+import { nlToBr } from "@common/utils/nl-to-br";
 
 const SendInvoiceModal = dynamic(() => import("@/components/SendInvoiceModal"));
 
@@ -194,7 +195,7 @@ const InvoicePrint = () => {
 
           <div>
             <h3>Description</h3>
-            <p>{invoice.data.description}</p>
+            <p>{nlToBr(invoice.data.description)}</p>
           </div>
         </div>
 

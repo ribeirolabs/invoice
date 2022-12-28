@@ -232,7 +232,7 @@ export default function InvoiceGenerate() {
           </Select>
 
           <Select
-            label="Receiver"
+            label="Payer"
             error={!payers.length}
             value={payerId || ""}
             name="payer_id"

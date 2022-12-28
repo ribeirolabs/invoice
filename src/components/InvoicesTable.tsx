@@ -51,8 +51,15 @@ export const InvoicesTable = () => {
             {!invoices.data?.length && (
               <tr>
                 <td colSpan={7}>
-                  No invoices. <Link href="/generate">Generate</Link> your first
-                  one.
+                  <p className="mt-0">
+                    You don&apos;t have any <b>invoices</b> yet.
+                  </p>
+                  <Link href="/generate">
+                    <a className="btn btn-sm">
+                      <InvoiceIcon />
+                      Generate your first invoice
+                    </a>
+                  </Link>
                 </td>
               </tr>
             )}

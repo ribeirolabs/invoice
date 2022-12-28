@@ -90,6 +90,29 @@ export const CompaniesTable = () => {
             </tr>
           </thead>
           <tbody>
+            {!companies.data?.length && (
+              <tr>
+                <td colSpan={7}>
+                  <p className="mt-0">
+                    You don&apos;t have any <b>companies</b> yet.
+                  </p>
+                  <p>
+                    To generate an invoice you need 2 companies:
+                    <ol>
+                      <li>A company that you own</li>
+                      <li>A company to pay you</li>
+                    </ol>
+                  </p>
+                  <Link href="/company/create">
+                    <a className="btn btn-sm">
+                      <AddIcon size={16} />
+                      Add your first company
+                    </a>
+                  </Link>
+                </td>
+              </tr>
+            )}
+
             {companies.data?.map((company) => {
               const isOwned = company.users.some(
                 (user) => user.userId === authUser?.id && user.owner

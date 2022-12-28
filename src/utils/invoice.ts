@@ -5,14 +5,14 @@ export const INVOICE_PATTERN_SYMBOLS = {
   MONTH: "%M",
   DAY: "%D",
   INCREMENT: "%0",
-};
+} as const;
 
 const PATTERNS = {
   YEAR: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.YEAR})`),
   MONTH: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.MONTH})`),
   DAY: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.DAY})`),
   INCREMENT: new RegExp(`(${INVOICE_PATTERN_SYMBOLS.INCREMENT})(\\[\\d\\])?`),
-};
+} as const;
 
 export function parseInvoicePattern(
   pattern: string,
@@ -53,12 +53,4 @@ export function parseInvoicePattern(
   return invoiceNumber;
 }
 
-export const CURRENCY_SYMBOL = {
-  USD: "$",
-  BRL: "R$",
-  EUR: "€",
-};
-
-export const getCurrency = (code: string) => {
-  return CURRENCY_SYMBOL[code as keyof typeof CURRENCY_SYMBOL];
-};
+export const CURRENCIES = ["USD", "BRL", "EUR"] as const;

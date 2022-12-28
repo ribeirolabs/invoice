@@ -7,7 +7,6 @@ import {
   ChangeEvent,
   FormEvent,
   KeyboardEvent,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -21,6 +20,7 @@ import Link from "next/link";
 import { addToast } from "@common/components/Toast";
 import { Alert } from "@common/components/Alert";
 import { useSettingsValue } from "@common/components/Settings";
+import { Select } from "@common/components/Select";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -214,58 +214,44 @@ export default function InvoiceGenerate() {
         <form className="form w-form" onSubmit={onSubmit}>
           <div className="divider"></div>
 
-          <div className="form-control w-full mb-2">
-            <label className="label">
-              <span className="label-text">Receiver</span>
-            </label>
+          <Select
+            label="Receiver"
+            error={!receivers.length}
+            name="receiver_id"
+            onChange={(e) => setReceiverId(e.target.value)}
+            value={receiverId ?? ""}
+          >
+            <option></option>
+            {receivers.map((company) => {
+              return (
+                <option key={company.id} value={company.id}>
+                  {company.alias ?? company.name}
+                </option>
+              );
+            })}
+          </Select>
 
-            <select
-              className={`select select-bordered w-full ${
-                !receivers.length ? "select-error" : ""
-              }`}
-              value={receiverId || ""}
-              name="receiver_id"
-              onChange={(e) => setReceiverId(e.target.value)}
-            >
-              <option></option>
-              {receivers.map((company) => {
-                return (
-                  <option key={company.id} value={company.id}>
-                    {company.alias ?? company.name}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+          <Select
+            label="Receiver"
+            error={!payers.length}
+            value={payerId || ""}
+            name="payer_id"
+            onChange={(e) => setPayerId(e.target.value)}
+          >
+            <option></option>
+            {payers.map((company) => {
+              const user = company.users.find(
+                (user) => user.userId === session.data?.user?.id
+              );
 
-          <div className="form-control w-full mb-2">
-            <label className="label">
-              <span className="label-text">Payer</span>
-            </label>
-
-            <select
-              className={`select select-bordered w-full ${
-                !payers.length ? "select-error" : ""
-              }`}
-              value={payerId || ""}
-              name="payer_id"
-              onChange={(e) => setPayerId(e.target.value)}
-            >
-              <option></option>
-              {payers.map((company) => {
-                const user = company.users.find(
-                  (user) => user.userId === session.data?.user?.id
-                );
-
-                return (
-                  <option key={company.id} value={company.id}>
-                    {company.alias ?? company.name}{" "}
-                    {user?.type === "SHARED" && "(shared)"}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+              return (
+                <option key={company.id} value={company.id}>
+                  {company.alias ?? company.name}{" "}
+                  {user?.type === "SHARED" && "(shared)"}
+                </option>
+              );
+            })}
+          </Select>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -305,7 +291,7 @@ export default function InvoiceGenerate() {
             value={amount}
             onKeyDown={onKeyDown}
             onChange={onChangeAmount}
-            leading={<span>{payer?.currency}</span>}
+            leading={<span>{payer?.currency ?? <>&nbsp;&nbsp;</>}</span>}
             disabled={!payer}
           />
 

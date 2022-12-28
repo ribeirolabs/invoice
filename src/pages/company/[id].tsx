@@ -2,7 +2,11 @@ import pluralize from "pluralize";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { addToast } from "@common/components/Toast";
 import { ssp } from "@common/server/ssp";
-import { INVOICE_PATTERN_SYMBOLS, parseInvoicePattern } from "@/utils/invoice";
+import {
+  CURRENCIES,
+  INVOICE_PATTERN_SYMBOLS,
+  parseInvoicePattern,
+} from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
@@ -13,6 +17,8 @@ import { Input } from "@common/components/Input";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { useEvent } from "@ribeirolabs/events/react";
 import { User } from "@prisma/client";
+import { Select } from "@common/components/Select";
+import { getCurrencySymbol } from "@/utils/currency";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -230,12 +236,18 @@ const CompanyForm = () => {
           </div>
 
           <div className="flex-1">
-            <Input
+            <Select
               label="Currency"
               name="currency"
               defaultValue={company.data?.currency}
-              readOnly={!canEdit}
-            />
+              disabled={!canEdit}
+            >
+              {CURRENCIES.map((code) => (
+                <option key={code} value={code}>
+                  {getCurrencySymbol(code)} - {code}
+                </option>
+              ))}
+            </Select>
           </div>
         </div>
 

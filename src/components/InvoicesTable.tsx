@@ -12,12 +12,12 @@ import { addToast } from "@common/components/Toast";
 import { Senstive } from "./Sensitive";
 import { InvoiceIcon } from "./Icons";
 import { openModal } from "@common/components/Modal";
-import { getSendInvoiceModalId } from "./SendInvoiceModal";
+import { getSendInvoiceModalId } from "./Modal/SendInvoiceModal";
 import dynamic from "next/dynamic";
 import { InvoiceStatus } from "@/utils/invoice";
 import formatDistance from "date-fns/formatDistance";
 
-const SendInvoiceModal = dynamic(() => import("./SendInvoiceModal"));
+const SendInvoiceModal = dynamic(() => import("./Modal/SendInvoiceModal"));
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);

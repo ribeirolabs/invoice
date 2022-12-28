@@ -14,12 +14,14 @@ import { dispatchCustomEvent } from "@ribeirolabs/events";
 import { ErrorBoundary } from "react-error-boundary";
 import dynamic from "next/dynamic";
 import { Portal } from "@common/components/Portal";
-import { getSendInvoiceModalId } from "@/components/SendInvoiceModal";
+import { getSendInvoiceModalId } from "@/components/Modal/SendInvoiceModal";
 import { DownloadIcon, SendIcon } from "@common/components/Icons";
 import { openModal } from "@common/components/Modal";
 import { nlToBr } from "@common/utils/nl-to-br";
 
-const SendInvoiceModal = dynamic(() => import("@/components/SendInvoiceModal"));
+const SendInvoiceModal = dynamic(
+  () => import("@/components/Modal/SendInvoiceModal")
+);
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {

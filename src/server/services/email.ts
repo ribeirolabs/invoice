@@ -1,5 +1,6 @@
 import { env } from "@/env/server.mjs";
 import { getCurrencySymbol } from "@/utils/currency";
+import { getInvoiceFilename } from "@/utils/invoice";
 import { nlToBr } from "@common/utils/nl-to-br";
 import { Invoice } from "@prisma/client";
 import format from "date-fns/format";
@@ -56,7 +57,7 @@ export async function sendInvoiceEmail({
     }),
     attachment: {
       data: pdf,
-      filename: `${invoice.number}.pdf`,
+      filename: getInvoiceFilename(invoice),
       contentType: "application/pdf",
     },
   };

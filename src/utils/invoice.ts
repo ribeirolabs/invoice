@@ -1,3 +1,5 @@
+import { Invoice } from "@prisma/client";
+
 export type InvoiceStatus = "created" | "sent" | "overdue" | "fullfilled";
 
 export const INVOICE_PATTERN_SYMBOLS = {
@@ -54,3 +56,7 @@ export function parseInvoicePattern(
 }
 
 export const CURRENCIES = ["USD", "BRL", "EUR"] as const;
+
+export function getInvoiceFilename(invoice: Invoice) {
+  return `${invoice.number.replace(/[^a-z0-9_-]/gi, "_")}.pdf`;
+}

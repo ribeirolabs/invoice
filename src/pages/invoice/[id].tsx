@@ -18,6 +18,7 @@ import { getSendInvoiceModalId } from "@/components/Modal/SendInvoiceModal";
 import { DownloadIcon, SendIcon } from "@common/components/Icons";
 import { openModal } from "@common/components/Modal";
 import { nlToBr } from "@common/utils/nl-to-br";
+import { getInvoiceFilename } from "@/utils/invoice";
 
 const SendInvoiceModal = dynamic(
   () => import("@/components/Modal/SendInvoiceModal")
@@ -111,7 +112,7 @@ const InvoicePrint = () => {
       const blob = new Blob([file], { type: "application/pdf" });
       const a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
-      a.download = `${invoice.data.number}.pdf`;
+      a.download = getInvoiceFilename(invoice.data);
       a.click();
     } catch (e) {
       console.error(e);

@@ -15,6 +15,7 @@ import { openModal } from "@common/components/Modal";
 import { getSendInvoiceModalId } from "./SendInvoiceModal";
 import dynamic from "next/dynamic";
 import { InvoiceStatus } from "@/utils/invoice";
+import formatDistance from "date-fns/formatDistance";
 
 const SendInvoiceModal = dynamic(() => import("./SendInvoiceModal"));
 
@@ -133,7 +134,9 @@ const InvoiceRow = ({
           {invoice.receiver.alias ?? invoice.receiver.name}
         </div>
       </td>
-      <td>{invoice.expiredAt.toLocaleDateString()}</td>
+      <td>
+        {formatDistance(invoice.expiredAt, new Date(), { addSuffix: true })}
+      </td>
       <td>
         <div className="flex justify-end gap-1">
           <div

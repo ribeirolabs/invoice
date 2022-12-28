@@ -23,11 +23,17 @@ export default function SendInvoiceModal({
   const id = getSendInvoiceModalId(invoice.id);
 
   function onConfirm() {
-    sendInvoice.mutateAsync({ id: invoice.id }).then(() => {
-      closeModal(id);
-      addToast(`Invoice ${invoice.number} sent!`, "success");
-      history.refetch();
-    });
+    sendInvoice
+      .mutateAsync({ id: invoice.id })
+      .then(() => {
+        closeModal(id);
+        addToast(`Invoice ${invoice.number} sent!`, "success");
+        history.refetch();
+      })
+      .catch((e) => {
+        console.error(e);
+        addToast(`Unable to send ${invoice.number}`, "error");
+      });
   }
 
   const historyCount = history.data?.length ?? 0;
@@ -36,12 +42,11 @@ export default function SendInvoiceModal({
     <Modal id={id} size="sm">
       <div className="p-4">
         <h2>Are you sure?</h2>
-        <p>You&apos;re about to send an email with:</p>
         <p>
-          <b>invoice:</b> {invoice.number}
-          <br />
-          <b>to:</b> {invoice.payer.email}
+          You&apos;re about to send <b>{invoice.number}</b> to:
         </p>
+        <p className="font-bold">{invoice.payer.email}</p>
+        <p className="text-sm">*You will also receive a copy</p>
 
         {history.isLoading ? (
           <p>Checking email history...</p>

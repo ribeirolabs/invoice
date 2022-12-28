@@ -1,8 +1,10 @@
 import { env } from "@/env/server.mjs";
+import { getCurrencySymbol } from "@/utils/currency";
 import { Invoice } from "@prisma/client";
 import format from "date-fns/format";
 import formData from "form-data";
 import Mailgun from "mailgun.js";
+import { MailgunMessageData } from "mailgun.js/interfaces/Messages";
 import { NextApiRequest } from "next";
 import { generatePdf } from "./pdf";
 
@@ -23,20 +25,26 @@ export async function sendInvoiceEmail({
   };
   req: NextApiRequest;
 }) {
+  if (!req.headers.origin) {
+    throw new Error('Unable to generate PDF, missing "origin" from request');
+  }
+
   const pdf = await generatePdf({
     id: invoice.id,
-    domain: req.headers.origin!,
+    domain: req.headers.origin,
     cookies: req.cookies,
   });
 
-  const data = {
-    from: `${invoice.receiver.name} <mailgun@${env.EMAIL_API_DOMAIN}>`,
-    to: [invoice.payer.email, invoice.receiver.email],
-    subject: `Invoice - ${invoice.receiver.name}`,
-    template: "send-invoice",
+  const data: MailgunMessageData = {
+    from: `${invoice.receiver.name} <${env.EMAIL_API_SENDER}>`,
+    to: invoice.payer.email,
+    cc: invoice.receiver.email,
+    subject: `Invoice from: ${invoice.receiver.name}`,
+    template: "invoice.send-invoice",
     "h:Reply-To": invoice.receiver.email,
     "h:X-Mailgun-Variables": JSON.stringify({
       invoice_number: invoice.number,
+      invoice_currency: getCurrencySymbol(invoice.currency),
       invoice_date: format(invoice.issuedAt, "yyyy/MM/dd"),
       invoice_due_date: format(invoice.expiredAt, "yyyy/MM/dd"),
       invoice_description: invoice.description,

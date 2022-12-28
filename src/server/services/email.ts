@@ -1,5 +1,6 @@
 import { env } from "@/env/server.mjs";
 import { getCurrencySymbol } from "@/utils/currency";
+import { nlToBr } from "@common/utils/nl-to-br";
 import { Invoice } from "@prisma/client";
 import format from "date-fns/format";
 import formData from "form-data";
@@ -47,7 +48,7 @@ export async function sendInvoiceEmail({
       invoice_currency: getCurrencySymbol(invoice.currency),
       invoice_date: format(invoice.issuedAt, "yyyy/MM/dd"),
       invoice_due_date: format(invoice.expiredAt, "yyyy/MM/dd"),
-      invoice_description: invoice.description,
+      invoice_description: nlToBr(invoice.description),
       payer_name: invoice.payer.name,
       payer_email: invoice.payer.email,
       receiver_name: invoice.receiver.name,

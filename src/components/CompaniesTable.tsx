@@ -96,13 +96,11 @@ export const CompaniesTable = () => {
                   <p className="mt-0">
                     You don&apos;t have any <b>companies</b> yet.
                   </p>
-                  <p>
-                    To generate an invoice you need 2 companies:
-                    <ol>
-                      <li>A company that you own</li>
-                      <li>A company to pay you</li>
-                    </ol>
-                  </p>
+                  <p>To generate an invoice you need 2 companies:</p>
+                  <ol>
+                    <li>A company that you own</li>
+                    <li>A company to pay you</li>
+                  </ol>
                   <Link href="/company/create">
                     <a className="btn btn-sm">
                       <AddIcon size={16} />

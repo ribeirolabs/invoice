@@ -1,3 +1,4 @@
+import parse from "html-react-parser";
 import { ssp } from "@common/server/ssp";
 import { formatCurrency } from "@/utils/currency";
 import { noSSR } from "@/utils/no-ssr";
@@ -198,7 +199,7 @@ const InvoicePrint = () => {
 
           <div>
             <h3>Description</h3>
-            <p>{nlToBr(invoice.data.description)}</p>
+            <p>{parse(nlToBr(invoice.data.description))}</p>
           </div>
         </div>
 

@@ -19,6 +19,7 @@ import { useEvent } from "@ribeirolabs/events/react";
 import { User } from "@prisma/client";
 import { Select } from "@common/components/Select";
 import { getCurrencySymbol } from "@/utils/currency";
+import { objectKeys } from "@common/utils/object-keys";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -90,7 +91,16 @@ const CompanyForm = () => {
   function insertInvoicePatternSymbol(
     symbol: keyof typeof INVOICE_PATTERN_SYMBOLS
   ) {
-    setPattern((pattern) => pattern + INVOICE_PATTERN_SYMBOLS[symbol]);
+    setPattern((current) => {
+      const pattern = INVOICE_PATTERN_SYMBOLS[symbol];
+      const next = [current, pattern];
+
+      if (symbol === "INCREMENT") {
+        next.push("[3]");
+      }
+
+      return next.join("");
+    });
   }
 
   async function onDetach() {
@@ -253,65 +263,48 @@ const CompanyForm = () => {
           </div>
         </div>
 
-        <Input
-          label="Invoice Number Pattern"
-          name="invoice_number_pattern"
-          placeholder="INV-%Y/%0[4]"
-          helper={parseInvoicePattern(pattern, { INCREMENT: 0 }) || "-"}
-          value={pattern}
-          onChange={(e) => setPattern(e.target.value)}
-          readOnly={!canEdit}
-          required
-        />
-
-        <div className="not-prose">
-          <ul className="leading-4 text-xs grid gap-1">
-            <li>
-              <button
-                className="btn btn-xs"
-                type="button"
-                onClick={() => insertInvoicePatternSymbol("YEAR")}
-              >
-                {INVOICE_PATTERN_SYMBOLS.YEAR}
-              </button>{" "}
-              = year
-            </li>
-            <li>
-              <button
-                className="btn btn-xs"
-                type="button"
-                onClick={() => insertInvoicePatternSymbol("MONTH")}
-              >
-                %M
-              </button>{" "}
-              = month
-            </li>
-            <li>
-              <button
-                className="btn btn-xs"
-                type="button"
-                onClick={() => insertInvoicePatternSymbol("DAY")}
-              >
-                %D
-              </button>{" "}
-              = day
-            </li>
-            <li>
-              <button
-                className="btn btn-xs"
-                type="button"
-                onClick={() => insertInvoicePatternSymbol("INCREMENT")}
-              >
-                %0
-              </button>{" "}
-              = increment. Use [n] to specify number of leading zeros
-            </li>
-
-            <ul className="not-prose ml-6 leading-4 text-xs">
-              <li>%0[3] = 001, 002, 003...</li>
-            </ul>
-          </ul>
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <Input
+              label="Invoice Number Pattern"
+              name="invoice_number_pattern"
+              placeholder="INV-%Y/%0[4]"
+              value={pattern}
+              onChange={(e) => setPattern(e.target.value)}
+              readOnly={!canEdit}
+              required
+              helper={
+                /\%0/.test(pattern)
+                  ? "Use the [X] after %0 to control the leading numbers for the increment"
+                  : ""
+              }
+            />
+          </div>
+          <div className="flex-1 flex gap-2 flex-col">
+            <span>&nbsp;</span>
+            <div className="h-[48px] flex items-center">
+              <h3 className="m-0">
+                {parseInvoicePattern(pattern, { INCREMENT: 0 }) || "-"}
+              </h3>
+            </div>
+          </div>
         </div>
+
+        <div className="btn-group">
+          {objectKeys(INVOICE_PATTERN_SYMBOLS).map((pattern) => (
+            <button
+              key={pattern}
+              className="btn btn-sm"
+              type="button"
+              onClick={() => insertInvoicePatternSymbol(pattern)}
+            >
+              {pattern}
+            </button>
+          ))}
+        </div>
+        <p className="m-0 text-sm">
+          Click on the buttons above to insert a pattern
+        </p>
 
         <Alert type="info" inverse className="my-8">
           The update will only affect future invoices

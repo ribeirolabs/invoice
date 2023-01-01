@@ -261,6 +261,7 @@ const CompanyForm = () => {
           value={pattern}
           onChange={(e) => setPattern(e.target.value)}
           readOnly={!canEdit}
+          required
         />
 
         <div className="not-prose">

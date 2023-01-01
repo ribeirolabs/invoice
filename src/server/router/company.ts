@@ -6,12 +6,12 @@ export const companyRouter = createProtectedRouter()
   .mutation("upsert", {
     input: z.object({
       id: z.string().nullish(),
-      name: z.string(),
-      email: z.string(),
+      name: z.string().min(5),
+      email: z.string().email(),
       alias: z.string().optional(),
-      currency: z.string(),
-      address: z.string(),
-      invoiceNumberPattern: z.string(),
+      currency: z.string().min(3).max(5),
+      address: z.string().min(10),
+      invoiceNumberPattern: z.string().min(3),
       owner: z.boolean(),
     }),
     async resolve({ input, ctx }) {

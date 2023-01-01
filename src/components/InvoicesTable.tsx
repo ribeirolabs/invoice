@@ -16,8 +16,10 @@ import { getSendInvoiceModalId } from "./Modal/SendInvoiceModal";
 import dynamic from "next/dynamic";
 import { InvoiceStatus } from "@/utils/invoice";
 import formatDistance from "date-fns/formatDistance";
+import { getDeleteInvoiceModalId } from "./Modal/DeleteInvoiceModal";
 
 const SendInvoiceModal = dynamic(() => import("./Modal/SendInvoiceModal"));
+const DeleteInvoiceModal = dynamic(() => import("./Modal/DeleteInvoiceModal"));
 
 export const InvoicesTable = () => {
   const invoices = trpc.useQuery(["invoice.recent"]);
@@ -88,12 +90,6 @@ const InvoiceRow = ({
   invoice: inferQueryOutput<"invoice.recent">[number];
 }) => {
   const utils = trpc.useContext();
-  const deleteInvoice = trpc.useMutation("invoice.delete", {
-    onSuccess(data) {
-      addToast(`Invoice ${data.number} deleted`, "success");
-      utils.invalidateQueries(["invoice.recent"]);
-    },
-  });
   const fullfillInvoice = trpc.useMutation("invoice.fullfill", {
     onSuccess(data) {
       addToast(`Invoice ${data.number} marked as fullfilled`, "success");
@@ -104,7 +100,7 @@ const InvoiceRow = ({
   const invoiceUrl = `/invoice/${invoice.id}`;
 
   return (
-    <tr className={deleteInvoice.isLoading ? "opacity-5" : ""}>
+    <tr>
       <td className="font-normal align-top">
         <div className="flex flex-col">
           <Link href={invoiceUrl}>
@@ -174,8 +170,7 @@ const InvoiceRow = ({
           </div>
           <div className="tooltip tooltip-left" data-tip="Delete">
             <button
-              onClick={() => deleteInvoice.mutateAsync(invoice.id)}
-              disabled={deleteInvoice.isLoading}
+              onClick={() => openModal(getDeleteInvoiceModalId(invoice.id))}
               className="btn-action"
             >
               <DeleteIcon />
@@ -185,6 +180,7 @@ const InvoiceRow = ({
       </td>
 
       <SendInvoiceModal invoice={invoice} />
+      <DeleteInvoiceModal invoice={invoice} />
     </tr>
   );
 };

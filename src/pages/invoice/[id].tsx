@@ -16,13 +16,18 @@ import { ErrorBoundary } from "react-error-boundary";
 import dynamic from "next/dynamic";
 import { Portal } from "@common/components/Portal";
 import { getSendInvoiceModalId } from "@/components/Modal/SendInvoiceModal";
-import { DownloadIcon, SendIcon } from "@common/components/Icons";
+import { DeleteIcon, DownloadIcon, SendIcon } from "@common/components/Icons";
 import { openModal } from "@common/components/Modal";
 import { nlToBr } from "@common/utils/nl-to-br";
 import { getInvoiceFilename } from "@/utils/invoice";
+import { getDeleteInvoiceModalId } from "@/components/Modal/DeleteInvoiceModal";
 
 const SendInvoiceModal = dynamic(
   () => import("@/components/Modal/SendInvoiceModal")
+);
+
+const DeleteInvoiceModal = dynamic(
+  () => import("@/components/Modal/DeleteInvoiceModal")
 );
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
@@ -159,6 +164,14 @@ const InvoicePrint = () => {
             Send Email
           </button>
         </li>
+        <li>
+          <button
+            onClick={() => openModal(getDeleteInvoiceModalId(invoice.data.id))}
+          >
+            <DeleteIcon />
+            Delete Invoice
+          </button>
+        </li>
       </Portal>
 
       <div>
@@ -233,6 +246,7 @@ const InvoicePrint = () => {
       </footer>
 
       <SendInvoiceModal invoice={invoice.data} />
+      <DeleteInvoiceModal invoice={invoice.data} />
     </div>
   );
 };

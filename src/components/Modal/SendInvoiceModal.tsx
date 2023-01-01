@@ -41,12 +41,16 @@ export default function SendInvoiceModal({
   return (
     <Modal id={id} size="sm">
       <div className="p-4">
-        <h2>Are you sure?</h2>
-        <p>
-          You&apos;re about to send <b>{invoice.number}</b> to:
+        <h2>Send Invoice</h2>
+        <p className="m-0">
+          You&apos;re about to send an email to{" "}
+          <span className="text-highlight">{invoice.payer.email}</span> with the
+          invoice <b className="text-highlight">{invoice.number}</b>
         </p>
-        <p className="font-bold">{invoice.payer.email}</p>
-        <p className="text-sm">*You will also receive a copy</p>
+        <p>
+          You&apos;ll also receive a copy on{" "}
+          <b className="text-highlight">{invoice.receiver.email}</b>
+        </p>
 
         {history.isLoading ? (
           <p>Checking email history...</p>

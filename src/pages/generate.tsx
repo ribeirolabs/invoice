@@ -21,6 +21,7 @@ import { addToast } from "@common/components/Toast";
 import { Alert } from "@common/components/Alert";
 import { useSettingsValue } from "@common/components/Settings";
 import { Select } from "@common/components/Select";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -39,9 +40,8 @@ export default function InvoiceGenerate() {
   const [payerId, setPayerId] = useState("");
   const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [dueDateDays, setDueDateDays] = useState(5);
-
   const [amount, setAmount] = useState("");
-
+  const router = useRouter();
   const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
   const invoiceNumber = trpc.useMutation("invoice.getNumber");
@@ -156,6 +156,7 @@ export default function InvoiceGenerate() {
 
     const receiverId = data.get("receiver_id") as string;
     const payerId = data.get("payer_id") as string;
+    const openInvoice = Boolean(data.get("open_invoice"));
 
     try {
       const response = await invoice.mutateAsync({
@@ -174,9 +175,11 @@ export default function InvoiceGenerate() {
 
       latest.refetch();
 
-      window.open(`/invoice/${response.id}`, "_blank");
-
-      form.reset();
+      if (openInvoice) {
+        router.replace(`/invoice/${response.id}`);
+      } else {
+        router.replace("/");
+      }
     } catch (e) {
       console.error(e);
       addToast("Unable to generate invoice", "error");
@@ -296,6 +299,13 @@ export default function InvoiceGenerate() {
           />
 
           <div className="divider"></div>
+
+          <div className="flex justify-end mb-4">
+            <div className="flex gap-2 items-center">
+              <label className="cursor-pointer text-sm">Open invoice</label>
+              <input type="checkbox" className="toggle" name="open_invoice" />
+            </div>
+          </div>
 
           <div className="btn-form-group">
             <Link href="/">

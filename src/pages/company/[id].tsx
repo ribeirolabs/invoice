@@ -112,28 +112,32 @@ const CompanyForm = () => {
     const data = new FormData(form);
     const action = company.data?.id ? "update" : "create";
 
-    try {
-      await upsert.mutateAsync({
-        id: data.get("id") as string,
-        name: data.get("name") as string,
-        alias: data.get("alias") as string,
-        email: data.get("email") as string,
-        address: data.get("address") as string,
-        currency: data.get("currency") as string,
-        invoiceNumberPattern: data.get("invoice_number_pattern") as string,
-        owner: Boolean(data.get("owner") as string),
-      });
+    const request = {
+      id: data.get("id") as string,
+      name: data.get("name") as string,
+      alias: data.get("alias") as string,
+      email: data.get("email") as string,
+      address: data.get("address") as string,
+      currency: data.get("currency") as string,
+      invoiceNumberPattern: data.get("invoice_number_pattern") as string,
+      owner: Boolean(data.get("owner") as string),
+    };
 
-      if (action === "update") {
-        company.refetch();
-      } else {
+    try {
+      await upsert.mutateAsync(request);
+
+      if (action === "create" && Boolean(data.get("create_another"))) {
         form.reset();
+        (form.querySelector('input[name="name"]') as HTMLInputElement)?.focus();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        router.push("/");
       }
 
-      addToast(`Company ${action}d`, "success");
+      addToast(`Company ${request.alias ?? ""} ${action}d`, "success");
     } catch (e) {
       console.error(e);
-      addToast(`Unable to ${action} company`, "error");
+      addToast(`Unable to ${action} company ${request.alias ?? ""}`, "error");
     }
   }
 
@@ -184,8 +188,6 @@ const CompanyForm = () => {
       </div>
 
       <form className="form w-full md:max-w-lg" onSubmit={onSubmit}>
-        <input type="hidden" name="id" value={company.data?.id} />
-
         <Input
           label="Name"
           name="name"
@@ -310,11 +312,25 @@ const CompanyForm = () => {
           </ul>
         </div>
 
-        <div className="divider"></div>
-
-        <Alert type="info" inverse>
+        <Alert type="info" inverse className="my-8">
           The update will only affect future invoices
         </Alert>
+
+        <div className="divider" />
+
+        {!company.data ? (
+          <div className="flex justify-end">
+            <div className="flex gap-2 items-center">
+              <label className="cursor-pointer text-sm">Create another</label>
+              <input
+                type="checkbox"
+                className="toggle"
+                name="create_another"
+                disabled={!canEdit}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-4 btn-form-group">
           <Link href="/">
@@ -333,6 +349,8 @@ const CompanyForm = () => {
             <span>&nbsp;</span>
           )}
         </div>
+
+        <input type="hidden" name="id" value={company.data?.id} />
       </form>
 
       <Modal users={sharedWith} />

@@ -57,6 +57,6 @@ export function parseInvoicePattern(
 
 export const CURRENCIES = ["USD", "BRL", "EUR"] as const;
 
-export function getInvoiceFilename(invoice: Invoice) {
+export function getInvoiceFilename(invoice: { number: string }) {
   return `${invoice.number.replace(/[^a-z0-9_-]/gi, "_")}.pdf`;
 }

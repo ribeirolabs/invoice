@@ -12,4 +12,7 @@ module.exports = {
     },
   },
   translations: {},
+  auth: {
+    scopes: ["https://www.googleapis.com/auth/gmail.compose"],
+  },
 };

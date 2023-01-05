@@ -313,12 +313,6 @@ export const invoiceRouter = createProtectedRouter()
             access_token: true,
             refresh_token: true,
             expires_at: true,
-            user: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
           },
         }),
       ]);
@@ -343,7 +337,7 @@ export const invoiceRouter = createProtectedRouter()
 
       const message = new MailComposer({
         to: invoice.payer.email,
-        from: `${invoice.receiver.name} <${account.user.email}>`,
+        from: `${invoice.receiver.name} <${ctx.session.user.email}>`,
         subject: `Invoice from: ${invoice.receiver.name}`,
         html: renderToStaticMarkup(
           createElement(InvoiceEmail, {

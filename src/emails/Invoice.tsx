@@ -1,7 +1,6 @@
 import parse from "html-react-parser";
 import { nlToBr } from "@common/utils/nl-to-br";
 import { Company, Invoice } from "@prisma/client";
-import format from "date-fns/format";
 import { Spacing, Row, Heading, Separator, Text, Link } from "./Components";
 import formatInTimeZone from "date-fns-tz/formatInTimeZone";
 

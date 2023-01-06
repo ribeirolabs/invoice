@@ -36,11 +36,12 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
         <Row bg="#fff">
           <div>
             <Heading level={3}>Issued</Heading>
-            <Text>{format(invoice.issuedAt, "MMM dd, yyyy")}</Text>
+            <Text>{format(invoice.issuedAt, "MMM d, yyyy")}</Text>
+            <Text>{invoice.issuedAt.toString()}</Text>
           </div>
           <div>
             <Heading level={3}>Due Date</Heading>
-            <Text>{format(invoice.expiredAt, "MMM dd, yyyy")}</Text>
+            <Text>{format(invoice.expiredAt, "MMM d, yyyy")}</Text>
           </div>
         </Row>
         <Row bg="#fff">

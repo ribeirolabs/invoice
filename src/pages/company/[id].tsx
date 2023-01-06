@@ -61,7 +61,6 @@ const CompanyForm = () => {
   ]);
 
   const authUser = session.data?.user;
-
   const [pattern, setPattern] = useState("");
 
   const user = useMemo(() => {
@@ -138,6 +137,8 @@ const CompanyForm = () => {
 
       if (action === "create" && Boolean(data.get("create_another"))) {
         form.reset();
+        setPattern("");
+
         (form.querySelector('input[name="name"]') as HTMLInputElement)?.focus();
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {

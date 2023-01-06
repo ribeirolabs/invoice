@@ -214,7 +214,7 @@ export default function InvoiceGenerate() {
           ) : null}
         </div>
 
-        <form className="form w-form" onSubmit={onSubmit}>
+        <form className="form w-form" onSubmit={onSubmit} autoComplete="off">
           <div className="divider"></div>
 
           <Select

@@ -198,7 +198,11 @@ const CompanyForm = () => {
         <div className="divider"></div>
       </div>
 
-      <form className="form w-full md:max-w-lg" onSubmit={onSubmit}>
+      <form
+        className="form w-full md:max-w-lg"
+        onSubmit={onSubmit}
+        autoComplete="off"
+      >
         <Input
           label="Name"
           name="name"

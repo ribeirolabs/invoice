@@ -1,15 +1,8 @@
+import parse from "html-react-parser";
 import { nlToBr } from "@common/utils/nl-to-br";
 import { Company, Invoice } from "@prisma/client";
 import format from "date-fns/format";
-import {
-  Background,
-  Spacing,
-  Row,
-  Heading,
-  Separator,
-  Text,
-  Link,
-} from "./Components";
+import { Spacing, Row, Heading, Separator, Text, Link } from "./Components";
 
 type PartialInvoice = Pick<
   Invoice,
@@ -53,7 +46,7 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
         <Row bg="#fff">
           <div>
             <Heading level={3}>Description</Heading>
-            <Text>{nlToBr(invoice.description)}</Text>
+            <Text>{parse(nlToBr(invoice.description))}</Text>
           </div>
         </Row>
         <Row bg="#fff">

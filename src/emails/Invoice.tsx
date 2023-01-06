@@ -3,6 +3,7 @@ import { nlToBr } from "@common/utils/nl-to-br";
 import { Company, Invoice } from "@prisma/client";
 import format from "date-fns/format";
 import { Spacing, Row, Heading, Separator, Text, Link } from "./Components";
+import formatInTimeZone from "date-fns-tz/formatInTimeZone";
 
 type PartialInvoice = Pick<
   Invoice,
@@ -10,6 +11,9 @@ type PartialInvoice = Pick<
 > & {
   payer: Pick<Company, "name" | "email" | "currency">;
   receiver: Pick<Company, "name" | "email">;
+  user: {
+    timezone: string;
+  };
 };
 
 export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
@@ -36,12 +40,23 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
         <Row bg="#fff">
           <div>
             <Heading level={3}>Issued</Heading>
-            <Text>{format(invoice.issuedAt, "MMM d, yyyy")}</Text>
-            <Text>{invoice.issuedAt.toString()}</Text>
+            <Text>
+              {formatInTimeZone(
+                invoice.issuedAt,
+                invoice.user.timezone,
+                "MMM d, yyyy"
+              )}
+            </Text>
           </div>
           <div>
             <Heading level={3}>Due Date</Heading>
-            <Text>{format(invoice.expiredAt, "MMM d, yyyy")}</Text>
+            <Text>
+              {formatInTimeZone(
+                invoice.expiredAt,
+                invoice.user.timezone,
+                "MMM d, yyyy"
+              )}
+            </Text>
           </div>
         </Row>
         <Row bg="#fff">

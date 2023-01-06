@@ -300,6 +300,11 @@ export const invoiceRouter = createProtectedRouter()
                 currency: true,
               },
             },
+            user: {
+              select: {
+                timezone: true,
+              },
+            },
           },
         }),
 
@@ -446,6 +451,11 @@ export const invoiceRouter = createProtectedRouter()
         include: {
           payer: true,
           receiver: true,
+          user: {
+            select: {
+              timezone: true,
+            },
+          },
         },
       });
 

@@ -14,7 +14,6 @@ import {
 } from "react";
 import format from "date-fns/format";
 import addDays from "date-fns/addDays";
-import { getLocale } from "@/utils/locale";
 import { getSeparators } from "@/utils/currency";
 import Link from "next/link";
 import { addToast } from "@common/components/Toast";
@@ -22,6 +21,7 @@ import { Alert } from "@common/components/Alert";
 import { useSettingsValue } from "@common/components/Settings";
 import { Select } from "@common/components/Select";
 import { useRouter } from "next/router";
+import { getLocale } from "@common/utils/locale";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {

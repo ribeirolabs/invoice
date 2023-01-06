@@ -1,4 +1,4 @@
-import { getLocale } from "./locale";
+import { getLocale } from "@common/utils/locale";
 
 export function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat(getLocale(), {

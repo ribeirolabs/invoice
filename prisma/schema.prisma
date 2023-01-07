@@ -12,23 +12,46 @@ datasource db {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String  @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String   @db.Text
   expires_at        BigInt?
   token_type        String?
-  scope             String? @db.Text
-  id_token          String? @db.Text
+  scope             String?  @db.Text
+  id_token          String?  @db.Text
   session_state     String?
+  createdAt         DateTime @default(now())
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
+}
+
+model AccountTransfer {
+  id String @id @default(cuid())
+
+  fromUser      User?   @relation("from", fields: [fromUserId], references: [id], onDelete: SetNull)
+  fromUserId    String?
+  fromUserEmail String
+
+  toUser      User?   @relation("to", fields: [toUserId], references: [id], onDelete: Cascade)
+  toUserId    String?
+  toUserEmail String
+
+  sentAt     DateTime  @default(now())
+  acceptedAt DateTime?
+  rejectedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([fromUserEmail, toUserEmail])
+  @@index([fromUserId])
+  @@index([toUserId])
 }
 
 model Session {
@@ -51,11 +74,13 @@ model User {
   timezone      String
   createdAt     DateTime  @default(now())
 
-  accounts  Account[]
-  sessions  Session[]
-  invoices  Invoice[]
-  companies CompaniesOnUsers[] @relation("user")
-  shared    CompaniesOnUsers[] @relation("sharedBy")
+  accounts             Account[]
+  sessions             Session[]
+  invoices             Invoice[]
+  companies            CompaniesOnUsers[] @relation("user")
+  shared               CompaniesOnUsers[] @relation("sharedBy")
+  accountTransfersFrom AccountTransfer[]  @relation("from")
+  accountTransfersTo   AccountTransfer[]  @relation("to")
 }
 
 model VerificationToken {

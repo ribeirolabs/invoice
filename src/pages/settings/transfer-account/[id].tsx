@@ -94,18 +94,17 @@ function Page() {
       <h3>Activity</h3>
       <div className="rounded-lg py-5 px-6 my-4 bg-base-300 relative">
         <span className="w-[1px] h-full absolute left-6 top-0 bg-base-content/20"></span>
+
         {transfer.data.events.map((event, i) => (
-          <div key={i} className="relative">
-            <div className="flex flex-col items-start md:flex-row md:items-center md:gap-6 pl-6 py-4 md:py-2">
+          <div key={i} className="relative text-sm">
+            <div className="flex flex-col items-start md:flex-row md:items-center md:gap-6 pl-6 py-4 md:py-3">
               <span className="text-highlight">{event.author}</span>
               <span className="text-neutral-content">{event.action}</span>
-              <span className="opacity-80 text-sm">
-                {dateToDistance(event.date)}
-              </span>
+              <span className="opacity-80">{dateToDistance(event.date)}</span>
             </div>
 
-            <span className="overflow-hidden rounded-full w-6 h-6 bg-base-300 absolute left-0 top-[50%] translate-x-[-50%] translate-y-[-50%] grid place-items-center">
-              <span className="rounded-full w-3 h-3 bg-base-content/50"></span>
+            <span className="overflow-hidden rounded-full w-5 h-5 bg-base-300 absolute left-0 top-[50%] translate-x-[-50%] translate-y-[-50%] grid place-items-center">
+              <span className="rounded-full w-2 h-2 bg-base-content/50"></span>
             </span>
           </div>
         ))}

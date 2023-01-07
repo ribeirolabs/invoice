@@ -152,7 +152,7 @@ export const userRouter = createProtectedRouter()
       }[] = [
         {
           author: isRequester ? "You" : toAuthor,
-          action: "Requested to Transfer Account",
+          action: "requested to Transfer Account",
           date: transfer.sentAt,
         },
       ];
@@ -163,7 +163,7 @@ export const userRouter = createProtectedRouter()
       ) {
         events.push({
           author: !isRequester ? "You" : toAuthor,
-          action: "Created account",
+          action: "created account",
           date: transfer.toUser.createdAt,
         });
       }

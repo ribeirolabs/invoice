@@ -54,7 +54,7 @@ export default function TransferAccountModal() {
           <h2 className="flex gap-2 items-center">Are you sure?</h2>
           <p>You&apos;re about to transfer the data below:</p>
 
-          <table className="table table-compact border border-base-300">
+          <table className="table table-compact border border-neutral">
             <thead>
               <tr>
                 <th colSpan={2}>Invoices</th>
@@ -70,7 +70,7 @@ export default function TransferAccountModal() {
             </tbody>
           </table>
 
-          <table className="table table-compact border border-base-300">
+          <table className="table table-compact border border-neutral">
             <thead>
               <tr>
                 <th colSpan={2}>Companies</th>
@@ -103,7 +103,6 @@ export default function TransferAccountModal() {
             autoComplete="off"
             value={transferTo}
             onChange={(e) => setTransferTo(e.target.value)}
-            autoFocus
           />
 
           <p>

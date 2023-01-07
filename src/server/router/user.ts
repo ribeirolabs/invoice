@@ -1,5 +1,6 @@
 import { isBefore } from "date-fns";
 import { z } from "zod";
+import { checkPendingAccountTransfer } from "../services/account";
 import { createProtectedRouter } from "./protected-router";
 
 export const userRouter = createProtectedRouter()
@@ -100,24 +101,7 @@ export const userRouter = createProtectedRouter()
       id: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const hasToUpdate = await ctx.prisma.accountTransfer.findFirst({
-        where: {
-          id: input.id,
-          toUser: null,
-          toUserEmail: ctx.session.user.email,
-        },
-      });
-
-      if (hasToUpdate) {
-        await ctx.prisma.accountTransfer.update({
-          where: {
-            id: hasToUpdate.id,
-          },
-          data: {
-            toUserId: ctx.session.user.id,
-          },
-        });
-      }
+      await checkPendingAccountTransfer(ctx.session.user);
 
       const transfer = await ctx.prisma.accountTransfer.findFirstOrThrow({
         where: {
@@ -169,5 +153,29 @@ export const userRouter = createProtectedRouter()
       }
 
       return { ...transfer, events: events.reverse(), isRequester };
+    },
+  })
+  .query("account.transfers.getPending", {
+    async resolve({ ctx }) {
+      await checkPendingAccountTransfer(ctx.session.user);
+
+      return await ctx.prisma.accountTransfer.findMany({
+        where: {
+          toUserId: ctx.session.user.id,
+          acceptedAt: null,
+          rejectedAt: null,
+        },
+        select: {
+          id: true,
+          fromUserEmail: true,
+          fromUser: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          sentAt: true,
+        },
+      });
     },
   });

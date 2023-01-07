@@ -1,8 +1,11 @@
+import TransferAccountModal from "@/components/Modal/TransferAccountModal";
 import { trpc } from "@/utils/trpc";
+import { openModal } from "@common/components/Modal";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { ssp } from "@common/server/ssp";
 import formatInTimeZone from "date-fns-tz/formatInTimeZone";
 import { GetServerSideProps } from "next";
+import Image from "next/image";
 import pluralize from "pluralize";
 import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -69,9 +72,10 @@ function Page() {
       <div className="px-2">
         <h2>Profile</h2>
         <div className="flex items-center gap-4">
-          <div className="rounded-full w-20 h-20 overflow-hidden bg-neutral">
+          <div className="relative flex-shrink-0 rounded-full w-20 h-20 overflow-hidden bg-neutral">
             {user.data.image && (
-              <img
+              <Image
+                layout="fill"
                 className="m-0 w-full"
                 src={user.data.image}
                 alt={`${user.data.name}'s avatar`}
@@ -80,7 +84,7 @@ function Page() {
           </div>
 
           <div className="grid gap-3">
-            <div className="flex items-end gap-2">
+            <div className="flex flex-col md:flex-row md:items-end gap-2">
               <h3 className="m-0 leading-none">{user.data.name}</h3>
               <p className="m-0 text-sm">({user.data.email})</p>
             </div>
@@ -99,7 +103,29 @@ function Page() {
         </div>
       </div>
       <div className="divider"></div>
+      <TransferAccountSection />
+      <div className="divider"></div>
     </>
+  );
+}
+
+function TransferAccountSection() {
+  return (
+    <div className="md:max-w-[500px]">
+      <h2>Transfer Account</h2>
+      <p>
+        This action will transfer all your data (invoices, companies) to a
+        different account. You&apos;ll still be able to continue using the app
+        with this account, but without any data.
+      </p>
+      <button
+        className="btn btn-sm btn-outline btn-error"
+        onClick={() => openModal("transfer-account")}
+      >
+        Transfer
+      </button>
+      <TransferAccountModal />
+    </div>
   );
 }
 

@@ -48,7 +48,8 @@ function Page() {
           <h2 className="m-0">Transfer Request</h2>
           <span
             className={cn(
-              "badge px-4",
+              "badge rounded-full px-4",
+              status === "waiting" && "badge-info",
               status === "confirmed" && "badge-primary",
               status === "rejected" && "badge-error"
             )}

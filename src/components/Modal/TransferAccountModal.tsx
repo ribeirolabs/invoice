@@ -92,9 +92,6 @@ export default function TransferAccountModal() {
             </tbody>
           </table>
 
-          <p className="m-0 mt-4 text-highlight">Companies:</p>
-          <ul className="m-0"></ul>
-
           <Input
             label="Email to Transfer Account"
             name="email"
@@ -120,6 +117,8 @@ export default function TransferAccountModal() {
           </p>
           <Input
             name="confirmation"
+            autoComplete="off"
+            autoCapitalize="off"
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
           />

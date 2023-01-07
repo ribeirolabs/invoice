@@ -9,6 +9,7 @@ module.exports = {
       primary: "#48b16d",
       secondary: "#555",
       neutral: "#111",
+      "info-content": "#031422",
     },
   },
   translations: {},

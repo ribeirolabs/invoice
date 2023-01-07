@@ -208,6 +208,7 @@ const CompanyForm = () => {
           name="name"
           defaultValue={company.data?.name}
           readOnly={!canEdit}
+          style={{ textTransform: "uppercase" }}
         />
 
         <Input
@@ -216,6 +217,7 @@ const CompanyForm = () => {
           helper="Optional"
           defaultValue={company.data?.alias ?? ""}
           readOnly={!canEdit}
+          style={{ textTransform: "uppercase" }}
         />
 
         <Input
@@ -232,6 +234,7 @@ const CompanyForm = () => {
           placeholder="Street, number - city/state, country"
           defaultValue={company.data?.address}
           readOnly={!canEdit}
+          style={{ textTransform: "uppercase" }}
         />
 
         <div className="flex">

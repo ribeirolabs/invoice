@@ -16,11 +16,11 @@ export const companyRouter = createProtectedRouter()
     }),
     async resolve({ input, ctx }) {
       const data: Prisma.CompanyCreateInput = {
-        name: input.name,
-        alias: input.alias || null,
+        name: input.name.toUpperCase(),
+        alias: input.alias?.toUpperCase() || null,
         email: input.email,
         currency: input.currency,
-        address: input.address,
+        address: input.address.toUpperCase(),
         invoiceNumberPattern: input.invoiceNumberPattern,
       };
 

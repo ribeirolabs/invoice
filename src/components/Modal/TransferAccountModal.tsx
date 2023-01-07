@@ -6,6 +6,7 @@ import {
   useModalEvent,
 } from "@common/components/Modal";
 import { addToast } from "@common/components/Toast";
+import { cn } from "@common/utils/classNames";
 import { FormEvent, useCallback, useState } from "react";
 
 const CONFIRMATION_TEXT = "transfer account";
@@ -81,11 +82,14 @@ export default function TransferAccountModal() {
                   <td className="w-6">{i + 1}</td>
                   <td>
                     <span>{company.alias ?? company.name}</span>
-                    {owner ? (
-                      <span className="badge badge-sm badge-info ml-4">
-                        owned
-                      </span>
-                    ) : null}
+                    <span
+                      className={cn(
+                        "badge badge-sm ml-4",
+                        owner && "badge-info"
+                      )}
+                    >
+                      {owner ? "owned" : "shared"}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -103,8 +107,9 @@ export default function TransferAccountModal() {
           />
 
           <p>
-            We&apos;ll send an email asking for the transfer confirmation, after
-            that your data will belong to that user.
+            The user will receive the transfer request and will be able to
+            either accept or reject it. When accepted, all the data listed above
+            will belong to that user.
           </p>
 
           <p>

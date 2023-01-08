@@ -43,11 +43,12 @@ model AccountTransfer {
   toUserId    String?
   toUserEmail String
 
-  sentAt     DateTime  @default(now())
-  acceptedAt DateTime?
-  rejectedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  sentAt      DateTime  @default(now())
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([fromUserEmail, toUserEmail])
   @@index([fromUserId])

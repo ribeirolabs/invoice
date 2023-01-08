@@ -90,6 +90,7 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
               href="https://invoice.ribeirolabs.com"
               color="#238244"
               fontWeight="bold"
+              fontSize={12}
             >
               ribeirolabs / invoice
             </Link>

@@ -1,5 +1,6 @@
 import { CompaniesTable } from "@/components/CompaniesTable";
 import { InvoicesTable } from "@/components/InvoicesTable";
+import { getUserDisplayName } from "@/utils/account";
 import { trpc } from "@/utils/trpc";
 import { InfoIcon } from "@common/components/Icons";
 import { ProtectedPage } from "@common/components/ProtectedPage";
@@ -39,20 +40,25 @@ function PendingAccountTransfers() {
   return (
     <div className="not-prose mb-4">
       {pending.data.map((request) => (
-        <div key={request.id} className="alert bg-info/10">
-          <span>
-            <span className="text-info">
-              <InfoIcon size={24} />
-            </span>
-            Pensing transfer account request from{" "}
-            <span className="text-highlight">
-              {request.fromUser
-                ? `${request.fromUser.name} (${request.fromUser.email})`
-                : request.fromUserEmail}
-            </span>
+        <div
+          key={request.id}
+          className="alert bg-warning/10 items-stretch md:items-center"
+        >
+          <span className="flex-col md:flex-row">
+            <div className="text-center">
+              Pending transfer account request{" "}
+              {request.isOwner ? "to " : "from "}
+              <span className="text-highlight break-words whitespace whitespace-normal">
+                {request.isOwner
+                  ? getUserDisplayName(request.toUserEmail, request.toUser)
+                  : getUserDisplayName(request.fromUserEmail, request.fromUser)}
+              </span>
+            </div>
           </span>
           <Link href={`/settings/transfer-account/${request.id}`}>
-            <a className="btn btn-sm btn-info btn-bordered">View</a>
+            <a className="flex-1 md:flex-none btn btn-sm btn-warning md:btn-wide btn-bordered">
+              View
+            </a>
           </Link>
         </div>
       ))}

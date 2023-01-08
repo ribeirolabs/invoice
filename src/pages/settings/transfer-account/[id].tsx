@@ -1,3 +1,4 @@
+import { getUserDisplayName } from "@/utils/account";
 import { dateToDistance } from "@/utils/date";
 import { trpc } from "@/utils/trpc";
 import { CheckIcon, CloseIcon } from "@common/components/Icons";
@@ -21,17 +22,6 @@ export default function SettingsPage() {
       <Page />
     </ProtectedPage>
   );
-}
-
-function getUserDisplayName(
-  email: string,
-  user: { name: string | null } | null
-) {
-  if (!user) {
-    return email;
-  }
-
-  return [user.name, `(${email})`].join(" ");
 }
 
 function Page() {
@@ -80,9 +70,9 @@ function Page() {
 
         <div className="flex items-center gap-4">
           <span className="text-sm">
-            {transfer.isRequester ? "To" : "From"}{" "}
+            {transfer.isOwner ? "To" : "From"}{" "}
             <span className="text-highlight">
-              {transfer.isRequester
+              {transfer.isOwner
                 ? getUserDisplayName(transfer.toUserEmail, transfer.toUser)
                 : getUserDisplayName(transfer.fromUserEmail, transfer.fromUser)}
             </span>
@@ -91,7 +81,7 @@ function Page() {
 
         {transfer.status === "pending" && (
           <div className="flex gap-2">
-            {transfer.isRequester ? (
+            {transfer.isOwner ? (
               <button className="flex-1 md:flex-none btn btn-sm btn-error">
                 <CloseIcon />
                 Cancel

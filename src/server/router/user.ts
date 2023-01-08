@@ -126,7 +126,7 @@ export const userRouter = createProtectedRouter()
         },
       });
 
-      const isRequester = transfer.fromUserId === ctx.session.user.id;
+      const isOwner = transfer.fromUserId === ctx.session.user.id;
       const toAuthor = transfer.fromUser?.name ?? transfer.fromUserEmail;
 
       const status = transfer.acceptedAt
@@ -143,7 +143,7 @@ export const userRouter = createProtectedRouter()
         date: Date;
       }[] = [
         {
-          author: isRequester ? "You" : toAuthor,
+          author: isOwner ? "You" : toAuthor,
           action: "requested to Transfer Account",
           date: transfer.sentAt,
         },
@@ -154,7 +154,7 @@ export const userRouter = createProtectedRouter()
         isBefore(transfer.sentAt, transfer.toUser.createdAt)
       ) {
         events.push({
-          author: isRequester ? toAuthor : "You",
+          author: isOwner ? toAuthor : "You",
           action: "created account",
           date: transfer.toUser.createdAt,
         });
@@ -162,7 +162,7 @@ export const userRouter = createProtectedRouter()
 
       if (transfer.acceptedAt) {
         events.push({
-          author: isRequester ? toAuthor : "You",
+          author: isOwner ? toAuthor : "You",
           action: "accepted the transfer",
           date: transfer.acceptedAt,
         });
@@ -170,7 +170,7 @@ export const userRouter = createProtectedRouter()
 
       if (transfer.rejectedAt) {
         events.push({
-          author: isRequester ? toAuthor : "You",
+          author: isOwner ? toAuthor : "You",
           action: "rejected the transfer",
           date: transfer.rejectedAt,
         });
@@ -178,27 +178,41 @@ export const userRouter = createProtectedRouter()
 
       if (transfer.cancelledAt) {
         events.push({
-          author: isRequester ? "You" : toAuthor,
+          author: isOwner ? "You" : toAuthor,
           action: "cancelled the transfer",
           date: transfer.cancelledAt,
         });
       }
 
-      return { ...transfer, events: events.reverse(), isRequester, status };
+      return { ...transfer, events: events.reverse(), isOwner, status };
     },
   })
   .query("account.transfers.getPending", {
     async resolve({ ctx }) {
       await checkPendingAccountTransfer(ctx.session.user);
 
-      return await ctx.prisma.accountTransfer.findMany({
+      const requests = await ctx.prisma.accountTransfer.findMany({
         where: {
-          toUserId: ctx.session.user.id,
           acceptedAt: null,
           rejectedAt: null,
+          OR: [
+            {
+              toUserId: ctx.session.user.id,
+            },
+            {
+              fromUserId: ctx.session.user.id,
+            },
+          ],
         },
         select: {
           id: true,
+          toUserEmail: true,
+          toUser: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
           fromUserEmail: true,
           fromUser: {
             select: {
@@ -209,5 +223,10 @@ export const userRouter = createProtectedRouter()
           sentAt: true,
         },
       });
+
+      return requests.map((request) => ({
+        ...request,
+        isOwner: request.fromUserEmail === ctx.session.user.email,
+      }));
     },
   });

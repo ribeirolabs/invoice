@@ -61,7 +61,7 @@ function Page() {
           >
             <span className="flex h-2 w-2 items-center justify-center relative">
               {transfer.status === "pending" && (
-                <span className="animate-ping-slow absolute rounded-full w-3 h-3" />
+                <span className="animate-ping-slow absolute rounded-full w-3 h-3 bg-info" />
               )}
 
               <span

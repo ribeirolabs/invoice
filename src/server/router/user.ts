@@ -130,10 +130,12 @@ export const userRouter = createProtectedRouter()
       const toAuthor = transfer.fromUser?.name ?? transfer.fromUserEmail;
 
       const status = transfer.acceptedAt
-        ? "confirmed"
+        ? "accepted"
         : transfer.rejectedAt
         ? "rejected"
-        : "waiting";
+        : transfer.cancelledAt
+        ? "cancelled"
+        : "pending";
 
       const events: {
         author: string;
@@ -152,9 +154,33 @@ export const userRouter = createProtectedRouter()
         isBefore(transfer.sentAt, transfer.toUser.createdAt)
       ) {
         events.push({
-          author: !isRequester ? "You" : toAuthor,
+          author: isRequester ? toAuthor : "You",
           action: "created account",
           date: transfer.toUser.createdAt,
+        });
+      }
+
+      if (transfer.acceptedAt) {
+        events.push({
+          author: isRequester ? toAuthor : "You",
+          action: "accepted the transfer",
+          date: transfer.acceptedAt,
+        });
+      }
+
+      if (transfer.rejectedAt) {
+        events.push({
+          author: isRequester ? toAuthor : "You",
+          action: "rejected the transfer",
+          date: transfer.rejectedAt,
+        });
+      }
+
+      if (transfer.cancelledAt) {
+        events.push({
+          author: isRequester ? "You" : toAuthor,
+          action: "cancelled the transfer",
+          date: transfer.cancelledAt,
         });
       }
 

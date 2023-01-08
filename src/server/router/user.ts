@@ -129,6 +129,12 @@ export const userRouter = createProtectedRouter()
       const isRequester = transfer.fromUserId === ctx.session.user.id;
       const toAuthor = transfer.fromUser?.name ?? transfer.fromUserEmail;
 
+      const status = transfer.acceptedAt
+        ? "confirmed"
+        : transfer.rejectedAt
+        ? "rejected"
+        : "waiting";
+
       const events: {
         author: string;
         action: string;
@@ -152,7 +158,7 @@ export const userRouter = createProtectedRouter()
         });
       }
 
-      return { ...transfer, events: events.reverse(), isRequester };
+      return { ...transfer, events: events.reverse(), isRequester, status };
     },
   })
   .query("account.transfers.getPending", {

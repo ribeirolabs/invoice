@@ -24,22 +24,27 @@ export default function SettingsPage() {
   );
 }
 
+function getUserDisplayName(
+  email: string,
+  user: { name: string | null } | null
+) {
+  if (!user) {
+    return email;
+  }
+
+  return [user.name, `(${email})`].join(" ");
+}
+
 function Page() {
   const router = useRouter();
-  const transfer = trpc.useQuery([
+  const { data: transfer } = trpc.useQuery([
     "user.getAccountTransfer",
     { id: router.query.id as string },
   ]);
 
-  if (!transfer.data) {
+  if (!transfer) {
     return <p>Transfer not found</p>;
   }
-
-  const status = transfer.data.acceptedAt
-    ? "confirmed"
-    : transfer.data.rejectedAt
-    ? "rejected"
-    : "waiting";
 
   return (
     <div>
@@ -48,32 +53,36 @@ function Page() {
           <h2 className="m-0">Transfer Request</h2>
           <span
             className={cn(
-              "badge rounded-full px-4",
-              status === "waiting" && "badge-info",
-              status === "confirmed" && "badge-primary",
-              status === "rejected" && "badge-error"
+              "badge rounded-full px-2 py-3 gap-2",
+              transfer.status === "waiting" && "text-info",
+              transfer.status === "confirmed" && "text-primary",
+              transfer.status === "rejected" && "text-error"
             )}
           >
-            {status}
+            <span className="flex h-2 w-2 items-center justify-center relative">
+              <span className="animate-ping-slow absolute rounded-full w-3 h-3 bg-info"></span>
+              <span className="relative rounded-full w-2 h-2 bg-info"></span>
+            </span>
+            {transfer.status}
           </span>
         </div>
 
         <div className="flex items-center gap-4">
           <span className="text-sm">
-            {transfer.data.isRequester ? "To" : "From"}{" "}
+            {transfer.isRequester ? "To" : "From"}{" "}
             <span className="text-highlight">
-              {transfer.data.isRequester
-                ? transfer.data.toUserEmail
-                : transfer.data.fromUserEmail}
+              {transfer.isRequester
+                ? getUserDisplayName(transfer.toUserEmail, transfer.toUser)
+                : getUserDisplayName(transfer.fromUserEmail, transfer.fromUser)}
             </span>
           </span>
         </div>
 
         <div className="flex gap-2">
-          {transfer.data.isRequester ? (
+          {transfer.isRequester ? (
             <button className="flex-1 md:flex-none btn btn-sm btn-error">
               <CloseIcon />
-              Cancel Request
+              Cancel
             </button>
           ) : (
             <>
@@ -96,7 +105,7 @@ function Page() {
       <div className="rounded-lg py-5 px-6 my-4 bg-base-300 relative">
         <span className="w-[1px] h-full absolute left-6 top-0 bg-base-content/20"></span>
 
-        {transfer.data.events.map((event, i) => (
+        {transfer.events.map((event, i) => (
           <div key={i} className="relative text-sm">
             <div className="flex flex-col items-start md:flex-row md:items-center md:gap-6 pl-6 py-4 md:py-3">
               <span className="text-highlight">{event.author}</span>

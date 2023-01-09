@@ -217,7 +217,7 @@ export const userRouter = createProtectedRouter()
     async resolve({ ctx }) {
       await checkPendingAccountTransfer(ctx.session.user);
 
-      const requests = await ctx.prisma.accountTransfer.findMany({
+      const request = await ctx.prisma.accountTransfer.findFirst({
         where: {
           acceptedAt: null,
           rejectedAt: null,
@@ -251,10 +251,14 @@ export const userRouter = createProtectedRouter()
         },
       });
 
-      return requests.map((request) => ({
+      if (!request) {
+        return null;
+      }
+
+      return {
         ...request,
         isOwner: request.fromUserEmail === ctx.session.user.email,
-      }));
+      };
     },
   })
   .mutation("account.transfer.cancel", {

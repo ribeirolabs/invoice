@@ -112,8 +112,9 @@ function Page() {
 }
 
 function TransferAccountSection() {
-  const pending = trpc.useQuery(["user.account.transfer.getPending"]);
-  const firstRequest = pending.data?.[0];
+  const { data: pending, isLoading } = trpc.useQuery([
+    "user.account.transfer.getPending",
+  ]);
   return (
     <div className="md:max-w-[70%]">
       <h2>Transfer Account</h2>
@@ -122,18 +123,18 @@ function TransferAccountSection() {
         different account. You&apos;ll still be able to continue using the app
         with this account, but without any data.
       </p>
-      {firstRequest ? (
+      {pending ? (
         <div className="alert bg-warning/10 ">
-          {firstRequest.isOwner
+          {pending.isOwner
             ? `You currently have a pending transfer request waiting on ${getUserDisplayName(
-                firstRequest.toUserEmail,
-                firstRequest.toUser
+                pending.toUserEmail,
+                pending.toUser
               )} to accept/reject it`
             : `You have a pending transfer request from ${getUserDisplayName(
-                firstRequest.fromUserEmail,
-                firstRequest.fromUser
+                pending.fromUserEmail,
+                pending.fromUser
               )}. Approve or reject it in order to request an account transfer`}
-          <Link href={`/settings/transfer-account/${firstRequest.id}`}>
+          <Link href={`/settings/transfer-account/${pending.id}`}>
             <a className="flex-1 md:flex-none btn btn-sm btn-warning md:btn-wide btn-bordered">
               View
             </a>
@@ -143,7 +144,7 @@ function TransferAccountSection() {
         <button
           className="btn btn-sm btn-outline btn-error"
           onClick={() => openModal("transfer-account")}
-          data-loading={pending.isLoading}
+          data-loading={isLoading}
         >
           Transfer
         </button>

@@ -26,7 +26,7 @@ export const userRouter = createProtectedRouter()
       });
     },
   })
-  .query("getAccountTransferData", {
+  .query("account.transfer.getTransferredData", {
     async resolve({ ctx }) {
       return await ctx.prisma.user.findFirst({
         where: {
@@ -56,7 +56,7 @@ export const userRouter = createProtectedRouter()
       });
     },
   })
-  .mutation("requestAccountTransfer", {
+  .mutation("account.transfer.request", {
     input: z.object({
       toEmail: z.string().email(),
     }),
@@ -69,6 +69,29 @@ export const userRouter = createProtectedRouter()
           email: input.toEmail,
         },
       });
+
+      const pending = await ctx.prisma.accountTransfer.findMany({
+        where: {
+          acceptedAt: null,
+          rejectedAt: null,
+          cancelledAt: null,
+          OR: [
+            {
+              toUserId: ctx.session.user.id,
+            },
+            {
+              fromUserId: ctx.session.user.id,
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (pending.length) {
+        throw new Error("You have pending transfer requests");
+      }
 
       // @todo: send email
 
@@ -96,7 +119,7 @@ export const userRouter = createProtectedRouter()
       });
     },
   })
-  .query("getAccountTransfer", {
+  .query("account.transfer.get", {
     input: z.object({
       id: z.string(),
     }),
@@ -187,7 +210,7 @@ export const userRouter = createProtectedRouter()
       return { ...transfer, events: events.reverse(), isOwner, status };
     },
   })
-  .query("account.transfers.getPending", {
+  .query("account.transfer.getPending", {
     async resolve({ ctx }) {
       await checkPendingAccountTransfer(ctx.session.user);
 
@@ -229,5 +252,37 @@ export const userRouter = createProtectedRouter()
         ...request,
         isOwner: request.fromUserEmail === ctx.session.user.email,
       }));
+    },
+  })
+  .mutation("account.transfer.cancel", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const transfer = await ctx.prisma.accountTransfer.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (transfer.acceptedAt) {
+        throw new Error("Transfer request already accepted");
+      }
+
+      if (transfer.rejectedAt) {
+        throw new Error("Transfer request already rejected");
+      }
+
+      return await ctx.prisma.accountTransfer.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          cancelledAt: new Date(),
+        },
+        select: {
+          id: true,
+        },
+      });
     },
   });

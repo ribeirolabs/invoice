@@ -1,7 +1,9 @@
+import { CancelTransferAccount } from "@/components/Modal/CancelTransferAccount";
 import { getUserDisplayName } from "@/utils/account";
 import { dateToDistance } from "@/utils/date";
 import { trpc } from "@/utils/trpc";
 import { CheckIcon, CloseIcon } from "@common/components/Icons";
+import { openModal } from "@common/components/Modal";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { ssp } from "@common/server/ssp";
 import { cn } from "@common/utils/classNames";
@@ -10,7 +12,7 @@ import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("user.getAccountTransfer", {
+    return ssr.fetchQuery("user.account.transfer.get", {
       id: ctx.query.id as string,
     });
   });
@@ -27,7 +29,7 @@ export default function SettingsPage() {
 function Page() {
   const router = useRouter();
   const { data: transfer } = trpc.useQuery([
-    "user.getAccountTransfer",
+    "user.account.transfer.get",
     { id: router.query.id as string },
   ]);
 
@@ -82,7 +84,10 @@ function Page() {
         {transfer.status === "pending" && (
           <div className="flex gap-2">
             {transfer.isOwner ? (
-              <button className="flex-1 md:flex-none btn btn-sm btn-error">
+              <button
+                className="flex-1 md:flex-none btn btn-sm btn-error"
+                onClick={() => openModal("cancel-transfer-account-modal")}
+              >
                 <CloseIcon />
                 Cancel
               </button>
@@ -140,6 +145,7 @@ function Page() {
           </div>
         ))}
       </div>
+      <CancelTransferAccount />
     </div>
   );
 }

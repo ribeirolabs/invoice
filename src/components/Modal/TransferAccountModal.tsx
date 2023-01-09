@@ -12,8 +12,10 @@ import { FormEvent, useCallback, useState } from "react";
 const CONFIRMATION_TEXT = "transfer account";
 
 export default function TransferAccountModal() {
-  const transferData = trpc.useQuery(["user.getAccountTransferData"]);
-  const transfer = trpc.useMutation("user.requestAccountTransfer", {
+  const transferData = trpc.useQuery([
+    "user.account.transfer.getTransferredData",
+  ]);
+  const transfer = trpc.useMutation("user.account.transfer.request", {
     onSuccess(data) {
       addToast(
         `Transfer requested, waiting on ${data.toUserEmail} to accept it`,

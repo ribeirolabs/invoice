@@ -1,4 +1,5 @@
 import TransferAccountModal from "@/components/Modal/TransferAccountModal";
+import { getUserDisplayName } from "@/utils/account";
 import { trpc } from "@/utils/trpc";
 import { openModal } from "@common/components/Modal";
 import { ProtectedPage } from "@common/components/ProtectedPage";
@@ -6,6 +7,7 @@ import { ssp } from "@common/server/ssp";
 import formatInTimeZone from "date-fns-tz/formatInTimeZone";
 import { GetServerSideProps } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import pluralize from "pluralize";
 import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -110,20 +112,42 @@ function Page() {
 }
 
 function TransferAccountSection() {
+  const pending = trpc.useQuery(["user.account.transfer.getPending"]);
+  const firstRequest = pending.data?.[0];
   return (
-    <div className="md:max-w-[500px]">
+    <div className="md:max-w-[70%]">
       <h2>Transfer Account</h2>
       <p>
         This action will transfer all your data (invoices, companies) to a
         different account. You&apos;ll still be able to continue using the app
         with this account, but without any data.
       </p>
-      <button
-        className="btn btn-sm btn-outline btn-error"
-        onClick={() => openModal("transfer-account")}
-      >
-        Transfer
-      </button>
+      {firstRequest ? (
+        <div className="alert bg-warning/10 ">
+          {firstRequest.isOwner
+            ? `You currently have a pending transfer request waiting on ${getUserDisplayName(
+                firstRequest.toUserEmail,
+                firstRequest.toUser
+              )} to accept/reject it`
+            : `You have a pending transfer request from ${getUserDisplayName(
+                firstRequest.fromUserEmail,
+                firstRequest.fromUser
+              )}. Approve or reject it in order to request an account transfer`}
+          <Link href={`/settings/transfer-account/${firstRequest.id}`}>
+            <a className="flex-1 md:flex-none btn btn-sm btn-warning md:btn-wide btn-bordered">
+              View
+            </a>
+          </Link>
+        </div>
+      ) : (
+        <button
+          className="btn btn-sm btn-outline btn-error"
+          onClick={() => openModal("transfer-account")}
+          data-loading={pending.isLoading}
+        >
+          Transfer
+        </button>
+      )}
       <TransferAccountModal />
     </div>
   );

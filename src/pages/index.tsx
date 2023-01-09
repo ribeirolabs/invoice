@@ -2,11 +2,12 @@ import { CompaniesTable } from "@/components/CompaniesTable";
 import { InvoicesTable } from "@/components/InvoicesTable";
 import { getUserDisplayName } from "@/utils/account";
 import { trpc } from "@/utils/trpc";
-import { InfoIcon } from "@common/components/Icons";
 import { ProtectedPage } from "@common/components/ProtectedPage";
+import { addToast } from "@common/components/Toast";
 import { ssp } from "@common/server/ssp";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -14,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
       ssr.fetchQuery("company.getAll"),
       ssr.fetchQuery("invoice.countByCompany"),
       ssr.fetchQuery("invoice.recent"),
-      ssr.fetchQuery("user.account.transfers.getPending"),
+      ssr.fetchQuery("user.account.transfer.getPending"),
     ];
   });
 };
@@ -31,7 +32,7 @@ const Home: NextPage = () => {
 };
 
 function PendingAccountTransfers() {
-  const pending = trpc.useQuery(["user.account.transfers.getPending"]);
+  const pending = trpc.useQuery(["user.account.transfer.getPending"]);
 
   if (!pending.data || !pending.data.length) {
     return null;
@@ -40,10 +41,7 @@ function PendingAccountTransfers() {
   return (
     <div className="not-prose mb-4">
       {pending.data.map((request) => (
-        <div
-          key={request.id}
-          className="alert bg-warning/10 items-stretch md:items-center"
-        >
+        <div key={request.id} className="alert bg-warning/10">
           <span className="flex-col md:flex-row">
             <div className="text-center">
               Pending transfer account request{" "}

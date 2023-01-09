@@ -195,6 +195,7 @@ export const userRouter = createProtectedRouter()
         where: {
           acceptedAt: null,
           rejectedAt: null,
+          cancelledAt: null,
           OR: [
             {
               toUserId: ctx.session.user.id,

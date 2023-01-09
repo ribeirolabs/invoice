@@ -1,6 +1,9 @@
 import { isBefore } from "date-fns";
 import { z } from "zod";
-import { checkPendingAccountTransfer } from "../services/account";
+import {
+  checkPendingAccountTransfer,
+  validateTransferRequest,
+} from "../services/account";
 import { createProtectedRouter } from "./protected-router";
 
 export const userRouter = createProtectedRouter()
@@ -259,19 +262,7 @@ export const userRouter = createProtectedRouter()
       id: z.string().cuid(),
     }),
     async resolve({ ctx, input }) {
-      const transfer = await ctx.prisma.accountTransfer.findUniqueOrThrow({
-        where: {
-          id: input.id,
-        },
-      });
-
-      if (transfer.acceptedAt) {
-        throw new Error("Transfer request already accepted");
-      }
-
-      if (transfer.rejectedAt) {
-        throw new Error("Transfer request already rejected");
-      }
+      await validateTransferRequest(input.id);
 
       return await ctx.prisma.accountTransfer.update({
         where: {
@@ -279,6 +270,26 @@ export const userRouter = createProtectedRouter()
         },
         data: {
           cancelledAt: new Date(),
+        },
+        select: {
+          id: true,
+        },
+      });
+    },
+  })
+  .mutation("account.transfer.reject", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      await validateTransferRequest(input.id);
+
+      return await ctx.prisma.accountTransfer.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          rejectedAt: new Date(),
         },
         select: {
           id: true,

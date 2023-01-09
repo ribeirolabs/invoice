@@ -1,4 +1,5 @@
 import { CancelTransferAccount } from "@/components/Modal/CancelTransferAccount";
+import { RejectTransferAccount } from "@/components/Modal/RejectTransferAccount";
 import { getUserDisplayName } from "@/utils/account";
 import { dateToDistance } from "@/utils/date";
 import { trpc } from "@/utils/trpc";
@@ -97,7 +98,10 @@ function Page() {
                   <CheckIcon />
                   Accept
                 </button>
-                <button className="flex-1 md:flex-none btn btn-sm">
+                <button
+                  className="flex-1 md:flex-none btn btn-sm"
+                  onClick={() => openModal("reject-transfer-account-modal")}
+                >
                   <CloseIcon />
                   Reject
                 </button>
@@ -146,6 +150,7 @@ function Page() {
         ))}
       </div>
       <CancelTransferAccount />
+      <RejectTransferAccount />
     </div>
   );
 }

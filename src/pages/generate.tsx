@@ -22,9 +22,22 @@ import { useSettingsValue } from "@common/components/Settings";
 import { Select } from "@common/components/Select";
 import { useRouter } from "next/router";
 import { getLocale } from "@common/utils/locale";
+import { useRequiredUser } from "@/utils/account";
+import { TRPCError } from "@trpc/server";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
+    const user = ssr.queryClient.getQueryData(["user.me"]) as {
+      locked: boolean;
+    };
+
+    if (user.locked) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Your account is locked",
+      });
+    }
+
     return ssr.prefetchQuery("company.getAll");
   });
 };
@@ -35,14 +48,22 @@ function formatAmount(amount: number) {
   }).format(amount);
 }
 
-export default function InvoiceGenerate() {
+export default function GeneratePage() {
+  return (
+    <ProtectedPage>
+      <InvoiceGenerate />
+    </ProtectedPage>
+  );
+}
+
+export function InvoiceGenerate() {
   const [receiverId, setReceiverId] = useState("");
   const [payerId, setPayerId] = useState("");
   const [date, setDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [dueDateDays, setDueDateDays] = useState(5);
   const [amount, setAmount] = useState("");
   const router = useRouter();
-  const session = trpc.useQuery(["auth.getSession"]);
+  const user = useRequiredUser();
   const companies = trpc.useQuery(["company.getAll"]);
   const invoiceNumber = trpc.useMutation("invoice.getNumber");
   const invoice = trpc.useMutation("invoice.generate");
@@ -58,12 +79,10 @@ export default function InvoiceGenerate() {
   const receivers = useMemo(() => {
     return (
       companies.data?.filter((company) =>
-        company.users.find(
-          (user) => user.userId === session.data?.user?.id && user.owner
-        )
+        company.users.find(({ userId, owner }) => userId === user.id && owner)
       ) ?? []
     );
-  }, [companies.data, session.data]);
+  }, [companies.data, user]);
 
   const payers = useMemo(() => {
     return (
@@ -138,7 +157,6 @@ export default function InvoiceGenerate() {
     }
 
     rawAmount.current = parseFloat(value.replace(",", ".") || "0");
-    console.log("onChange", value, rawAmount.current);
 
     setAmount(formatAmount(rawAmount.current));
   }
@@ -187,139 +205,136 @@ export default function InvoiceGenerate() {
   }
 
   return (
-    <ProtectedPage>
-      <div className="flex flex-col items-center">
-        {(!receivers.length || !payers.length) && (
-          <div className="mb-4">
-            <Alert type="error" fluid>
-              {!receivers.length
-                ? "You need to own at least one company to generate an invoice."
-                : !payers.length
-                ? "You have no payer companies to generate an invoice."
-                : ""}
-              <Link href="/company/create">
-                <a className="text-error-content font-bold ml-2">Create one</a>
-              </Link>
-            </Alert>
+    <div className="flex flex-col items-center">
+      {(!receivers.length || !payers.length) && (
+        <div className="mb-4">
+          <Alert type="error" fluid>
+            {!receivers.length
+              ? "You need to own at least one company to generate an invoice."
+              : !payers.length
+              ? "You have no payer companies to generate an invoice."
+              : ""}
+            <Link href="/company/create">
+              <a className="text-error-content font-bold ml-2">Create one</a>
+            </Link>
+          </Alert>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2 w-full max-w-lg justify-between items-end">
+        <h1 className="m-0">Invoice</h1>
+
+        {invoiceNumber.data ? (
+          <div className="badge badge-primary badge-lg text-xl font-bold">
+            {invoiceNumber.data}
           </div>
-        )}
+        ) : null}
+      </div>
 
-        <div className="flex flex-wrap gap-2 w-full max-w-lg justify-between items-end">
-          <h1 className="m-0">Invoice</h1>
+      <form className="form w-form" onSubmit={onSubmit} autoComplete="off">
+        <div className="divider"></div>
 
-          {invoiceNumber.data ? (
-            <div className="badge badge-primary badge-lg text-xl font-bold">
-              {invoiceNumber.data}
-            </div>
-          ) : null}
+        <Select
+          label="Receiver"
+          error={!receivers.length}
+          name="receiver_id"
+          onChange={(e) => setReceiverId(e.target.value)}
+          value={receiverId ?? ""}
+        >
+          <option></option>
+          {receivers.map((company) => {
+            return (
+              <option key={company.id} value={company.id}>
+                {company.alias ?? company.name}
+              </option>
+            );
+          })}
+        </Select>
+
+        <Select
+          label="Payer"
+          error={!payers.length}
+          value={payerId || ""}
+          name="payer_id"
+          onChange={(e) => setPayerId(e.target.value)}
+        >
+          <option></option>
+          {payers.map((company) => {
+            const { type } =
+              company.users.find(({ userId }) => userId === user.id) ?? {};
+
+            return (
+              <option key={company.id} value={company.id}>
+                {company.alias ?? company.name}{" "}
+                {type === "SHARED" && "(shared)"}
+              </option>
+            );
+          })}
+        </Select>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Date"
+            name="date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+          <Input
+            label="Due Date"
+            name="due_date"
+            type="number"
+            value={dueDateDays || 0}
+            onChange={(e) => {
+              const value = parseInt(e.target.value || "");
+              setDueDateDays(value || 0);
+            }}
+            helper={dueDate}
+            trailing={<span>days</span>}
+          />
         </div>
 
-        <form className="form w-form" onSubmit={onSubmit} autoComplete="off">
-          <div className="divider"></div>
+        <Input
+          key={payerId + "-description"}
+          label="Description"
+          name="description"
+          type="textarea"
+          defaultValue={latest.data?.description || ""}
+        />
 
-          <Select
-            label="Receiver"
-            error={!receivers.length}
-            name="receiver_id"
-            onChange={(e) => setReceiverId(e.target.value)}
-            value={receiverId ?? ""}
+        <Input
+          key={payerId + "-amount"}
+          label="Amount"
+          name="amount"
+          type={sensitiveInformation ? "text" : "password"}
+          value={amount}
+          onKeyDown={onKeyDown}
+          onChange={onChangeAmount}
+          leading={<span>{payer?.currency ?? <>&nbsp;&nbsp;</>}</span>}
+          disabled={!payer}
+        />
+
+        <div className="divider"></div>
+
+        <div className="flex justify-end mb-4">
+          <div className="flex gap-2 items-center">
+            <label className="cursor-pointer text-sm">Open invoice</label>
+            <input type="checkbox" className="toggle" name="open_invoice" />
+          </div>
+        </div>
+
+        <div className="btn-form-group">
+          <Link href="/">
+            <a className="btn btn-outline btn-wide">Cancel</a>
+          </Link>
+          <button
+            className="btn btn-primary btn-wide"
+            data-loading={invoice.isLoading}
           >
-            <option></option>
-            {receivers.map((company) => {
-              return (
-                <option key={company.id} value={company.id}>
-                  {company.alias ?? company.name}
-                </option>
-              );
-            })}
-          </Select>
-
-          <Select
-            label="Payer"
-            error={!payers.length}
-            value={payerId || ""}
-            name="payer_id"
-            onChange={(e) => setPayerId(e.target.value)}
-          >
-            <option></option>
-            {payers.map((company) => {
-              const user = company.users.find(
-                (user) => user.userId === session.data?.user?.id
-              );
-
-              return (
-                <option key={company.id} value={company.id}>
-                  {company.alias ?? company.name}{" "}
-                  {user?.type === "SHARED" && "(shared)"}
-                </option>
-              );
-            })}
-          </Select>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Date"
-              name="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-            <Input
-              label="Due Date"
-              name="due_date"
-              type="number"
-              value={dueDateDays || 0}
-              onChange={(e) => {
-                const value = parseInt(e.target.value || "");
-                setDueDateDays(value || 0);
-              }}
-              helper={dueDate}
-              trailing={<span>days</span>}
-            />
-          </div>
-
-          <Input
-            key={payerId + "-description"}
-            label="Description"
-            name="description"
-            type="textarea"
-            defaultValue={latest.data?.description || ""}
-          />
-
-          <Input
-            key={payerId + "-amount"}
-            label="Amount"
-            name="amount"
-            type={sensitiveInformation ? "text" : "password"}
-            value={amount}
-            onKeyDown={onKeyDown}
-            onChange={onChangeAmount}
-            leading={<span>{payer?.currency ?? <>&nbsp;&nbsp;</>}</span>}
-            disabled={!payer}
-          />
-
-          <div className="divider"></div>
-
-          <div className="flex justify-end mb-4">
-            <div className="flex gap-2 items-center">
-              <label className="cursor-pointer text-sm">Open invoice</label>
-              <input type="checkbox" className="toggle" name="open_invoice" />
-            </div>
-          </div>
-
-          <div className="btn-form-group">
-            <Link href="/">
-              <a className="btn btn-outline btn-wide">Cancel</a>
-            </Link>
-            <button
-              className="btn btn-primary btn-wide"
-              data-loading={invoice.isLoading}
-            >
-              Confirm
-            </button>
-          </div>
-        </form>
-      </div>
-    </ProtectedPage>
+            Confirm
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { EyeClosedIcon, EyeIcon } from "@common/components/Icons";
 import { useSettings } from "@common/components/Settings";
 import Link from "next/link";
 import { InvoiceIcon } from "./Icons";
+import { UserUnlocked } from "./UserUnlocked";
 
 export const Sidebar = () => {
   const [sensitiveInformation, update] = useSettings("sensitiveInformation");
@@ -30,14 +31,16 @@ export const Sidebar = () => {
           Sensitive Information
         </label>
       </li>
-      <li>
-        <Link href="/generate">
-          <a>
-            <InvoiceIcon />
-            Generate Invoice
-          </a>
-        </Link>
-      </li>
+      <UserUnlocked>
+        <li>
+          <Link href="/generate">
+            <a>
+              <InvoiceIcon />
+              Generate Invoice
+            </a>
+          </Link>
+        </li>
+      </UserUnlocked>
       <div id="sidebar-menu"></div>
     </AppSidebar>
   );

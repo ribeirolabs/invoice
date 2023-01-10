@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import { Modal, ModalCancelButton } from "@common/components/Modal";
+import { closeModal, Modal, ModalCancelButton } from "@common/components/Modal";
 import { addToast } from "@common/components/Toast";
 import { Invoice } from "@prisma/client";
 
@@ -11,10 +11,11 @@ export default function DeleteInvoiceModal({ invoice }: { invoice: Invoice }) {
   const id = getDeleteInvoiceModalId(invoice.id);
   const utils = trpc.useContext();
   const deleteInvoice = trpc.useMutation("invoice.delete", {
-    onSuccess(data) {
-      utils
-        .invalidateQueries(["invoice.recent"])
-        .finally(() => addToast(`Invoice ${data.number} deleted`, "success"));
+    async onSuccess(data) {
+      return utils.invalidateQueries(["invoice.recent"]).finally(() => {
+        addToast(`Invoice ${data.number} deleted`, "success");
+        closeModal(id);
+      });
     },
     onError() {
       addToast(`Unable to delete invoice ${invoice.number}`, "error");

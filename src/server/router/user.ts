@@ -9,8 +9,11 @@ import { createProtectedRouter } from "./protected-router";
 export const userRouter = createProtectedRouter()
   .query("me", {
     async resolve({ ctx }) {
-      return await ctx.prisma.user.findUniqueOrThrow({
+      await checkPendingAccountTransfer(ctx.session.user);
+
+      const user = await ctx.prisma.user.findUniqueOrThrow({
         select: {
+          id: true,
           name: true,
           email: true,
           image: true,
@@ -27,6 +30,53 @@ export const userRouter = createProtectedRouter()
           id: ctx.session.user.id,
         },
       });
+
+      const pendingTransfer = await ctx.prisma.accountTransfer.findFirst({
+        where: {
+          acceptedAt: null,
+          rejectedAt: null,
+          cancelledAt: null,
+          OR: [
+            {
+              toUserId: ctx.session.user.id,
+            },
+            {
+              fromUserId: ctx.session.user.id,
+            },
+          ],
+        },
+        select: {
+          id: true,
+          toUserEmail: true,
+          toUser: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          fromUserEmail: true,
+          fromUser: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          sentAt: true,
+        },
+      });
+
+      const isOwner = pendingTransfer?.fromUserEmail === ctx.session.user.email;
+
+      return {
+        ...user,
+        locked: pendingTransfer !== null && isOwner,
+        pendingTransfer: pendingTransfer
+          ? {
+              ...pendingTransfer,
+              isOwner,
+            }
+          : null,
+      };
     },
   })
   .query("account.transfer.getTransferredData", {

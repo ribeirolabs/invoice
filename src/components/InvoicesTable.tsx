@@ -17,22 +17,25 @@ import dynamic from "next/dynamic";
 import { InvoiceStatus } from "@/utils/invoice";
 import formatDistance from "date-fns/formatDistance";
 import { getDeleteInvoiceModalId } from "./Modal/DeleteInvoiceModal";
+import { UserUnlocked } from "./UserUnlocked";
 
 const SendInvoiceModal = dynamic(() => import("./Modal/SendInvoiceModal"));
 const DeleteInvoiceModal = dynamic(() => import("./Modal/DeleteInvoiceModal"));
 
 export const InvoicesTable = () => {
-  const invoices = trpc.useQuery(["invoice.recent"]);
+  const { data: invoices } = trpc.useQuery(["invoice.recent"]);
 
   return (
     <>
       <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Invoices
-        <Link href="/generate">
-          <a className="btn btn-outline btn-sm">
-            <InvoiceIcon /> generate
-          </a>
-        </Link>
+        <UserUnlocked>
+          <Link href="/generate">
+            <a className="btn btn-outline btn-sm">
+              <InvoiceIcon /> generate
+            </a>
+          </Link>
+        </UserUnlocked>
       </h1>
 
       <div className="border border-base-300 rounded-md mt-4 overflow-x-auto">
@@ -51,23 +54,26 @@ export const InvoicesTable = () => {
           </thead>
 
           <tbody>
-            {!invoices.data?.length && (
+            {!invoices?.length && (
               <tr>
                 <td colSpan={7}>
                   <p className="mt-0">
                     You don&apos;t have any <b>invoices</b> yet.
                   </p>
-                  <Link href="/generate">
-                    <a className="btn btn-sm">
-                      <InvoiceIcon />
-                      Generate your first invoice
-                    </a>
-                  </Link>
+
+                  <UserUnlocked>
+                    <Link href="/generate">
+                      <a className="btn btn-sm">
+                        <InvoiceIcon />
+                        Generate your first invoice
+                      </a>
+                    </Link>
+                  </UserUnlocked>
                 </td>
               </tr>
             )}
 
-            {invoices.data?.map((invoice) => (
+            {invoices?.map((invoice) => (
               <InvoiceRow key={invoice.id} invoice={invoice} />
             ))}
           </tbody>
@@ -135,47 +141,49 @@ const InvoiceRow = ({
       </td>
       <td>
         <div className="flex justify-end gap-1">
-          <div
-            className="tooltip"
-            data-tip={
-              invoice.fullfilledAt ? "Already fullfilled" : "Send email"
-            }
-          >
-            <button
-              onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
-              className="btn-action"
-              disabled={!!invoice.fullfilledAt}
-            >
-              <SendIcon />
-            </button>
-          </div>
-          <div className="flex justify-end">
+          <UserUnlocked>
             <div
               className="tooltip"
               data-tip={
-                invoice.fullfilledAt
-                  ? "Already fullfilled"
-                  : "Mark as fullfilled"
+                invoice.fullfilledAt ? "Already fullfilled" : "Send email"
               }
             >
               <button
-                onClick={() => fullfillInvoice.mutate(invoice.id)}
-                className="btn btn-action"
-                data-loading={fullfillInvoice.isLoading}
+                onClick={() => openModal(getSendInvoiceModalId(invoice.id))}
+                className="btn-action"
                 disabled={!!invoice.fullfilledAt}
               >
-                <CheckIcon />
+                <SendIcon />
               </button>
             </div>
-          </div>
-          <div className="tooltip tooltip-left" data-tip="Delete">
-            <button
-              onClick={() => openModal(getDeleteInvoiceModalId(invoice.id))}
-              className="btn-action"
-            >
-              <DeleteIcon />
-            </button>
-          </div>
+            <div className="flex justify-end">
+              <div
+                className="tooltip"
+                data-tip={
+                  invoice.fullfilledAt
+                    ? "Already fullfilled"
+                    : "Mark as fullfilled"
+                }
+              >
+                <button
+                  onClick={() => fullfillInvoice.mutate(invoice.id)}
+                  className="btn btn-action"
+                  data-loading={fullfillInvoice.isLoading}
+                  disabled={!!invoice.fullfilledAt}
+                >
+                  <CheckIcon />
+                </button>
+              </div>
+            </div>
+            <div className="tooltip tooltip-left" data-tip="Delete">
+              <button
+                onClick={() => openModal(getDeleteInvoiceModalId(invoice.id))}
+                className="btn-action"
+              >
+                <DeleteIcon />
+              </button>
+            </div>
+          </UserUnlocked>
         </div>
       </td>
 

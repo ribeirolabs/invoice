@@ -20,6 +20,7 @@ import { User } from "@prisma/client";
 import { Select } from "@common/components/Select";
 import { getCurrencySymbol } from "@/utils/currency";
 import { objectKeys } from "@common/utils/object-keys";
+import { useRequiredUser } from "@/utils/account";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -48,7 +49,7 @@ const NewCompanyPage: NextPage = () => {
 };
 
 const CompanyForm = () => {
-  const session = trpc.useQuery(["auth.getSession"]);
+  const authUser = useRequiredUser();
   const router = useRouter();
 
   const upsert = trpc.useMutation(["company.upsert"]);
@@ -60,14 +61,11 @@ const CompanyForm = () => {
     },
   ]);
 
-  const authUser = session.data?.user;
   const [pattern, setPattern] = useState("");
 
   const user = useMemo(() => {
-    return company.data?.users.find(
-      (user) => user.userId === session.data?.user?.id
-    );
-  }, [company.data, session.data]);
+    return company.data?.users.find((user) => user.userId === authUser.id);
+  }, [company.data, authUser]);
 
   const sharedWith = useMemo(() => {
     return (
@@ -77,7 +75,7 @@ const CompanyForm = () => {
     );
   }, [authUser, company.data]);
 
-  const canEdit = user?.type === "OWNED" || !company.data;
+  const canEdit = !authUser.locked && (user?.type === "OWNED" || !company.data);
 
   useEffect(() => {
     if (company.data == null) {

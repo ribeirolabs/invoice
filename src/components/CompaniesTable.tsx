@@ -4,16 +4,16 @@ import { useMemo } from "react";
 import { AddIcon, ShareIcon } from "@common/components/Icons";
 import { Company } from "@prisma/client";
 import { shareOrCopy } from "@common/utils/share";
+import { useRequiredUser } from "@/utils/account";
+import { UserUnlocked } from "./UserUnlocked";
 
 export const CompaniesTable = () => {
-  const session = trpc.useQuery(["auth.getSession"]);
   const companies = trpc.useQuery(["company.getAll"]);
   const invoiceCounts = trpc.useQuery(["invoice.countByCompany"]);
-
-  const authUser = session.data?.user;
+  const user = useRequiredUser();
 
   function copyShareLink(company: Company) {
-    if (!authUser) {
+    if (!user) {
       return;
     }
 
@@ -22,7 +22,7 @@ export const CompaniesTable = () => {
 
     url.searchParams.set("type", "company");
     url.searchParams.set("value", company.id);
-    url.searchParams.set("sharedBy", authUser.id);
+    url.searchParams.set("sharedBy", user.id);
 
     const data: Required<Pick<ShareData, "url" | "text">> = {
       url: url.toString(),
@@ -73,11 +73,13 @@ export const CompaniesTable = () => {
     <>
       <h1 className="text-xl leading-normal font-extrabold flex gap-4 justify-between">
         Companies
-        <Link href="/company/new">
-          <a className="btn btn-outline btn-sm">
-            <AddIcon size={16} /> add
-          </a>
-        </Link>
+        <UserUnlocked>
+          <Link href="/company/new">
+            <a className="btn btn-outline btn-sm">
+              <AddIcon size={16} /> add
+            </a>
+          </Link>
+        </UserUnlocked>
       </h1>
 
       <div className="border border-base-300 rounded-md mt-4 overflow-x-auto">
@@ -101,19 +103,22 @@ export const CompaniesTable = () => {
                     <li>A company that you own</li>
                     <li>A company to pay you</li>
                   </ol>
-                  <Link href="/company/create">
-                    <a className="btn btn-sm">
-                      <AddIcon size={16} />
-                      Add your first company
-                    </a>
-                  </Link>
+
+                  <UserUnlocked>
+                    <Link href="/company/create">
+                      <a className="btn btn-sm">
+                        <AddIcon size={16} />
+                        Add your first company
+                      </a>
+                    </Link>
+                  </UserUnlocked>
                 </td>
               </tr>
             )}
 
             {companies.data?.map((company) => {
               const isOwned = company.users.some(
-                (user) => user.userId === authUser?.id && user.owner
+                ({ userId, owner }) => userId === user.id && owner
               );
 
               const isShared = company.users.some(
@@ -157,13 +162,15 @@ export const CompaniesTable = () => {
 
                   <td>
                     <div className="flex gap-1 justify-end">
-                      <button
-                        className="btn-action"
-                        onClick={() => copyShareLink(company)}
-                        title="Share"
-                      >
-                        <ShareIcon />
-                      </button>
+                      <UserUnlocked>
+                        <button
+                          className="btn-action"
+                          onClick={() => copyShareLink(company)}
+                          title="Share"
+                        >
+                          <ShareIcon />
+                        </button>
+                      </UserUnlocked>
                     </div>
                   </td>
                 </tr>

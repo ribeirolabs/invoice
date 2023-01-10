@@ -21,6 +21,7 @@ import { openModal } from "@common/components/Modal";
 import { nlToBr } from "@common/utils/nl-to-br";
 import { getInvoiceFilename } from "@/utils/invoice";
 import { getDeleteInvoiceModalId } from "@/components/Modal/DeleteInvoiceModal";
+import { UserUnlocked } from "@/components/UserUnlocked";
 
 const SendInvoiceModal = dynamic(
   () => import("@/components/Modal/SendInvoiceModal")
@@ -38,20 +39,11 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
   });
 };
 
-const ErrorFallback = ({ error }: { error: Error }) => (
-  <>
-    <h1>Something went wrong</h1>
-    <pre>{error.stack}</pre>
-  </>
-);
-
 const InvoicePage: NextPage = () => {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <ProtectedPage>
-        <InvoicePrint />
-      </ProtectedPage>
-    </ErrorBoundary>
+    <ProtectedPage>
+      <InvoicePrint />
+    </ProtectedPage>
   );
 };
 
@@ -155,23 +147,27 @@ const InvoicePrint = () => {
             Export PDF
           </button>
         </li>
-        <li>
-          <button
-            onClick={() => openModal(getSendInvoiceModalId(invoice.data.id))}
-            disabled={!!invoice.data.fullfilledAt}
-          >
-            <SendIcon />
-            Send Email
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => openModal(getDeleteInvoiceModalId(invoice.data.id))}
-          >
-            <DeleteIcon />
-            Delete Invoice
-          </button>
-        </li>
+        <UserUnlocked>
+          <li>
+            <button
+              onClick={() => openModal(getSendInvoiceModalId(invoice.data.id))}
+              disabled={!!invoice.data.fullfilledAt}
+            >
+              <SendIcon />
+              Send Email
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() =>
+                openModal(getDeleteInvoiceModalId(invoice.data.id))
+              }
+            >
+              <DeleteIcon />
+              Delete Invoice
+            </button>
+          </li>
+        </UserUnlocked>
       </Portal>
 
       <div>

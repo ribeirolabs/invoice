@@ -17,9 +17,6 @@ export function useRequiredUser() {
   if (!user) {
     throw new Error("Missing required user");
   }
-  if (user.locked) {
-    throw new Error("Missing required user");
-  }
 
   return user;
 }

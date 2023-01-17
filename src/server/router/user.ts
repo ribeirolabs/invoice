@@ -5,6 +5,14 @@ import {
   validateTransferRequest,
 } from "../services/account";
 import { createProtectedRouter } from "./protected-router";
+import { gmail_v1, google } from "googleapis";
+import MailComposer from "nodemailer/lib/mail-composer";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { gmail } from "@googleapis/gmail";
+import { SendAccountTransfer } from "@/emails/SendAccountTransfer";
+import { env } from "@/env/server.mjs";
+import { getTransferUrl } from "@/utils/account";
 
 export const userRouter = createProtectedRouter()
   .query("me", {
@@ -146,29 +154,62 @@ export const userRouter = createProtectedRouter()
         throw new Error("You have pending transfer requests");
       }
 
-      // @todo: send email
+      return await ctx.prisma.$transaction(async (tx) => {
+        const transfer = await tx.accountTransfer.create({
+          data: {
+            fromUserEmail: ctx.session.user.email,
+            toUserEmail: input.toEmail,
+            fromUserId: ctx.session.user.id,
+            toUserId: toUser?.id,
+          },
+          include: {
+            toUser: true,
+            fromUser: true,
+          },
+        });
 
-      return await ctx.prisma.accountTransfer.create({
-        data: {
-          fromUserEmail: ctx.session.user.email,
-          toUserEmail: input.toEmail,
-          fromUserId: ctx.session.user.id,
-          toUserId: toUser?.id,
-        },
-        select: {
-          toUserEmail: true,
-          toUser: {
-            select: {
-              id: true,
-            },
+        const transferUrl = getTransferUrl(transfer.id, ctx.req.headers.host);
+
+        const message = new MailComposer({
+          to: input.toEmail,
+          from: `Ribeirolabs Invoice <apps@ribeirolabs.com>`,
+          subject: "Account Transfer Request",
+          html: renderToStaticMarkup(
+            createElement(SendAccountTransfer, {
+              transfer,
+              url: transferUrl.toString(),
+            })
+          ),
+        });
+
+        const buffer = await message.compile().build();
+
+        const client = new google.auth.GoogleAuth({
+          credentials: {
+            client_email: env.GOOGLE_CLIENT_EMAIL,
+            private_key: env.GOOGLE_PRIVATE_KEY,
           },
-          fromUserEmail: true,
-          fromUser: {
-            select: {
-              id: true,
-            },
+          clientOptions: {
+            subject: "apps@ribeirolabs.com",
           },
-        },
+          scopes: ["https://www.googleapis.com/auth/gmail.compose"],
+        });
+
+        await gmail("v1")
+          .users.messages.send({
+            auth: client,
+            userId: "me",
+            requestBody: {
+              raw: buffer.toString("base64"),
+            },
+          })
+          .then((res) => {
+            if (res.status > 200) {
+              throw new Error(res.statusText);
+            }
+          });
+
+        return transfer;
       });
     },
   })
@@ -408,5 +449,32 @@ export const userRouter = createProtectedRouter()
           },
         });
       });
+    },
+  })
+  .query("account.transfer.htmlForEmail", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const transfer = await ctx.prisma.accountTransfer.findFirstOrThrow({
+        where: {
+          id: input.id,
+        },
+        include: {
+          toUser: true,
+          fromUser: true,
+        },
+      });
+
+      const transferUrl = getTransferUrl(transfer.id, ctx.req.headers.host);
+
+      const html = renderToStaticMarkup(
+        createElement(SendAccountTransfer, {
+          transfer,
+          url: transferUrl,
+        })
+      );
+
+      return html;
     },
   });

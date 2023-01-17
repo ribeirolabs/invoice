@@ -5,6 +5,8 @@ import {
   Children,
   useEffect,
   useRef,
+  ElementType,
+  ReactNode,
 } from "react";
 
 const HEADING_STYLE = {
@@ -36,20 +38,24 @@ export function Heading({
 
 export function Text({
   children,
+  as = "p",
   ...style
-}: PropsWithChildren & CSSProperties) {
-  return (
-    <p
-      style={{
-        ...style,
+}: {
+  as?: ElementType;
+  children?: ReactNode;
+} & CSSProperties) {
+  return createElement(
+    as,
+    {
+      style: {
         margin: "6px 0",
         fontFamily: "Arial, sans-serif",
         fontSize: 16,
         color: style.color ?? "#888",
-      }}
-    >
-      {children}
-    </p>
+        ...style,
+      },
+    },
+    children
   );
 }
 
@@ -147,16 +153,28 @@ export function Link({
   );
 }
 
-export function Page({
-  children,
-  css,
-}: PropsWithChildren<{ css?: string }>) {
+export function Page({ children, css }: PropsWithChildren<{ css?: string }>) {
   return (
     <html>
       <head>
         <style>{css}</style>
       </head>
-      <body style={{ padding: 6, backgroundColor: "#e3e3e3" }}>{children}</body>
+      <body style={{ padding: 6, backgroundColor: "#e3e3e3" }}>
+        {children}
+        <Row>
+          <Text textAlign="center">
+            <Link
+              href="https://invoice.ribeirolabs.com"
+              color="#238244"
+              fontWeight="bold"
+              fontSize={14}
+            >
+              ribeirolabs / invoice
+            </Link>
+          </Text>
+        </Row>
+        <Spacing />
+      </body>
     </html>
   );
 }

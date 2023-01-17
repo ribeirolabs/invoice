@@ -115,6 +115,7 @@ function TransferAccountSection() {
   const { data: pending, isLoading } = trpc.useQuery([
     "user.account.transfer.getPending",
   ]);
+
   return (
     <div className="md:max-w-[70%]">
       <h2>Transfer Account</h2>

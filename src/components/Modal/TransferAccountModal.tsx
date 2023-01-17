@@ -24,8 +24,9 @@ export default function TransferAccountModal() {
       setTransferTo("");
       setConfirmation("");
     },
-    onError() {
-      addToast(`Unable to request the transder. Try again later`, "error");
+    onError(e) {
+      console.error(e);
+      addToast(e.message, "error");
     },
   });
   const [transferTo, setTransferTo] = useState("");

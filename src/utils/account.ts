@@ -24,3 +24,16 @@ export function useRequiredUser() {
 export function useIsUserLocked() {
   return useRequiredUser().locked;
 }
+
+export function getTransferUrl(id: string, host?: string) {
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+
+  if (!host) {
+    throw new Error("Unable to get host from request headers");
+  }
+
+  return new URL(
+    `/settings/transfer-account/${id}`,
+    `${protocol}://${host}`
+  ).toString();
+}

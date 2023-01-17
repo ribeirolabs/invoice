@@ -1,5 +1,4 @@
 import { prisma } from "@/server/db/client";
-import { AccountTransfer } from "@prisma/client";
 
 export async function checkPendingAccountTransfer({
   id,

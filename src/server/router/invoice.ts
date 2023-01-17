@@ -15,7 +15,6 @@ import MailComposer from "nodemailer/lib/mail-composer";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { z } from "zod";
-import { sendInvoiceEmail } from "../services/email";
 import { generatePdf } from "../services/pdf";
 import { createProtectedRouter } from "./protected-router";
 
@@ -235,41 +234,6 @@ export const invoiceRouter = createProtectedRouter()
       return ctx.prisma.invoice.delete({
         where: {
           id: input,
-        },
-      });
-    },
-  })
-  .mutation("send.old", {
-    input: z.object({
-      id: z.string().cuid(),
-    }),
-    async resolve({ ctx, input }) {
-      const invoice = await ctx.prisma.invoice.findUniqueOrThrow({
-        where: { id: input.id },
-        include: {
-          receiver: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-          payer: {
-            select: {
-              name: true,
-              email: true,
-              currency: true,
-            },
-          },
-        },
-      });
-
-      await sendInvoiceEmail({ invoice, req: ctx.req });
-
-      return await ctx.prisma.invoiceEmailHistory.create({
-        data: {
-          provider: "mailgun",
-          invoiceId: input.id,
-          email: invoice.payer.email,
         },
       });
     },

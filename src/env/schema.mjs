@@ -12,11 +12,13 @@ export const serverSchema = z.object({
   NEXTAUTH_URL: z.string().url(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_CLIENT_EMAIL: z.string(),
+  GOOGLE_PRIVATE_KEY: z.string(),
   EMAIL_API_KEY: z.string(),
   EMAIL_API_URL: z.string(),
   EMAIL_API_DOMAIN: z.string(),
   EMAIL_API_SENDER: z.string().email(),
-  BROWSERLESS_API_KEY: z.string()
+  BROWSERLESS_API_KEY: z.string(),
 });
 
 /**

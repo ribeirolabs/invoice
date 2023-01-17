@@ -12,7 +12,6 @@ import Link from "next/link";
 import { Senstive } from "@/components/Sensitive";
 import { ProtectedPage } from "@common/components/ProtectedPage";
 import { dispatchCustomEvent } from "@ribeirolabs/events";
-import { ErrorBoundary } from "react-error-boundary";
 import dynamic from "next/dynamic";
 import { Portal } from "@common/components/Portal";
 import { getSendInvoiceModalId } from "@/components/Modal/SendInvoiceModal";
@@ -185,16 +184,16 @@ const InvoicePrint = () => {
         <div className="invoice-section">
           <div className="flex justify-between mb-4">
             <div>
-              <h3>Date</h3>
+              <h3>Issued</h3>
               <p className="m-0">
-                {format(invoice.data.issuedAt, "yyyy/MM/dd")}
+                {format(invoice.data.issuedAt, "MMM d, YYY")}
               </p>
             </div>
 
             <div>
               <h3>Due Date</h3>
               <p className="m-0">
-                {format(invoice.data.expiredAt, "yyyy/MM/dd")}
+                {format(invoice.data.expiredAt, "MMM d, YYY")}
               </p>
             </div>
 

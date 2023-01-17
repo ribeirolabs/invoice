@@ -72,7 +72,7 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
       </Row>
       <Row bg="#fff">
         <div>
-          <Heading level={3}>From</Heading>
+          <Heading level={3}>Receiver</Heading>
           <Text>{invoice.receiver.name}</Text>
           <Text>
             <Link href={`mailto:${invoice.receiver.email}`} color="#4175d7">
@@ -81,7 +81,7 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
           </Text>
         </div>
         <div>
-          <Heading level={3}>To</Heading>
+          <Heading level={3}>Bill To</Heading>
           <Text>{invoice.payer.name}</Text>
           <Text>
             <Link href={`mailto:${invoice.payer.email}`} color="#4175d7">
@@ -90,19 +90,6 @@ export function InvoiceEmail({ invoice }: { invoice: PartialInvoice }) {
           </Text>
         </div>
       </Row>
-      <Row>
-        <Text textAlign="center">
-          <Link
-            href="https://invoice.ribeirolabs.com"
-            color="#238244"
-            fontWeight="bold"
-            fontSize={12}
-          >
-            ribeirolabs / invoice
-          </Link>
-        </Text>
-      </Row>
-      <Spacing />
     </Page>
   );
 }

@@ -12,7 +12,7 @@ import {
 const HEADING_STYLE = {
   1: { fontSize: 26 },
   2: { fontSize: 20 },
-  3: { fontSize: 16, letterSpacing: "0.05rem" },
+  3: { fontSize: 16 },
 } as const;
 
 export function Heading({
@@ -29,7 +29,6 @@ export function Heading({
         ...HEADING_STYLE[level],
         fontFamily: "Arial, sans-serif",
         fontWeight: 900,
-        textTransform: "uppercase",
       },
     },
     children

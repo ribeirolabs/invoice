@@ -3,6 +3,8 @@ import {
   CSSProperties,
   createElement,
   Children,
+  useEffect,
+  useRef,
 } from "react";
 
 const HEADING_STYLE = {
@@ -143,4 +145,66 @@ export function Link({
       {children}
     </a>
   );
+}
+
+export function Page({
+  children,
+  css,
+}: PropsWithChildren<{ css?: string }>) {
+  return (
+    <html>
+      <head>
+        <style>{css}</style>
+      </head>
+      <body style={{ padding: 6, backgroundColor: "#e3e3e3" }}>{children}</body>
+    </html>
+  );
+}
+
+export function useRenderEmail({
+  html,
+  isLoading,
+}: {
+  html?: string;
+  isLoading: boolean;
+}) {
+  const ref = useRef<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    if (!html) {
+      return;
+    }
+
+    const doc = ref.current?.contentDocument;
+
+    if (!doc) {
+      return;
+    }
+
+    const htmlElement = document.body.parentElement;
+
+    if (htmlElement) {
+      htmlElement.dataset.theme = "light";
+    }
+
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    return () => {
+      if (htmlElement) {
+        htmlElement.dataset.theme = "dark";
+      }
+    };
+  }, [html]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (html == null) {
+    return <p>No HTML</p>;
+  }
+
+  return <iframe ref={ref} className="w-screen h-screen" />;
 }

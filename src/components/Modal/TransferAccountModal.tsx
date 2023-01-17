@@ -16,6 +16,7 @@ export default function TransferAccountModal() {
   const transferData = trpc.useQuery([
     "user.account.transfer.getTransferredData",
   ]);
+  const utils = trpc.useContext();
   const transfer = trpc.useMutation("user.account.transfer.request", {
     onSuccess(data) {
       addToast(
@@ -25,6 +26,7 @@ export default function TransferAccountModal() {
       setTransferTo("");
       setConfirmation("");
       closeModal("transfer-account");
+      utils.invalidateQueries(["user.account.transfer.getPending"]);
     },
     onError(e) {
       console.error(e);

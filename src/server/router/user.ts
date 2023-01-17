@@ -184,12 +184,14 @@ export const userRouter = createProtectedRouter()
 
         const buffer = await message.compile().build();
 
-        console.log(env);
+        const key = JSON.parse(`"${env.GOOGLE_PRIVATE_KEY}"`);
+
+        console.log(key);
 
         const client = new google.auth.GoogleAuth({
           credentials: {
             client_email: env.GOOGLE_CLIENT_EMAIL,
-            private_key: env.GOOGLE_PRIVATE_KEY,
+            private_key: key,
           },
           clientOptions: {
             subject: "apps@ribeirolabs.com",

@@ -184,6 +184,8 @@ export const userRouter = createProtectedRouter()
 
         const buffer = await message.compile().build();
 
+        console.log(env);
+
         const client = new google.auth.GoogleAuth({
           credentials: {
             client_email: env.GOOGLE_CLIENT_EMAIL,

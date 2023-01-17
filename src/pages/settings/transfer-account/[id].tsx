@@ -1,3 +1,4 @@
+import { AcceptTransferAccount } from "@/components/Modal/AcceptTransferAccount";
 import { CancelTransferAccount } from "@/components/Modal/CancelTransferAccount";
 import { RejectTransferAccount } from "@/components/Modal/RejectTransferAccount";
 import { getUserDisplayName } from "@/utils/account";
@@ -94,7 +95,10 @@ function Page() {
               </button>
             ) : (
               <>
-                <button className="flex-1 md:flex-none btn btn-primary btn-sm">
+                <button
+                  className="flex-1 md:flex-none btn btn-primary btn-sm"
+                  onClick={() => openModal("accept-transfer-account-modal")}
+                >
                   <CheckIcon />
                   Accept
                 </button>
@@ -151,6 +155,7 @@ function Page() {
       </div>
       <CancelTransferAccount />
       <RejectTransferAccount />
+      <AcceptTransferAccount transfer={transfer} />
     </div>
   );
 }

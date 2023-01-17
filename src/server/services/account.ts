@@ -37,11 +37,6 @@ export async function validateTransferRequest(id: string) {
     where: {
       id,
     },
-    select: {
-      acceptedAt: true,
-      rejectedAt: true,
-      cancelledAt: true,
-    },
   });
 
   if (transfer.acceptedAt) {
@@ -56,5 +51,5 @@ export async function validateTransferRequest(id: string) {
     throw new Error("Transfer request already cancelled");
   }
 
-  return true;
+  return transfer;
 }

@@ -350,4 +350,63 @@ export const userRouter = createProtectedRouter()
         },
       });
     },
+  })
+  .mutation("account.transfer.accept", {
+    input: z.object({
+      id: z.string().cuid(),
+    }),
+    async resolve({ ctx, input }) {
+      const request = await validateTransferRequest(input.id);
+
+      return await ctx.prisma.$transaction(async (tx) => {
+        if (!request.fromUserId) {
+          throw new Error("Transfer request missing creator");
+        }
+
+        if (!request.toUserId) {
+          throw new Error("Transfer request missing receipient user");
+        }
+
+        await Promise.all([
+          tx.companiesOnUsers.updateMany({
+            where: {
+              userId: request.fromUserId,
+            },
+            data: {
+              userId: request.toUserId,
+            },
+          }),
+
+          tx.companiesOnUsers.updateMany({
+            where: {
+              sharedById: request.fromUserId,
+            },
+            data: {
+              sharedById: request.toUserId,
+            },
+          }),
+
+          tx.invoice.updateMany({
+            where: {
+              userId: request.fromUserId,
+            },
+            data: {
+              userId: request.toUserId,
+            },
+          }),
+        ]);
+
+        return await tx.accountTransfer.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            acceptedAt: new Date(),
+          },
+          select: {
+            id: true,
+          },
+        });
+      });
+    },
   });

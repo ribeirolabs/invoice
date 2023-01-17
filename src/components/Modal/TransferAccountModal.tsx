@@ -1,6 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import { Input } from "@common/components/Input";
 import {
+  closeModal,
   Modal,
   ModalCancelButton,
   useModalEvent,
@@ -23,6 +24,7 @@ export default function TransferAccountModal() {
       );
       setTransferTo("");
       setConfirmation("");
+      closeModal("transfer-account");
     },
     onError(e) {
       console.error(e);

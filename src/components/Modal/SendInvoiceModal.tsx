@@ -1,7 +1,10 @@
+import { dateToDistance } from "@/utils/date";
+import { INVOICE_EMAIL_LIMIT } from "@/utils/invoice";
 import { trpc } from "@/utils/trpc";
 import { Alert } from "@common/components/Alert";
 import { closeModal, Modal, ModalCancelButton } from "@common/components/Modal";
 import { addToast } from "@common/components/Toast";
+import { cn } from "@common/utils/classNames";
 import { Company, Invoice } from "@prisma/client";
 import format from "date-fns/format";
 import pluralize from "pluralize";
@@ -37,6 +40,7 @@ export default function SendInvoiceModal({
   }
 
   const historyCount = history.data?.length ?? 0;
+  const submissionsLeft = INVOICE_EMAIL_LIMIT - historyCount;
 
   return (
     <Modal id={id} size="sm">
@@ -56,29 +60,48 @@ export default function SendInvoiceModal({
           <p>Checking email history...</p>
         ) : (
           historyCount > 0 && (
-            <Alert type="warning">
-              You already sent this invoice {historyCount}{" "}
-              {pluralize("time", historyCount)}:
-              <ul>
+            <div
+              className={cn(
+                "p-4 rounded-sm font-bold",
+                submissionsLeft > 0 ? "bg-warning/10" : "bg-error/10"
+              )}
+            >
+              {submissionsLeft > 0 ? (
+                <>
+                  You can send this invoice {submissionsLeft} more{" "}
+                  {pluralize("time", submissionsLeft)}
+                </>
+              ) : (
+                <>
+                  You already sent this invoice {historyCount}{" "}
+                  {pluralize("time", historyCount)}
+                </>
+              )}
+
+              <ol>
                 {history.data?.map(({ id, createdAt, email }) => (
                   <li key={id}>
-                    <div>{format(createdAt, "yyyy-MM-dd HH:mm")}</div>
+                    <div>Sent {dateToDistance(createdAt)}</div>
                     <div className="text-xs">{email}</div>
                   </li>
                 ))}
-              </ul>
-            </Alert>
+              </ol>
+            </div>
           )
         )}
       </div>
 
       <div className="flex gap-2 bg-base-300 p-4 justify-end">
-        <ModalCancelButton modalId={id} className="flex-1 md:flex-none" />
+        <ModalCancelButton
+          modalId={id}
+          className="flex-1 md:flex-none"
+          autoFocus
+        />
         <button
           className="btn btn-primary flex-1 md:btn-wide md:flex-none"
           data-loading={sendInvoice.isLoading}
           onClick={onConfirm}
-          disabled={history.isLoading}
+          disabled={history.isLoading || submissionsLeft === 0}
           autoFocus
         >
           Send Email

@@ -13,6 +13,7 @@ export default async function restricted(
   const session = await getServerSession(req, res, nextAuthOptions);
 
   if (!session?.user) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.redirect(`/auth/signin?callbackUrl=${encodeURIComponent(req.url!)}`);
     return;
   }
@@ -41,11 +42,15 @@ export default async function restricted(
     },
   });
 
-  await ssr.fetchQuery("company.share", {
-    companyId: value,
-    userId: session.user.id,
-    sharedById: sharedById,
-  });
+  try {
+    await ssr.fetchQuery("company.share", {
+      companyId: value,
+      userId: session.user.id,
+      sharedById: sharedById,
+    });
 
-  res.redirect(`/company/${value}`);
+    res.redirect(`/company/${value}?company_share=success`);
+  } catch (e) {
+    res.redirect(`/?company_share=error`);
+  }
 }

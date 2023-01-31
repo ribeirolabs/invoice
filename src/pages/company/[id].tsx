@@ -20,7 +20,7 @@ import { User } from "@prisma/client";
 import { Select } from "@common/components/Select";
 import { getCurrencySymbol } from "@/utils/currency";
 import { objectKeys } from "@common/utils/object-keys";
-import { useRequiredUser } from "@/utils/account";
+import { getUserDisplayName, useRequiredUser } from "@/utils/account";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
@@ -51,6 +51,7 @@ const NewCompanyPage: NextPage = () => {
 const CompanyForm = () => {
   const authUser = useRequiredUser();
   const router = useRouter();
+  const shareState = router.query.company_share as "success" | undefined;
 
   const upsert = trpc.useMutation(["company.upsert"]);
   const detach = trpc.useMutation(["company.detach"]);
@@ -150,9 +151,28 @@ const CompanyForm = () => {
     }
   }
 
+  useEffect(() => {
+    if (shareState === "success" && user?.sharedBy) {
+      requestAnimationFrame(() => {
+        addToast(
+          `Company received from ${getUserDisplayName(
+            user.sharedBy!.email,
+            user.sharedBy
+          )}`,
+          "success",
+          "company-share"
+        );
+
+        const [url] = router.asPath.split("?");
+
+        router.replace(url!);
+      });
+    }
+  }, [shareState, user, router.asPath]);
+
   return (
     <div className="flex flex-col items-center">
-      <div className="py-2 w-full md:max-w-lg text-center w-full">
+      <div className="py-2 md:max-w-lg text-center w-full">
         {user?.sharedBy && (
           <span className="badge badge-secondary mb-2">read-only</span>
         )}
@@ -180,7 +200,7 @@ const CompanyForm = () => {
           <p className="m-0 text-sm">
             Shared with
             <button
-              className="btn btn-sm mx-2 btn"
+              className="btn btn-sm mx-2"
               onClick={() => {
                 dispatchCustomEvent("modal", {
                   action: "open",

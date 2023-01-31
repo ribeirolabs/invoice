@@ -50,7 +50,6 @@ model AccountTransfer {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@unique([fromUserEmail, toUserEmail])
   @@index([fromUserId])
   @@index([toUserId])
 }

@@ -2,9 +2,7 @@
   "name": "invoice",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "app-common"
-  ],
+  "workspaces": ["app-common"],
   "scripts": {
     "dev": "PORT=3300 next dev",
     "prod:install": "node ./init-submodule.js && npm i",
@@ -17,7 +15,7 @@
   "dependencies": {
     "@googleapis/gmail": "^1.1.0",
     "@next-auth/prisma-adapter": "^1.0.4",
-    "@prisma/client": "^4.8.1",
+    "@prisma/client": "5.6.0",
     "@ribeirolabs/events": "^3.0.0",
     "@ribeirolabs/local-storage": "^3.0.1",
     "@trpc/client": "^9.27.0",
@@ -57,9 +55,9 @@
     "eslint": "8.22.0",
     "eslint-config-next": "12.2.5",
     "postcss": "^8.4.16",
-    "prisma": "^4.8.0",
+    "prisma": "5.6.0",
     "tailwindcss": "^3.1.8",
-    "typescript": "4.7.4"
+    "typescript": "4.8.4"
   },
   "ct3aMetadata": {
     "initVersion": "5.8.0"

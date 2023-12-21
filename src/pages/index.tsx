@@ -23,7 +23,7 @@ const Home: NextPage = () => {
       <CompanyShareNotification />
       <InvoicesTable />
       <div className="my-12"></div>
-      {/*      <CompaniesTable /> */}
+      <CompaniesTable />
     </ProtectedPage>
   );
 };

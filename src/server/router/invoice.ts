@@ -329,21 +329,21 @@ export const invoiceRouter = createProtectedRouter()
       });
 
       if (expires_at && refresh_token) {
-        if (isBefore(fromUnixTime(Number(expires_at)), new Date())) {
-          console.log("refreshing token");
-          const response = await refreshAccessToken(refresh_token);
+        // if (isBefore(fromUnixTime(Number(expires_at)), new Date())) {
+        //   console.log("refreshing token");
+        const response = await refreshAccessToken(refresh_token);
 
-          access_token = response.access_token;
-          refresh_token = response.refresh_token;
-          expires_at = BigInt(response.expires_at);
+        access_token = response.access_token;
+        refresh_token = response.refresh_token;
+        expires_at = BigInt(response.expires_at);
 
-          await ctx.prisma.account.update({
-            where: {
-              id: account.id,
-            },
-            data: response,
-          });
-        }
+        await ctx.prisma.account.update({
+          where: {
+            id: account.id,
+          },
+          data: response,
+        });
+        // }
       }
 
       const response = await new Promise<gmail_v1.Schema$Message>(

@@ -323,8 +323,14 @@ export const invoiceRouter = createProtectedRouter()
 
       const buffer = await message.compile().build();
 
+      console.log({
+        expires_at: fromUnixTime(Number(expires_at)),
+        refresh_token,
+      });
+
       if (expires_at && refresh_token) {
         if (isBefore(fromUnixTime(Number(expires_at)), new Date())) {
+          console.log("refreshing token");
           const response = await refreshAccessToken(refresh_token);
 
           access_token = response.access_token;

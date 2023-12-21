@@ -10,8 +10,8 @@ import { useEffect } from "react";
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     return [
-      ssr.fetchQuery("company.getAll"),
-      ssr.fetchQuery("invoice.countByCompany"),
+      // ssr.fetchQuery("company.getAll"),
+      // ssr.fetchQuery("invoice.countByCompany"),
       ssr.fetchQuery("invoice.recent"),
     ];
   });
@@ -23,7 +23,7 @@ const Home: NextPage = () => {
       <CompanyShareNotification />
       <InvoicesTable />
       <div className="my-12"></div>
-      <CompaniesTable />
+      {/*      <CompaniesTable /> */}
     </ProtectedPage>
   );
 };

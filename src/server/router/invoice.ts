@@ -187,7 +187,7 @@ export const invoiceRouter = createProtectedRouter()
         orderBy: {
           createdAt: "desc",
         },
-        take: 5,
+        take: 10,
       });
 
       return invoices.map((invoice) => {
@@ -322,11 +322,6 @@ export const invoiceRouter = createProtectedRouter()
       });
 
       const buffer = await message.compile().build();
-
-      console.log({
-        expires_at: fromUnixTime(Number(expires_at)),
-        refresh_token,
-      });
 
       if (expires_at && refresh_token) {
         // if (isBefore(fromUnixTime(Number(expires_at)), new Date())) {

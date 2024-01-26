@@ -288,7 +288,7 @@ export const invoiceRouter = createProtectedRouter()
           })
           .catch((e) => {
             throw ServerError({
-              message: `Unable to find invoice: ${e.message}`,
+              message: `Unable to find invoice: ${e}`,
               code: "BAD_REQUEST",
             });
           }),
@@ -308,7 +308,7 @@ export const invoiceRouter = createProtectedRouter()
           })
           .catch((e) => {
             throw ServerError({
-              message: `Unable to find account: ${e.message}`,
+              message: `Unable to find account: ${e}`,
               code: "BAD_REQUEST",
             });
           }),
@@ -336,7 +336,7 @@ export const invoiceRouter = createProtectedRouter()
         cookies: ctx.req.cookies,
       }).catch((e) => {
         throw ServerError({
-          message: `Unable to generate PDF: ${e.message}`,
+          message: `Unable to generate PDF: ${e}`,
           code: "INTERNAL_SERVER_ERROR",
         });
       });
@@ -360,10 +360,11 @@ export const invoiceRouter = createProtectedRouter()
 
       const buffer = await message.compile().build();
 
-      if (expires_at && refresh_token) {
+      if (expires_at && refresh_token && Date.now() > expires_at) {
+        console.log("Account expired, refreshing token");
         const response = await refreshAccessToken(refresh_token).catch((e) => {
           throw ServerError({
-            message: `Unable to refresh token: ${e.message}`,
+            message: `Unable to refresh token: ${e}`,
             code: "INTERNAL_SERVER_ERROR",
           });
         });
@@ -381,7 +382,7 @@ export const invoiceRouter = createProtectedRouter()
           })
           .catch((e) => {
             throw ServerError({
-              message: `Unable to update account: ${e.message}`,
+              message: `Unable to update account: ${e}`,
               code: "INTERNAL_SERVER_ERROR",
             });
           });
@@ -409,7 +410,7 @@ export const invoiceRouter = createProtectedRouter()
         }
       ).catch((e) => {
         throw ServerError({
-          message: `Unable to send email: ${e.message}`,
+          message: `Unable to send email: ${e}`,
           code: "INTERNAL_SERVER_ERROR",
         });
       });

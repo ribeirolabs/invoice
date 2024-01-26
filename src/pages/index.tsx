@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return [ssr.fetchQuery("invoice.recent")];
+    return [];
   });
 };
 

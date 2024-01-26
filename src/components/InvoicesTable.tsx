@@ -23,7 +23,9 @@ const SendInvoiceModal = dynamic(() => import("./Modal/SendInvoiceModal"));
 const DeleteInvoiceModal = dynamic(() => import("./Modal/DeleteInvoiceModal"));
 
 export const InvoicesTable = () => {
-  const { data: invoices } = trpc.useQuery(["invoice.recent"]);
+  const { data: invoices, isLoading } = trpc.useQuery(["invoice.recent"], {
+    ssr: false,
+  });
 
   return (
     <>
@@ -54,7 +56,13 @@ export const InvoicesTable = () => {
           </thead>
 
           <tbody>
-            {!invoices?.length && (
+            {isLoading ? (
+              <tr>
+                <td colSpan={7}>
+                  <p className="mt-0">Loading invoices...</p>
+                </td>
+              </tr>
+            ) : !invoices?.length ? (
               <tr>
                 <td colSpan={7}>
                   <p className="mt-0">
@@ -71,7 +79,7 @@ export const InvoicesTable = () => {
                   </UserUnlocked>
                 </td>
               </tr>
-            )}
+            ) : null}
 
             {invoices?.map((invoice) => (
               <InvoiceRow key={invoice.id} invoice={invoice} />

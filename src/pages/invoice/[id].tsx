@@ -32,9 +32,10 @@ const DeleteInvoiceModal = dynamic(
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("invoice.get", {
-      id: ctx.params?.id as string,
-    });
+    return [];
+    // return ssr.fetchQuery("invoice.get", {
+    //   id: ctx.params?.id as string,
+    // });
   });
 };
 

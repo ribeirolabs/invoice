@@ -364,7 +364,7 @@ export const invoiceRouter = createProtectedRouter()
         console.log("Account expired, refreshing token");
         const response = await refreshAccessToken(refresh_token).catch((e) => {
           throw ServerError({
-            message: `Unable to refresh token: ${e}`,
+            message: `Unable to refresh token: ${JSON.stringify(e)}`,
             code: "INTERNAL_SERVER_ERROR",
           });
         });

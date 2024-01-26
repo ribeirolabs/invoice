@@ -7,9 +7,8 @@ import {
 import { refreshAccessToken } from "@common/server/refresh-access-token";
 import { gmail } from "@googleapis/gmail";
 import { TRPCError } from "@trpc/server";
-import fromUnixTime from "date-fns/fromUnixTime";
+import { TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
 import isAfter from "date-fns/isAfter";
-import isBefore from "date-fns/isBefore";
 import { gmail_v1 } from "googleapis";
 import MailComposer from "nodemailer/lib/mail-composer";
 import { createElement } from "react";
@@ -17,6 +16,21 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { z } from "zod";
 import { generatePdf } from "../services/pdf";
 import { createProtectedRouter } from "./protected-router";
+
+function ServerError(opts: {
+  message?: string;
+  code: TRPC_ERROR_CODE_KEY;
+  /**
+   * @deprecated use `cause`
+   */
+  originalError?: unknown;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore This will be `Error` in next major version
+  cause?: unknown;
+}) {
+  console.error(opts);
+  return new TRPCError(opts);
+}
 
 export const invoiceRouter = createProtectedRouter()
   .query("get", {
@@ -35,11 +49,11 @@ export const invoiceRouter = createProtectedRouter()
       });
 
       if (invoice == null) {
-        throw new TRPCError({ code: "NOT_FOUND" });
+        throw ServerError({ code: "NOT_FOUND" });
       }
 
       if (invoice.userId !== ctx.session.user.id) {
-        throw new TRPCError({ code: "FORBIDDEN" });
+        throw ServerError({ code: "FORBIDDEN" });
       }
 
       const data = invoice.data as Record<
@@ -194,10 +208,10 @@ export const invoiceRouter = createProtectedRouter()
         const status: InvoiceStatus = invoice.fullfilledAt
           ? "fullfilled"
           : isAfter(new Date(), invoice.expiredAt)
-          ? "overdue"
-          : invoice._count.emailHistory > 0
-          ? "sent"
-          : "created";
+            ? "overdue"
+            : invoice._count.emailHistory > 0
+              ? "sent"
+              : "created";
 
         return {
           ...invoice,
@@ -244,64 +258,87 @@ export const invoiceRouter = createProtectedRouter()
     }),
     async resolve({ ctx, input }) {
       const [invoice, account] = await Promise.all([
-        ctx.prisma.invoice.findUniqueOrThrow({
-          where: { id: input.id },
-          select: {
-            number: true,
-            issuedAt: true,
-            expiredAt: true,
-            description: true,
-            receiver: {
-              select: {
-                name: true,
-                email: true,
+        ctx.prisma.invoice
+          .findUniqueOrThrow({
+            where: { id: input.id },
+            select: {
+              number: true,
+              issuedAt: true,
+              expiredAt: true,
+              description: true,
+              receiver: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+              payer: {
+                select: {
+                  name: true,
+                  email: true,
+                  currency: true,
+                },
+              },
+              user: {
+                select: {
+                  timezone: true,
+                },
               },
             },
-            payer: {
-              select: {
-                name: true,
-                email: true,
-                currency: true,
-              },
-            },
-            user: {
-              select: {
-                timezone: true,
-              },
-            },
-          },
-        }),
+          })
+          .catch((e) => {
+            throw ServerError({
+              message: `Unable to find invoice: ${e.message}`,
+              code: "BAD_REQUEST",
+            });
+          }),
 
-        ctx.prisma.account.findFirstOrThrow({
-          where: {
-            userId: ctx.session.user.id,
-          },
-          select: {
-            id: true,
-            providerAccountId: true,
-            access_token: true,
-            refresh_token: true,
-            expires_at: true,
-          },
-        }),
+        ctx.prisma.account
+          .findFirstOrThrow({
+            where: {
+              userId: ctx.session.user.id,
+            },
+            select: {
+              id: true,
+              providerAccountId: true,
+              access_token: true,
+              refresh_token: true,
+              expires_at: true,
+            },
+          })
+          .catch((e) => {
+            throw ServerError({
+              message: `Unable to find account: ${e.message}`,
+              code: "BAD_REQUEST",
+            });
+          }),
       ]);
 
       let { access_token, refresh_token, expires_at } = account;
 
       if (access_token == null) {
-        throw new Error("Account missing access_token");
+        throw ServerError({
+          message: "Account missing access_token",
+          code: "BAD_REQUEST",
+        });
       }
 
       if (!ctx.req.headers.origin) {
-        throw new Error(
-          'Unable to generate PDF, missing "origin" from request'
-        );
+        throw ServerError({
+          message: 'Unable to generate PDF, missing "origin" from request',
+          code: "BAD_REQUEST",
+        });
       }
 
       const pdf = await generatePdf({
         id: input.id,
         domain: ctx.req.headers.origin,
         cookies: ctx.req.cookies,
+      }).catch((e) => {
+        throw ServerError({
+          message: `Unable to generate PDF: ${e.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        });
       });
 
       const message = new MailComposer({
@@ -324,21 +361,30 @@ export const invoiceRouter = createProtectedRouter()
       const buffer = await message.compile().build();
 
       if (expires_at && refresh_token) {
-        // if (isBefore(fromUnixTime(Number(expires_at)), new Date())) {
-        //   console.log("refreshing token");
-        const response = await refreshAccessToken(refresh_token);
+        const response = await refreshAccessToken(refresh_token).catch((e) => {
+          throw ServerError({
+            message: `Unable to refresh token: ${e.message}`,
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        });
 
         access_token = response.access_token;
         refresh_token = response.refresh_token;
         expires_at = BigInt(response.expires_at);
 
-        await ctx.prisma.account.update({
-          where: {
-            id: account.id,
-          },
-          data: response,
-        });
-        // }
+        await ctx.prisma.account
+          .update({
+            where: {
+              id: account.id,
+            },
+            data: response,
+          })
+          .catch((e) => {
+            throw ServerError({
+              message: `Unable to update account: ${e.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            });
+          });
       }
 
       const response = await new Promise<gmail_v1.Schema$Message>(
@@ -361,7 +407,12 @@ export const invoiceRouter = createProtectedRouter()
             })
             .catch(reject);
         }
-      );
+      ).catch((e) => {
+        throw ServerError({
+          message: `Unable to send email: ${e.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      });
 
       return await ctx.prisma.invoiceEmailHistory.create({
         data: {

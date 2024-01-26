@@ -7,9 +7,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
-    return [];
-  });
+  return ssp(ctx, () => []);
 };
 
 const Home: NextPage = () => {

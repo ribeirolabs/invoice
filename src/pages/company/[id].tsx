@@ -23,17 +23,7 @@ import { objectKeys } from "@common/utils/object-keys";
 import { getUserDisplayName, useRequiredUser } from "@/utils/account";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
-    if (ctx.params?.id && ctx.params.id !== "new") {
-      return [
-        ssr.prefetchQuery("company.get", {
-          id: ctx.params.id as string,
-        }),
-      ];
-    }
-
-    return Promise.resolve();
-  });
+  return ssp(ctx, (ssr) => []);
 };
 
 export const config = {

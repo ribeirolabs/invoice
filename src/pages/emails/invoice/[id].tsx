@@ -8,14 +8,12 @@ import { ComponentType } from "react";
 export const getServerSideProps: GetServerSideProps = (ctx) => {
   return ssp(ctx, (ssr) => {
     const id = ctx.params?.id as string | null;
+
     if (!id) {
       throw new Error("Missing invoice id");
     }
-    return [
-      ssr.fetchQuery("invoice.htmlForEmail", {
-        id,
-      }),
-    ];
+
+    return [];
   });
 };
 

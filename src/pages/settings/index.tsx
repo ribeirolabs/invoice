@@ -13,9 +13,7 @@ import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("user.me");
-  });
+  return ssp(ctx, () => []);
 };
 
 export default function SettingsPage() {

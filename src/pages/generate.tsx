@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = (ctx) => {
       });
     }
 
-    return ssr.prefetchQuery("company.getAll");
+    return [];
   });
 };
 
@@ -206,20 +206,20 @@ export function InvoiceGenerate() {
 
   return (
     <div className="flex flex-col items-center">
-      {(!receivers.length || !payers.length) && (
+      {(!receivers.length || !payers.length) && !companies.isLoading ? (
         <div className="mb-4">
           <Alert type="error" fluid>
             {!receivers.length
               ? "You need to own at least one company to generate an invoice."
               : !payers.length
-              ? "You have no payer companies to generate an invoice."
-              : ""}
+                ? "You have no payer companies to generate an invoice."
+                : ""}
             <Link href="/company/create">
               <a className="text-error-content font-bold ml-2">Create one</a>
             </Link>
           </Alert>
         </div>
-      )}
+      ) : null}
 
       <div className="flex flex-wrap gap-2 w-full max-w-lg justify-between items-end">
         <h1 className="m-0">Invoice</h1>
@@ -236,12 +236,12 @@ export function InvoiceGenerate() {
 
         <Select
           label="Receiver"
-          error={!receivers.length}
+          error={!receivers.length && !companies.isLoading}
           name="receiver_id"
           onChange={(e) => setReceiverId(e.target.value)}
           value={receiverId ?? ""}
         >
-          <option></option>
+          <option>{companies.isLoading && "Loading..."}</option>
           {receivers.map((company) => {
             return (
               <option key={company.id} value={company.id}>
@@ -253,12 +253,12 @@ export function InvoiceGenerate() {
 
         <Select
           label="Payer"
-          error={!payers.length}
+          error={!payers.length && !companies.isLoading}
           value={payerId || ""}
           name="payer_id"
           onChange={(e) => setPayerId(e.target.value)}
         >
-          <option></option>
+          <option>{companies.isLoading && "Loading..."}</option>
           {payers.map((company) => {
             const { type } =
               company.users.find(({ userId }) => userId === user.id) ?? {};
@@ -329,7 +329,7 @@ export function InvoiceGenerate() {
           </Link>
           <button
             className="btn btn-primary btn-wide"
-            data-loading={invoice.isLoading}
+            data-loading={invoice.isLoading || companies.isLoading}
           >
             Confirm
           </button>

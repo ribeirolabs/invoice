@@ -23,9 +23,7 @@ const SendInvoiceModal = dynamic(() => import("./Modal/SendInvoiceModal"));
 const DeleteInvoiceModal = dynamic(() => import("./Modal/DeleteInvoiceModal"));
 
 export const InvoicesTable = () => {
-  const { data: invoices, isLoading } = trpc.useQuery(["invoice.recent"], {
-    ssr: false,
-  });
+  const { data: invoices, isLoading } = trpc.useQuery(["invoice.recent"]);
 
   return (
     <>

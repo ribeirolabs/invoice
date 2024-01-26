@@ -6,16 +6,14 @@ import { useRouter } from "next/router";
 import { ComponentType } from "react";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
+  return ssp(ctx, () => {
     const id = ctx.params?.id as string | null;
+
     if (!id) {
       throw new Error("Missing account transfer request");
     }
-    return [
-      ssr.fetchQuery("user.account.transfer.htmlForEmail", {
-        id,
-      }),
-    ];
+
+    return [];
   });
 };
 

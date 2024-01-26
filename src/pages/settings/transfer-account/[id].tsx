@@ -13,11 +13,7 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
-    return ssr.fetchQuery("user.account.transfer.get", {
-      id: ctx.query.id as string,
-    });
-  });
+  return ssp(ctx, () => []);
 };
 
 export default function SettingsPage() {
@@ -135,8 +131,8 @@ function Page() {
                 /accept/.test(event.action)
                   ? "bg-success/20"
                   : /cancel|reject/.test(event.action)
-                  ? "bg-error/20"
-                  : "bg-base-content/10"
+                    ? "bg-error/20"
+                    : "bg-base-content/10"
               )}
             >
               <span
@@ -145,8 +141,8 @@ function Page() {
                   /accept/.test(event.action)
                     ? "bg-success"
                     : /cancel|reject/.test(event.action)
-                    ? "bg-error"
-                    : "bg-base-content/50"
+                      ? "bg-error"
+                      : "bg-base-content/50"
                 )}
               ></span>
             </span>

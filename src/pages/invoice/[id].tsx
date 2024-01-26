@@ -31,12 +31,7 @@ const DeleteInvoiceModal = dynamic(
 );
 
 export const getServerSideProps: GetServerSideProps = (ctx) => {
-  return ssp(ctx, (ssr) => {
-    return [];
-    // return ssr.fetchQuery("invoice.get", {
-    //   id: ctx.params?.id as string,
-    // });
-  });
+  return ssp(ctx, () => []);
 };
 
 const InvoicePage: NextPage = () => {

@@ -15,7 +15,6 @@ const Home: NextPage = () => {
     <ProtectedPage>
       <CompanyShareNotification />
       <InvoicesTable />
-      <div className="my-12"></div>
     </ProtectedPage>
   );
 };

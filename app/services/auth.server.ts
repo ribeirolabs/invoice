@@ -5,7 +5,9 @@ import invariant from "tiny-invariant";
 
 type User = {
   id: string;
+  name: string;
   email: string;
+  accessToken: string;
 };
 
 export let authenticator = new Authenticator<User>(sessionStorage);
@@ -27,6 +29,8 @@ let gooleStrategy = new GoogleStrategy(
       "openid",
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/gmail.compose",
+      "https://www.googleapis.com/auth/gmail.send",
     ],
   },
   async (response) => {
@@ -37,6 +41,8 @@ let gooleStrategy = new GoogleStrategy(
     return Promise.resolve({
       id: response.profile.id,
       email,
+      name: response.profile.displayName,
+      accessToken: response.accessToken,
     } as User);
   }
 );

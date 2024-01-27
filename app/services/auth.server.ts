@@ -1,0 +1,44 @@
+import { Authenticator } from "remix-auth";
+import { sessionStorage } from "./session.server";
+import { GoogleStrategy } from "remix-auth-google";
+import invariant from "tiny-invariant";
+
+type User = {
+  id: string;
+  email: string;
+};
+
+export let authenticator = new Authenticator<User>(sessionStorage);
+
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PORT, DOMAIN } = process.env;
+
+invariant(GOOGLE_CLIENT_ID, "Missing `GOOGLE_CLIENT_ID` env variable");
+invariant(GOOGLE_CLIENT_SECRET, "Missing `GOOGLE_SECRET` env variable");
+
+let gooleStrategy = new GoogleStrategy(
+  {
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: `${DOMAIN || "http://localhost"}:${
+      PORT || "80"
+    }/auth/google/callback`,
+    accessType: "offline",
+    scope: [
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ],
+  },
+  async (response) => {
+    const email = response.profile.emails[0].value;
+
+    invariant(email, "Missing `email` from google response");
+
+    return Promise.resolve({
+      id: response.profile.id,
+      email,
+    } as User);
+  }
+);
+
+authenticator.use(gooleStrategy);

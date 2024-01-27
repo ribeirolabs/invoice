@@ -32,7 +32,7 @@ export async function action({ request }: ActionFunctionArgs) {
       );
     }
 
-    const buffer = await getEmail(user.name, user.email);
+    const buffer = await getEmail({ from: user, to: { email: to.toString() } });
     const payload: gmail_v1.Params$Resource$Users$Messages$Send = {
       access_token: user.accessToken,
       userId: user.id,

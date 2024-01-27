@@ -1,9 +1,15 @@
 import MailComposer from "nodemailer/lib/mail-composer/index.js";
 
-export function getEmail(name: string, email: string) {
+export function getEmail({
+  from,
+  to,
+}: {
+  to: { email: string };
+  from: { name: string; email: string };
+}) {
   const message = new MailComposer({
-    to: "igor@ribeirolabs.com",
-    from: `${name} <${email}>`,
+    to: to.email,
+    from: `${from.name} <${from.email}>`,
     subject: "Test email from Remix",
     html: "<h1>It worked</h1>",
   });

@@ -17,13 +17,20 @@ const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PORT, DOMAIN } = process.env;
 invariant(GOOGLE_CLIENT_ID, "Missing `GOOGLE_CLIENT_ID` env variable");
 invariant(GOOGLE_CLIENT_SECRET, "Missing `GOOGLE_SECRET` env variable");
 
+const callbackURL = new URL(
+  "/auth/google/callback",
+  DOMAIN || "http://localhost"
+);
+
+if (PORT) {
+  callbackURL.port = PORT;
+}
+
 let gooleStrategy = new GoogleStrategy(
   {
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: `${DOMAIN || "http://localhost"}:${
-      PORT || "80"
-    }/auth/google/callback`,
+    callbackURL: callbackURL.toString(),
     accessType: "offline",
     scope: [
       "openid",

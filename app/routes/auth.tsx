@@ -1,4 +1,4 @@
-export let AUTH_INTENTS = {
+export const AUTH_INTENTS = {
   login: "login",
   logout: "logout",
 };

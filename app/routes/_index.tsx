@@ -6,6 +6,7 @@ import {
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import { authenticator } from "~/services/auth.server";
 import { AUTH_INTENTS } from "./auth";
+import { useEffect, useRef } from "react";
 
 export const meta: MetaFunction = () => {
   return [{ title: "ribeirolabs / invoice" }];
@@ -24,10 +25,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Index() {
-  let data = useLoaderData<typeof loader>();
-  let fetcher = useFetcher<{ ok: true } | { ok: false; message: string }>({
-    key: "send-email",
-  });
+  const data = useLoaderData<typeof loader>();
+  const fetcher = useFetcher<{ ok: true } | { ok: false; message: string }>();
+  const form = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (fetcher.data?.ok) {
+      form.current?.reset();
+    }
+  }, [fetcher.data]);
 
   return (
     <div>
@@ -40,7 +46,9 @@ export default function Index() {
         </button>
       </Form>
 
-      <fetcher.Form action="/email" method="post">
+      <fetcher.Form action="/email" method="post" ref={form}>
+        <input type="email" placeholder="Send to..." name="to" />
+        &nbsp;
         <button disabled={fetcher.state === "submitting"}>Send Email</button>
         &nbsp;
         {fetcher.data?.ok ? (

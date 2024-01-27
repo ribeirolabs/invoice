@@ -8,26 +8,43 @@ export function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const user = await authenticator.isAuthenticated(request);
-
-  if (!user) {
-    return redirect("/login", {
-      status: 401,
-    });
-  }
   try {
+    const user = await authenticator.isAuthenticated(request);
+
+    if (!user) {
+      return redirect("/login", {
+        status: 401,
+      });
+    }
+
+    const data = await request.formData();
+    const to = data.get("to");
+
+    if (!to) {
+      return json(
+        {
+          ok: false,
+          message: "Missing `to`",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
     const buffer = await getEmail(user.name, user.email);
+    const payload: gmail_v1.Params$Resource$Users$Messages$Send = {
+      access_token: user.accessToken,
+      userId: user.id,
+      requestBody: {
+        raw: buffer.toString("base64"),
+      },
+    };
 
     const response = await new Promise<gmail_v1.Schema$Message>(
       (resolve, reject) => {
         gmail("v1")
-          .users.messages.send({
-            access_token: user.accessToken,
-            userId: user.id,
-            requestBody: {
-              raw: buffer.toString("base64"),
-            },
-          })
+          .users.messages.send(payload)
           .then((res) => {
             if (res.status > 200) {
               reject(res.statusText);

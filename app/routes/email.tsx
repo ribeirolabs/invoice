@@ -1,11 +1,9 @@
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { authenticator } from "~/services/auth.server";
-import { gmail, gmail_v1 } from "@googleapis/gmail";
-import { getEmail } from "~/services/email.server";
-
-export function loader() {
-  return redirect("/");
-}
+import { sendEmail } from "~/services/email.server";
+import { useFetcher } from "@remix-run/react";
+import { useRef } from "react";
+import { getValidAccount } from "~/data/user.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
@@ -32,33 +30,20 @@ export async function action({ request }: ActionFunctionArgs) {
       );
     }
 
-    const buffer = await getEmail({ from: user, to: { email: to.toString() } });
-    const payload: gmail_v1.Params$Resource$Users$Messages$Send = {
-      access_token: user.accessToken,
-      userId: user.id,
-      requestBody: {
-        raw: buffer.toString("base64"),
+    const account = await getValidAccount(user.id, "google");
+
+    const response = await sendEmail({
+      from: user,
+      to: to.toString(),
+      provider: {
+        accountId: account.providerAccountId,
+        accessToken: account.access_token,
       },
-    };
-
-    const response = await new Promise<gmail_v1.Schema$Message>(
-      (resolve, reject) => {
-        gmail("v1")
-          .users.messages.send(payload)
-          .then((res) => {
-            if (res.status > 200) {
-              reject(res.statusText);
-              return;
-            }
-
-            resolve(res.data);
-          })
-          .catch(reject);
-      }
-    );
+    });
 
     return json({ ok: true, ...response });
   } catch (e: any) {
+    console.error(e);
     return json(
       {
         ok: false,
@@ -69,4 +54,35 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     );
   }
+}
+
+export default function Email() {
+  const fetcher = useFetcher<{ ok: true } | { ok: false; message: string }>();
+  const form = useRef<HTMLFormElement>(null);
+
+  // useEffect(() => {
+  // if (fetcher.data?.ok) {
+  //   form.current?.reset();
+  // }
+  // }, [fetcher.data]);
+
+  return (
+    <fetcher.Form action="/email" method="post" ref={form}>
+      <input
+        autoFocus
+        type="email"
+        placeholder="Send to..."
+        name="to"
+        defaultValue="igor.ribeiro.plus@gmail.com"
+      />
+      &nbsp;
+      <button disabled={fetcher.state === "submitting"}>Send Email</button>
+      &nbsp;
+      {fetcher.data?.ok ? (
+        <span style={{ color: "green" }}>Sent!</span>
+      ) : (
+        <span style={{ color: "red" }}>{fetcher.data?.message}</span>
+      )}
+    </fetcher.Form>
+  );
 }

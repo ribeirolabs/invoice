@@ -3,10 +3,10 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { authenticator } from "~/services/auth.server";
 import { AUTH_INTENTS } from "./auth";
-import { useEffect, useRef } from "react";
+import prisma from "~/services/prisma.server";
 
 export const meta: MetaFunction = () => {
   return [{ title: "ribeirolabs / invoice" }];
@@ -19,21 +19,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return redirect("/login");
   }
 
+  const invoices = await prisma.invoice.findMany({
+    select: {
+      id: true,
+      number: true,
+    },
+    take: 10,
+    where: {
+      userId: user.id,
+    },
+  });
+
   return {
     user,
+    invoices,
   };
 }
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<{ ok: true } | { ok: false; message: string }>();
-  const form = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (fetcher.data?.ok) {
-      form.current?.reset();
-    }
-  }, [fetcher.data]);
 
   return (
     <div>
@@ -46,17 +50,14 @@ export default function Index() {
         </button>
       </Form>
 
-      <fetcher.Form action="/email" method="post" ref={form}>
-        <input type="email" placeholder="Send to..." name="to" />
-        &nbsp;
-        <button disabled={fetcher.state === "submitting"}>Send Email</button>
-        &nbsp;
-        {fetcher.data?.ok ? (
-          <span style={{ color: "green" }}>Sent!</span>
-        ) : (
-          <span style={{ color: "red" }}>{fetcher.data?.message}</span>
-        )}
-      </fetcher.Form>
+      <a href="/email">Email</a>
+
+      <h2>Invoices</h2>
+      <ul>
+        {data.invoices.map((invoice) => (
+          <li key={invoice.id}>{invoice.number}</li>
+        ))}
+      </ul>
     </div>
   );
 }

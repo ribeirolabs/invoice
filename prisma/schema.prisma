@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String   @db.Text
+  expires_at        BigInt?
+  token_type        String?
+  scope             String?  @db.Text
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model AccountTransfer {
+  id String @id @default(cuid())
+
+  fromUser      User?   @relation("from", fields: [fromUserId], references: [id], onDelete: SetNull)
+  fromUserId    String?
+  fromUserEmail String
+
+  toUser      User?   @relation("to", fields: [toUserId], references: [id], onDelete: Cascade)
+  toUserId    String?
+  toUserEmail String
+
+  sentAt      DateTime  @default(now())
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([fromUserId])
+  @@index([toUserId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  locale        String?
+  timezone      String?
+  createdAt     DateTime  @default(now())
+
+  accounts             Account[]
+  sessions             Session[]
+  invoices             Invoice[]
+  companies            CompaniesOnUsers[] @relation("user")
+  shared               CompaniesOnUsers[] @relation("sharedBy")
+  accountTransfersFrom AccountTransfer[]  @relation("from")
+  accountTransfersTo   AccountTransfer[]  @relation("to")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Company {
+  id                   String   @id @default(cuid())
+  name                 String
+  address              String
+  invoiceNumberPattern String
+  currency             String   @default("USD")
+  alias                String?
+  email                String
+  createdAt            DateTime @default(now())
+
+  users            CompaniesOnUsers[]
+  receiverInvoices Invoice[]          @relation("receiver")
+  payerInvoices    Invoice[]          @relation("payer")
+}
+
+enum UserType {
+  OWNED
+  SHARED
+}
+
+model CompaniesOnUsers {
+  user      User     @relation("user", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  sharedBy   User?   @relation("sharedBy", fields: [sharedById], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sharedById String?
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String
+
+  owner Boolean  @default(false)
+  type  UserType
+
+  @@id([userId, companyId])
+  @@unique([userId, companyId])
+  @@index([sharedById])
+  @@index([companyId])
+}
+
+model Invoice {
+  id           String    @id @default(cuid())
+  number       String
+  description  String
+  amount       Float
+  currency     String
+  createdAt    DateTime  @default(now())
+  issuedAt     DateTime
+  expiredAt    DateTime
+  fullfilledAt DateTime?
+  data         Json?
+
+  receiver   Company @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  receiverId String
+
+  payer   Company @relation("payer", fields: [payerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  payerId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  emailHistory InvoiceEmailHistory[]
+
+  @@unique([number, receiverId, payerId])
+  @@index([receiverId])
+  @@index([payerId])
+  @@index([userId])
+}
+
+model InvoiceEmailHistory {
+  id       String @id @default(cuid())
+  email    String
+  provider String
+  data     Json?
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  invoiceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+}

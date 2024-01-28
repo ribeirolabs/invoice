@@ -1,11 +1,8 @@
 import { GoogleStrategy } from "remix-auth-google";
-import invariant from "tiny-invariant";
 import { loginUser } from "~/data/user.server";
+import { ENV } from "./env.server";
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PORT, DOMAIN } = process.env;
-
-invariant(GOOGLE_CLIENT_ID, "Missing `GOOGLE_CLIENT_ID` env variable");
-invariant(GOOGLE_CLIENT_SECRET, "Missing `GOOGLE_SECRET` env variable");
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PORT, DOMAIN } = ENV;
 
 const callbackURL = new URL(
   "/auth/google/callback",
@@ -13,7 +10,7 @@ const callbackURL = new URL(
 );
 
 if (PORT) {
-  callbackURL.port = PORT;
+  callbackURL.port = String(PORT);
 }
 
 export const gooleStrategy = new GoogleStrategy(
@@ -52,8 +49,6 @@ export async function refreshAccessToken(refreshToken: string) {
   });
 
   const refreshedTokens = await response.json();
-
-  console.log(refreshedTokens);
 
   if (!response.ok) {
     throw refreshedTokens;

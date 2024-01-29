@@ -4,7 +4,6 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { AUTH_INTENTS } from "~/intents";
 import { authenticator } from "~/services/auth.server";
 import prisma from "~/services/prisma.server";
 
@@ -46,13 +45,7 @@ export default function Index() {
       <h1>ribeirolabs / invoice</h1>
       <h3>Welcome, {data.user.email}</h3>
 
-      <Form action="/auth/google" method="post">
-        <button name="intent" value={AUTH_INTENTS.logout}>
-          Logout
-        </button>
-      </Form>
-
-      <a href="/email">Email</a>
+      <a href="/logout">Logout</a>
 
       <h2>Invoices</h2>
       <ul>

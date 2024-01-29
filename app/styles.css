@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  html,
+  body {
+    @apply h-full w-full;
+  }
+
   html {
     @apply font-sans;
   }
@@ -10,12 +15,21 @@
 
 @layer components {
   .btn {
-    @apply font-bold;
+    @apply font-bold flex items-center gap-2;
+    box-shadow: 0 2px 0 2px rgba(0, 0, 0, 0.5);
   }
 }
 
 @layer utilities {
+  .max-content {
+    @apply max-w-screen-lg mx-auto px-4;
+  }
+
   .btn-xs {
     @apply font-medium;
+  }
+
+  .btn-no-shadow {
+    box-shadow: none;
   }
 }

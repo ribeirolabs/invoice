@@ -4,6 +4,7 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { LoginIcon } from "~/components/Icons";
 import { authenticator } from "~/services/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -30,9 +31,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Login() {
   return (
-    <Form method="post">
-      <button name="provider" value="google">
-        Login with Google
+    <Form
+      method="post"
+      className="flex flex-col items-center justify-center h-full"
+    >
+      <div className="text-xl">
+        <span className="text-neutral-500">ribeirolabs</span>
+        <span className="font-bold text-primary"> / invoice</span>
+      </div>
+
+      <button name="provider" value="google" className="btn btn-primary">
+        <LoginIcon />
+        Entrar com Google
       </button>
     </Form>
   );

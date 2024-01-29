@@ -17,3 +17,7 @@ export function cookieToObject(cookies: string): Record<string, string> {
     return all;
   }, {} as ReturnType<typeof cookieToObject>);
 }
+
+export function cn(...args: (string | false | null | undefined)[]): string {
+  return args.filter(Boolean).join(" ");
+}

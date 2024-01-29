@@ -1,6 +1,6 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { AUTH_INTENTS } from "~/intents";
 import { authenticator } from "~/services/auth.server";
-import { AUTH_INTENTS } from "./auth";
 
 export function loader() {
   return redirect("/login");

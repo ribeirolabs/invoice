@@ -13,6 +13,7 @@ const envSchema = z.object({
     message: "Invalid, expected numeric value",
   }),
   DOMAIN: z.string().url().optional(),
+  BROWSERLESS_API_KEY: requiredString,
 });
 
 function buildEnv() {

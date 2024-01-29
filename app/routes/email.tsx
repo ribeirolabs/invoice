@@ -1,44 +1,27 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { authenticator } from "~/services/auth.server";
+import { ActionFunctionArgs, json } from "@remix-run/node";
+import { requireUser } from "~/services/auth.server";
 import { sendEmail } from "~/services/email.server";
 import { useFetcher } from "@remix-run/react";
 import { useRef } from "react";
-import { getValidAccount } from "~/data/user.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   try {
-    const user = await authenticator.isAuthenticated(request);
-
-    if (!user) {
-      return redirect("/login", {
-        status: 401,
-      });
-    }
-
+    const user = await requireUser(request);
     const data = await request.formData();
     const to = data.get("to");
 
     if (!to) {
-      return json(
-        {
-          ok: false,
-          message: "Missing `to`",
-        },
-        {
-          status: 400,
-        }
-      );
+      throw new Response(null, {
+        status: 400,
+        statusText: "Missing email receiver",
+      });
     }
 
-    const account = await getValidAccount(user.id, "google");
-
     const response = await sendEmail({
-      from: user,
+      user,
       to: to.toString(),
-      provider: {
-        accountId: account.providerAccountId,
-        accessToken: account.access_token,
-      },
+      subject: "Test",
+      content: "<h1>Test email</h1>",
     });
 
     return json({ ok: true, ...response });
@@ -59,12 +42,6 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Email() {
   const fetcher = useFetcher<{ ok: true } | { ok: false; message: string }>();
   const form = useRef<HTMLFormElement>(null);
-
-  // useEffect(() => {
-  // if (fetcher.data?.ok) {
-  //   form.current?.reset();
-  // }
-  // }, [fetcher.data]);
 
   return (
     <fetcher.Form action="/email" method="post" ref={form}>

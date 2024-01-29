@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { AUTH_INTENTS } from "~/intents";
 import { authenticator } from "~/services/auth.server";
-import { AUTH_INTENTS } from "./auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   if (await authenticator.isAuthenticated(request)) {

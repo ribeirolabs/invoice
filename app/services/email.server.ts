@@ -1,33 +1,37 @@
 import { gmail_v1, gmail } from "@googleapis/gmail";
+import { User } from "@prisma/client";
 import MailComposer from "nodemailer/lib/mail-composer/index.js";
-import { UserWithAccessToken } from "~/data/user.server";
+import { getValidAccount } from "~/data/user.server";
+import Mail from "nodemailer/lib/mailer";
 
 export async function sendEmail({
-  from,
+  user: user,
   to,
-  provider,
+  attachments,
+  subject,
+  content,
 }: {
-  from: UserWithAccessToken;
+  user: User;
   to: string;
-  provider: {
-    accessToken: string;
-    accountId: string;
-  };
+  subject: string;
+  content: string;
+  attachments?: Mail.Attachment[];
 }) {
+  const account = await getValidAccount(user.id, "google");
+
   const message = new MailComposer({
     to,
-    from: `${from.name} <${from.email}>`,
-    subject: "Test email from Remix",
-    html: "<h1>It worked</h1>",
+    from: `${user.name} <${user.email}>`,
+    subject,
+    html: content,
+    attachments: attachments ?? [],
   });
 
   const buffer = await message.compile().build();
 
-  console.log(provider);
-
   const payload: gmail_v1.Params$Resource$Users$Messages$Send = {
-    access_token: provider.accessToken,
-    userId: provider.accountId,
+    access_token: account.access_token,
+    userId: account.providerAccountId,
     requestBody: {
       raw: buffer.toString("base64"),
     },

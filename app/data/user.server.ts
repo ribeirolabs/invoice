@@ -134,6 +134,8 @@ export async function getValidAccount(
 
   // TODO: Redirect to /login forcing the consent screen to we can get the refresh token.
   invariant(account.refresh_token, "Account expired and missing refresh token");
+
+  console.info("[auth] refreshing expired token");
   const tokens = await refreshAccessToken(account.refresh_token);
 
   return prisma.account.update({

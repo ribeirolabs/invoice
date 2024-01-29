@@ -7,3 +7,15 @@
     @apply font-sans;
   }
 }
+
+@layer components {
+  .btn {
+    @apply font-bold;
+  }
+}
+
+@layer utilities {
+  .btn-xs {
+    @apply font-medium;
+  }
+}

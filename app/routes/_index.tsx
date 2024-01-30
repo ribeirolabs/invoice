@@ -71,7 +71,7 @@ function PendingSection() {
         ) : (
           <Card>
             <div className="flex gap-4 items-center">
-              <HeroIcon icon={SparkleIcon} />
+              <HeroIcon icon={SparkleIcon} className="text-neutral-400" />
 
               <div>
                 <h3 className="font-serif font-bold text-xl">
@@ -100,14 +100,19 @@ function RecentSection() {
 
         {invoices.fullfilled.length === 0 && (
           <Card className="flex gap-3 items-center">
-            <HeroIcon icon={DocumentPlusIcon} />
+            <HeroIcon icon={DocumentPlusIcon} className="opacity-50" />
             <div>
               <h3 className="font-serif text-xl font-bold">
                 Você não tem invoices.
               </h3>
-              <a href="/generate" className="btn btn-sm btn-primary">
-                Gerar nova
-              </a>
+              <p className="flex gap-1">
+                <a href="/generate" className="underline text-secondary">
+                  Clique aqui
+                </a>
+                <span className="text-dim">
+                  para gerar sua primeira invoice.
+                </span>
+              </p>
             </div>
           </Card>
         )}

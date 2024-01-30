@@ -1,25 +1,10 @@
+import { HTMLAttributes } from "react";
 import { cn } from "~/utils";
 
-type IconProps = { className?: string };
+export type IconProps = HTMLAttributes<SVGElement>;
 
 function iconClass(className?: string): string {
   return cn("icon", className);
-}
-
-export function LoginIcon({ className }: IconProps) {
-  return (
-    <svg fill="none" viewBox="0 0 24 24" className={iconClass(className)}>
-      <g
-        className="stroke-current"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      >
-        <path d="M13 4.528A6 6 0 0 0 3 9v6a6 6 0 0 0 10 4.472" opacity=".28" />
-        <path d="M10.812 9a15.002 15.002 0 0 0-2.655 2.556A.703.703 0 0 0 8 12m2.812 3a15 15 0 0 1-2.655-2.556A.703.703 0 0 1 8 12m0 0h13" />
-      </g>
-    </svg>
-  );
 }
 
 export function ArrowDownIcon({ className }: IconProps) {
@@ -346,6 +331,75 @@ export function CalendarIcon({ className }: IconProps) {
         strokeLinejoin="round"
         strokeWidth="2"
         d="M8 2v3m8-3v3m4.96 5H3.04"
+      />
+    </svg>
+  );
+}
+
+export function LoginIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <g
+        className="stroke-current"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      >
+        <path d="M13 4.528A6 6 0 0 0 3 9v6a6 6 0 0 0 10 4.472" opacity=".28" />
+        <path d="M10.812 9a15.002 15.002 0 0 0-2.655 2.556A.703.703 0 0 0 8 12m2.812 3a15 15 0 0 1-2.655-2.556A.703.703 0 0 1 8 12m0 0h13" />
+      </g>
+    </svg>
+  );
+}
+
+export function LogoutIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <path
+        className="stroke-current"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M13 4.528A6 6 0 0 0 3 9v6a6 6 0 0 0 10 4.472"
+        opacity=".28"
+      />
+      <path
+        className="stroke-current"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M18.189 9a15 15 0 0 1 2.654 2.556c.105.13.157.287.157.444m-2.811 3a14.998 14.998 0 0 0 2.654-2.556A.704.704 0 0 0 21 12m0 0H8"
+      />
+    </svg>
+  );
+}
+
+export function StarIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <path
+        className="fill-current"
+        d="M19.408 2.065a1.32 1.32 0 0 0-.816 0 1.325 1.325 0 0 0-.45.257 3.516 3.516 0 0 0-.2.189l-.431.432a3.462 3.462 0 0 0-.19.2 1.325 1.325 0 0 0-.256.449 1.308 1.308 0 0 0 .257 1.266c.062.073.137.148.189.2l.431.431c.052.052.127.127.2.19a1.308 1.308 0 0 0 1.716-.001c.073-.062.148-.137.2-.189l.431-.432c.052-.051.127-.126.19-.2a1.309 1.309 0 0 0 .256-1.265 1.325 1.325 0 0 0-.257-.45 3.458 3.458 0 0 0-.189-.2l-.431-.431c-.052-.052-.127-.127-.2-.19a1.325 1.325 0 0 0-.45-.256Zm.166 13.048a1.52 1.52 0 0 0-1.148 0c-.27.11-.456.285-.575.411-.11.117-.228.264-.339.403l-.833 1.042-.055.067c-.193.24-.456.565-.56.965a1.992 1.992 0 0 0 0 .998c.104.4.367.726.56.965l.055.067.833 1.042c.111.139.229.286.34.403.118.126.304.302.574.411.37.15.778.15 1.148 0 .27-.11.456-.285.575-.411.11-.117.228-.264.339-.403l.833-1.042.054-.067c.194-.239.457-.565.561-.965a1.992 1.992 0 0 0 0-.998c-.104-.4-.367-.726-.56-.965l-.055-.067-.833-1.042a6.833 6.833 0 0 0-.34-.403 1.639 1.639 0 0 0-.574-.411Z"
+        opacity=".28"
+      />
+      <path
+        className="fill-current"
+        d="M10.848 3.374a2 2 0 0 0-1.697 0c-.423.198-.685.552-.862.83-.178.28-.368.65-.58 1.063L6.496 7.621a5.962 5.962 0 0 1-.08.153l-.002.002-.002.001a5.984 5.984 0 0 1-.149.088L3.842 9.273c-.36.21-.687.4-.937.577-.254.18-.566.44-.743.839a2 2 0 0 0 0 1.622c.177.4.489.659.743.84.25.177.577.367.937.576l2.422 1.408.15.088h.001l.001.003c.017.03.038.07.08.153l1.212 2.354c.213.413.403.782.581 1.063.177.278.44.632.862.83a2 2 0 0 0 1.697 0c.423-.198.686-.552.862-.83.179-.28.369-.65.582-1.063l1.211-2.354.08-.153.002-.002.002-.001c.028-.018.068-.041.148-.088l2.423-1.408c.36-.21.687-.4.937-.577.254-.18.566-.44.743-.839a2 2 0 0 0 0-1.622c-.177-.4-.49-.659-.743-.84a13.22 13.22 0 0 0-.937-.576l-2.423-1.408c-.08-.047-.12-.07-.148-.088h-.002l-.002-.003a5.818 5.818 0 0 1-.08-.153l-1.211-2.354a14.473 14.473 0 0 0-.582-1.063c-.176-.278-.439-.632-.862-.83Z"
       />
     </svg>
   );

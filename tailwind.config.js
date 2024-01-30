@@ -25,6 +25,7 @@ export default {
           "base-100": "oklch(100% 0 0)",
           "base-content": "#181a2a",
           primary: "#48b16d",
+          "primary-content": "#122117",
           secondary: "#316f8d",
           "secondary-content": "#fff",
           accent: "#316f8d",
@@ -32,6 +33,7 @@ export default {
         dark: {
           ...themes.business,
           primary: "#48b16d",
+          "primary-content": "#fff",
           secondary: "#6fa0b8",
           "secondary-content": "#fff",
           accent: "#6fa0b8",

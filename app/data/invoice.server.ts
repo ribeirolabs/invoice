@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import prisma from "~/services/prisma.server";
 import { InvoiceStatus } from "./invoice";
 
@@ -39,18 +38,13 @@ export async function getRecentInvoicesGrouped(userId: string) {
     if (invoice.fullfilledAt) {
       fullfilled.push({ ...invoice, status: InvoiceStatus.PAID });
     } else {
-      pending.push({
-        ...invoice,
-        id: crypto.randomUUID(),
-        status: InvoiceStatus.CREATED,
-      });
-      pending.push({
-        ...invoice,
-        status:
-          invoice._count.emailHistory > 0
-            ? InvoiceStatus.SENT
-            : InvoiceStatus.CREATED,
-      });
+      // pending.push({
+      //   ...invoice,
+      //   status:
+      //     invoice._count.emailHistory > 0
+      //       ? InvoiceStatus.SENT
+      //       : InvoiceStatus.CREATED,
+      // });
     }
   }
 

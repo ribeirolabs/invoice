@@ -27,12 +27,12 @@
 
 @layer components {
   .btn {
-    @apply font-bold flex items-center gap-2;
-    box-shadow: inset 0 -2px 0 var(--btn-shadow-size) rgba(0, 0, 0, 0.1);
+    @apply font-bold flex items-center gap-2 rounded-full;
+    box-shadow: inset 0 -2px 0 var(--btn-shadow-size) rgba(0, 0, 0, 0.2);
   }
 
   .icon {
-    @apply w-6 aspect-square;
+    @apply w-6 aspect-square flex-shrink-0 flex-grow-0;
   }
 
   .divider {
@@ -42,6 +42,14 @@
   .divider:before,
   .divider:after {
     height: 1px;
+  }
+
+  .hero-icon {
+    @apply bg-base-200;
+
+    .badge {
+      @apply badge-neutral;
+    }
   }
 }
 
@@ -60,6 +68,14 @@
   .btn-ghost,
   .btn-outline {
     box-shadow: none;
+  }
+
+  .btn-neutral.btn-outline {
+    @apply border-neutral-600;
+  }
+
+  .btn-neutral.btn-outline:hover {
+    @apply bg-neutral-300/20 text-neutral-content;
   }
 
   .btn-secondary-ghost {
@@ -97,5 +113,13 @@
   .divider-horizontal:before,
   .divider-horizontal:after {
     width: 1px;
+  }
+
+  .hero-icon-primary {
+    @apply bg-primary/10 text-primary;
+
+    .badge {
+      @apply badge-primary;
+    }
   }
 }

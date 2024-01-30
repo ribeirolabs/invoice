@@ -19,7 +19,7 @@ export const gooleStrategy = new GoogleStrategy(
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: callbackURL.toString(),
     accessType: "offline",
-    prompt: "consent",
+    prompt: "select_account",
     scope: [
       "openid",
       "https://www.googleapis.com/auth/userinfo.profile",

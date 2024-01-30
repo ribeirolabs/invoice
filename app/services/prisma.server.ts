@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import invariant from "tiny-invariant";
-import { ENV } from "./env.server";
+import { ENV } from "~/env";
 
 declare global {
   let __prisma: any;

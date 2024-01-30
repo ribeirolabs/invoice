@@ -1,3 +1,6 @@
+import { formatDistance } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
+
 export function getLocale() {
   if (typeof navigator === "undefined") {
     return "en-US";
@@ -18,6 +21,22 @@ export function cookieToObject(cookies: string): Record<string, string> {
   }, {} as ReturnType<typeof cookieToObject>);
 }
 
-export function cn(...args: (string | false | null | undefined)[]): string {
-  return args.filter(Boolean).join(" ");
+export function cn(
+  ...args: (string | false | null | undefined | string[])[]
+): string {
+  return args.filter(Boolean).flat().join(" ");
+}
+
+export function formatCurrency(amount: number, currency: string) {
+  return new Intl.NumberFormat(getLocale(), {
+    style: "currency",
+    currency,
+  }).format(amount);
+}
+
+export function dateToDistance(date: Date | string) {
+  return formatDistance(date, new Date(), {
+    locale: ptBR,
+    addSuffix: true,
+  });
 }

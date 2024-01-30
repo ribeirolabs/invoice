@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import { ENV } from "~/services/env.server";
+import { ENV } from "~/env";
 import { cookieToObject } from "~/utils";
 
 export function getBrowser() {

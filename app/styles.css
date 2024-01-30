@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --btn-shadow-size: 2px;
+}
+
 @layer base {
   html,
   body {
@@ -9,14 +13,35 @@
   }
 
   html {
-    @apply font-sans;
+    @apply font-sans leading-none;
+  }
+
+  .border {
+    @apply border-neutral-700;
+  }
+
+  svg {
+    @apply inline-block align-middle;
   }
 }
 
 @layer components {
   .btn {
     @apply font-bold flex items-center gap-2;
-    box-shadow: 0 2px 0 2px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 -2px 0 var(--btn-shadow-size) rgba(0, 0, 0, 0.1);
+  }
+
+  .icon {
+    @apply w-6 aspect-square;
+  }
+
+  .divider {
+    margin: 0.5rem 0;
+  }
+
+  .divider:before,
+  .divider:after {
+    height: 1px;
   }
 }
 
@@ -25,11 +50,52 @@
     @apply max-w-screen-lg mx-auto px-4;
   }
 
+  .btn-sm,
   .btn-xs {
+    --btn-shadow-size: 1px;
     @apply font-medium;
   }
 
-  .btn-no-shadow {
+  .btn-no-shadow,
+  .btn-ghost,
+  .btn-outline {
     box-shadow: none;
+  }
+
+  .btn-secondary-ghost {
+    @apply btn-ghost bg-secondary/5 text-secondary hover:bg-secondary/20;
+  }
+
+  .icon-xs {
+    @apply w-4;
+  }
+
+  .icon-sm {
+    @apply w-5;
+  }
+
+  .icon-lg {
+    @apply w-8;
+  }
+
+  .icon-xl {
+    @apply w-10;
+  }
+
+  .icon-2xl {
+    @apply w-12;
+  }
+
+  .text-dim {
+    @apply text-current opacity-70;
+  }
+
+  .divider-horizontal {
+    margin: 0 0.5rem;
+  }
+
+  .divider-horizontal:before,
+  .divider-horizontal:after {
+    width: 1px;
   }
 }

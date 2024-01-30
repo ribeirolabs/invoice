@@ -1,5 +1,5 @@
 import { createCookieSessionStorage } from "@remix-run/node";
-import { ENV } from "./env.server";
+import { ENV } from "~/env";
 
 export let sessionStorage = createCookieSessionStorage({
   cookie: {

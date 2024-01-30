@@ -176,9 +176,11 @@ function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
             <div className="flex gap-1">
               <CalendarIcon />
               <div>
-                <div className="font-bold">Vencimento</div>
+                <div className="font-bold">
+                  {isPaid ? "Pagamento" : "Vencimento"}
+                </div>
                 <div className="text-dim text-sm">
-                  {dateToDistance(invoice.expiredAt)}
+                  {dateToDistance(invoice.fullfilledAt ?? invoice.expiredAt)}
                 </div>
               </div>
             </div>

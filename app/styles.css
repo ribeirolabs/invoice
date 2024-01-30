@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --btn-shadow-size: 2px;
-}
-
 @layer base {
   html,
   body {
@@ -23,12 +19,20 @@
   svg {
     @apply inline-block align-middle;
   }
+
+  .input {
+    height: 2.5rem;
+  }
+
+  .btn {
+    min-height: 2.5rem;
+    height: 2.5rem;
+  }
 }
 
 @layer components {
   .btn {
-    @apply font-bold flex items-center gap-2 rounded-full;
-    box-shadow: inset 0 -2px 0 var(--btn-shadow-size) rgba(0, 0, 0, 0.2);
+    @apply font-bold inline-flex items-center gap-2 rounded-full;
   }
 
   .icon {
@@ -60,14 +64,7 @@
 
   .btn-sm,
   .btn-xs {
-    --btn-shadow-size: 1px;
     @apply font-medium;
-  }
-
-  .btn-no-shadow,
-  .btn-ghost,
-  .btn-outline {
-    box-shadow: none;
   }
 
   .btn-neutral.btn-outline {
@@ -120,6 +117,14 @@
 
     .badge {
       @apply badge-primary;
+    }
+  }
+
+  .hero-icon-secondary {
+    @apply bg-secondary/10 text-secondary;
+
+    .badge {
+      @apply badge-secondary;
     }
   }
 }

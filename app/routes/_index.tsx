@@ -67,21 +67,13 @@ export default function Index() {
       </header>
 
       <PendingSection />
-
-      <main className="p-4 max-content">
-        <h2 className="font-serif text-2xl font-black mb-2">Recentes</h2>
-        <div className="grid gap-3">
-          {data.invoices.fullfilled.map((invoice) => (
-            <InvoiceCard key={invoice.id} invoice={invoice} />
-          ))}
-        </div>
-      </main>
+      <RecentSection />
     </div>
   );
 }
 
 function PendingSection() {
-  const data = useTypedLoaderData<typeof loader>();
+  const { invoices } = useTypedLoaderData<typeof loader>();
 
   return (
     <div
@@ -93,9 +85,9 @@ function PendingSection() {
           Pendentes
         </h2>
 
-        {data.invoices.pending.length ? (
+        {invoices.pending.length ? (
           <ul className="grid lg:grid-cols-2 gap-2">
-            {data.invoices.pending.map((invoice) => (
+            {invoices.pending.map((invoice) => (
               <InvoiceCard key={invoice.id} invoice={invoice} />
             ))}
           </ul>
@@ -108,13 +100,44 @@ function PendingSection() {
                 <h3 className="font-serif font-bold text-xl">
                   Tudo certo por aqui!
                 </h3>
-                <p className="text-dim">Você não tem nenhuma pendência.</p>
+                <p className="text-dim">
+                  Você não tem nenhuma invoice pendente.
+                </p>
               </div>
             </div>
           </Card>
         )}
       </div>
     </div>
+  );
+}
+
+function RecentSection() {
+  const { invoices } = useTypedLoaderData<typeof loader>();
+
+  return (
+    <main className="p-4 max-content">
+      <h2 className="font-serif text-2xl font-black mb-2">Recentes</h2>
+      <div className="grid gap-3">
+        {invoices.fullfilled.map((invoice) => (
+          <InvoiceCard key={invoice.id} invoice={invoice} />
+        ))}
+
+        {invoices.fullfilled.length === 0 && (
+          <Card className="flex gap-3">
+            <HeroIcon icon={DocumentPlusIcon} />
+            <div>
+              <h3 className="font-serif text-xl font-bold">
+                Você ainda não tem invoices.
+              </h3>
+              <a href="/generate" className="btn btn-sm btn-primary">
+                Gerar invoice
+              </a>
+            </div>
+          </Card>
+        )}
+      </div>
+    </main>
   );
 }
 
@@ -213,9 +236,20 @@ function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
   );
 }
 
-function Card({ children }: { children?: ReactNode }) {
+function Card({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: ReactNode;
+}) {
   return (
-    <div className="p-3 grid light:bg-white bg-neutral-800 rounded light:shadow-lg shadow-black/20 shadow-none overflow-hidden">
+    <div
+      className={cn(
+        "p-3 light:bg-white bg-neutral-800 rounded light:shadow-lg shadow-black/20 shadow-none overflow-hidden",
+        className
+      )}
+    >
       {children}
     </div>
   );

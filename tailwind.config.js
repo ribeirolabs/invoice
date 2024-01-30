@@ -33,7 +33,7 @@ export default {
         dark: {
           ...themes.business,
           primary: "#48b16d",
-          "primary-content": "#fff",
+          "primary-content": "#122117",
           secondary: "#6fa0b8",
           "secondary-content": "#fff",
           accent: "#6fa0b8",

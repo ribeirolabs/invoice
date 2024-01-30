@@ -1,4 +1,7 @@
+import d from "dotenv";
 import { z } from "zod";
+
+d.config();
 
 const requiredString = z.string().refine((value) => value.length > 0, {
   message: "Required",
@@ -10,6 +13,12 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: requiredString,
   GOOGLE_CLIENT_SECRET: requiredString,
   PORT: z
+    .string()
+    .optional()
+    .refine((value) => (value ? parseInt(value) : true), {
+      message: "Invalid, expected numeric value",
+    }),
+  SOCKET_PORT: z
     .string()
     .optional()
     .refine((value) => (value ? parseInt(value) : true), {

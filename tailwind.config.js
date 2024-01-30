@@ -14,6 +14,9 @@ export default {
       width: {
         18: "4.5rem",
       },
+      borderRadius: {
+        DEFAULT: ".5rem",
+      },
     },
   },
   daisyui: {
@@ -38,6 +41,7 @@ export default {
           "secondary-content": "#fff",
           accent: "#6fa0b8",
           error: "#c65e53",
+          "error-content": "#fff",
         },
       },
     ],

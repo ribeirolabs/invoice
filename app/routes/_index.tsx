@@ -4,23 +4,13 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { authenticator } from "~/services/auth.server";
-import { cn, dateToDistance, formatCurrency } from "~/utils";
-import {
-  ArrowDownIcon,
-  CalendarIcon,
-  DocumentCheckIcon,
-  DocumentPlusIcon,
-  EmailIcon,
-  SendIcon,
-  SparkleIcon,
-  TrashIcon,
-} from "~/components/Icons";
-import { InvoiceFull, getRecentInvoicesGrouped } from "~/data/invoice.server";
-import { InvoiceStatus } from "~/data/invoice";
+import { DocumentPlusIcon, SparkleIcon } from "~/components/Icons";
+import { getRecentInvoicesGrouped } from "~/data/invoice.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import { ReactNode } from "react";
 import { Header } from "~/components/Header";
 import { HeroIcon } from "~/components/HeroIcon";
+import { Card } from "~/components/Card";
+import { InvoiceCard } from "~/components/InvoiceCard";
 
 export const meta: MetaFunction = () => {
   return [{ title: "ribeirolabs / invoice" }];
@@ -118,144 +108,5 @@ function RecentSection() {
         )}
       </div>
     </main>
-  );
-}
-
-function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
-  const isSent = invoice.status === InvoiceStatus.SENT;
-  const isPaid = invoice.status === InvoiceStatus.PAID;
-
-  return (
-    <Card>
-      <div className="flex gap-6 items-start">
-        {isSent ? (
-          <HeroIcon
-            className="hero-icon-secondary"
-            label="Enviada"
-            icon={EmailIcon}
-          />
-        ) : isPaid ? (
-          <HeroIcon
-            className="hero-icon-primary"
-            label="Paga"
-            icon={DocumentCheckIcon}
-          />
-        ) : (
-          <HeroIcon
-            className="bg-secondary/20 text-secondary"
-            label="Criada"
-            icon={DocumentPlusIcon}
-          />
-        )}
-
-        <div className="flex flex-col gap-3 flex-1 light:text-neutral-700">
-          <div>
-            <a
-              href={`/invoice/${invoice.id}`}
-              className={cn(
-                "font-bold",
-                isPaid ? "text-white" : "text-secondary"
-              )}
-            >
-              {invoice.number}
-            </a>
-
-            <div className="">{formatCurrency(invoice.amount, "USD")}</div>
-          </div>
-
-          <div className="flex flex-col gap-2 md:gap-0 md:flex-row -justify-between">
-            <div className="flex gap-1 items-center">
-              <ArrowDownIcon className="-icon-lg" />
-              <div className="flex-col">
-                <div className="font-bold">{invoice.payer.alias}</div>
-                <div className="text-sm text-dim normal-case">
-                  {invoice.receiver.alias}
-                </div>
-              </div>
-            </div>
-
-            <div className="divider divider-horizontal hidden md:flex" />
-
-            <div className="flex gap-1">
-              <CalendarIcon />
-              <div
-                className="tooltip"
-                data-tip={(isPaid
-                  ? invoice.fullfilledAt
-                  : invoice.expiredAt
-                )?.toLocaleDateString()}
-              >
-                <div className="font-bold">
-                  {isPaid ? "Pagamento" : "Vencimento"}
-                </div>
-                <div className="text-dim text-sm">
-                  {dateToDistance(invoice.fullfilledAt ?? invoice.expiredAt)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="divider" />
-
-      <div className="flex gap-2 items-center justify-between">
-        <div
-          className="tooltip"
-          data-tip={invoice.issuedAt.toLocaleDateString()}
-        >
-          <p className="text-xs text-dimmer">
-            Emitida {dateToDistance(invoice.issuedAt)}
-          </p>
-        </div>
-        <div className="flex gap-2 justify-between">
-          {!isPaid && (
-            <>
-              {!isSent && (
-                <button
-                  className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
-                  data-tip="Enviar"
-                >
-                  <SendIcon className="icon-sm" />
-                </button>
-              )}
-
-              <button
-                className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
-                data-tip="Paga"
-              >
-                <DocumentCheckIcon className="icon-sm" />
-              </button>
-            </>
-          )}
-
-          <button
-            className="btn btn-sm btn-circle btn-error btn-outline tooltip"
-            data-tip="Remover"
-          >
-            <TrashIcon className="icon-sm" />
-          </button>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function Card({
-  className,
-  children,
-}: {
-  className?: string;
-  children?: ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "p-3 light:bg-white bg-neutral-800 rounded light:shadow-lg shadow-black/20 shadow-none",
-        className
-      )}
-    >
-      {children}
-    </div>
   );
 }

@@ -17,6 +17,7 @@ const envSchema = z.object({
     }),
   DOMAIN: z.string().url().optional(),
   BROWSERLESS_API_KEY: requiredString,
+  DATABASE_URL: z.string().url(),
 });
 
 function buildEnv() {

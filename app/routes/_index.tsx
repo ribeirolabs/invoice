@@ -81,10 +81,6 @@ function PendingSection() {
       data-theme="light"
     >
       <div className="max-content">
-        <h2 className="font-serif text-2xl hidden font-black mb-2 text-white">
-          Pendentes
-        </h2>
-
         {invoices.pending.length ? (
           <ul className="grid lg:grid-cols-2 gap-2">
             {invoices.pending.map((invoice) => (
@@ -168,7 +164,7 @@ function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
           />
         )}
 
-        <div className="flex flex-col gap-3 md:gap-2 flex-1 light:text-neutral-700">
+        <div className="flex flex-col gap-3 flex-1 light:text-neutral-700">
           <div>
             <a
               href={`/invoice/${invoice.id}`}
@@ -198,7 +194,13 @@ function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
             <div className="flex gap-1">
               <CalendarIcon />
-              <div>
+              <div
+                className="tooltip"
+                data-tip={(isPaid
+                  ? invoice.fullfilledAt
+                  : invoice.expiredAt
+                )?.toLocaleDateString()}
+              >
                 <div className="font-bold">
                   {isPaid ? "Pagamento" : "Vencimento"}
                 </div>
@@ -213,24 +215,43 @@ function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
       <div className="divider" />
 
-      <div className="flex gap-2 justify-end">
-        {!isPaid && (
-          <>
-            {!isSent && (
-              <button className="btn btn-sm btn-circle btn-secondary-ghost">
-                <SendIcon className="icon-sm" />
+      <div className="flex gap-2 items-center justify-between">
+        <div
+          className="tooltip"
+          data-tip={invoice.issuedAt.toLocaleDateString()}
+        >
+          <p className="text-xs text-dimmer">
+            Emitida {dateToDistance(invoice.issuedAt)}
+          </p>
+        </div>
+        <div className="flex gap-2 justify-between">
+          {!isPaid && (
+            <>
+              {!isSent && (
+                <button
+                  className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
+                  data-tip="Enviar"
+                >
+                  <SendIcon className="icon-sm" />
+                </button>
+              )}
+
+              <button
+                className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
+                data-tip="Paga"
+              >
+                <DocumentCheckIcon className="icon-sm" />
               </button>
-            )}
+            </>
+          )}
 
-            <button className="btn btn-sm btn-circle btn-secondary-ghost">
-              <DocumentCheckIcon className="icon-sm" />
-            </button>
-          </>
-        )}
-
-        <button className="btn btn-sm btn-circle btn-error btn-outline">
-          <TrashIcon className="icon-sm" />
-        </button>
+          <button
+            className="btn btn-sm btn-circle btn-error btn-outline tooltip"
+            data-tip="Remover"
+          >
+            <TrashIcon className="icon-sm" />
+          </button>
+        </div>
       </div>
     </Card>
   );
@@ -246,7 +267,7 @@ function Card({
   return (
     <div
       className={cn(
-        "p-3 light:bg-white bg-neutral-800 rounded light:shadow-lg shadow-black/20 shadow-none overflow-hidden",
+        "p-3 light:bg-white bg-neutral-800 rounded light:shadow-lg shadow-black/20 shadow-none",
         className
       )}
     >

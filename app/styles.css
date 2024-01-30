@@ -55,6 +55,10 @@
       @apply badge-neutral;
     }
   }
+
+  .tooltip {
+    text-align: unset;
+  }
 }
 
 @layer utilities {
@@ -101,6 +105,10 @@
 
   .text-dim {
     @apply text-current opacity-70;
+  }
+
+  .text-dimmer {
+    @apply text-current opacity-50;
   }
 
   .divider-horizontal {

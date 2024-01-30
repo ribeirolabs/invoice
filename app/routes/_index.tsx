@@ -14,7 +14,7 @@ import {
   IconProps,
   LogoutIcon,
   SendIcon,
-  StarIcon,
+  SparkleIcon,
   TrashIcon,
 } from "~/components/Icons";
 import { InvoiceFull, getRecentInvoicesGrouped } from "~/data/invoice.server";
@@ -90,7 +90,7 @@ function PendingSection() {
         ) : (
           <Card>
             <div className="flex gap-4 items-center">
-              <HeroIcon icon={StarIcon} />
+              <HeroIcon icon={SparkleIcon} />
 
               <div>
                 <h3 className="font-serif font-bold text-xl">

@@ -97,7 +97,7 @@ function PendingSection() {
                   Tudo certo por aqui!
                 </h3>
                 <p className="text-dim">
-                  Você não tem nenhuma invoice pendente.
+                  Você não tem invoices pendentes
                 </p>
               </div>
             </div>
@@ -120,14 +120,14 @@ function RecentSection() {
         ))}
 
         {invoices.fullfilled.length === 0 && (
-          <Card className="flex gap-3">
+          <Card className="flex gap-3 items-center">
             <HeroIcon icon={DocumentPlusIcon} />
             <div>
               <h3 className="font-serif text-xl font-bold">
-                Você ainda não tem invoices.
+                Você não tem invoices.
               </h3>
               <a href="/generate" className="btn btn-sm btn-primary">
-                Gerar invoice
+                Gerar nova
               </a>
             </div>
           </Card>

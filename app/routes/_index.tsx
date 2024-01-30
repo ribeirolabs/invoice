@@ -290,7 +290,7 @@ function HeroIcon({
   return (
     <div
       className={cn(
-        "hero-icon flex items-center justify-center w-18 aspect-square rounded-full relative",
+        "hero-icon flex items-center justify-center w-18 aspect-square rounded-full relative flex-shrink-0 flex-grow-0",
         label && "mb-2",
         className
       )}

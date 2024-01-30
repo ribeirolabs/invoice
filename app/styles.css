@@ -52,7 +52,7 @@
     @apply bg-base-200;
 
     .badge {
-      @apply badge-neutral;
+      @apply badge-neutral text-white;
     }
   }
 
@@ -101,6 +101,14 @@
 
   .icon-2xl {
     @apply w-12;
+  }
+
+  .icon-3xl {
+    @apply w-14;
+  }
+
+  .icon-4xl {
+    @apply w-16;
   }
 
   .text-dim {

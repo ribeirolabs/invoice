@@ -11,8 +11,6 @@ import {
   DocumentCheckIcon,
   DocumentPlusIcon,
   EmailIcon,
-  IconProps,
-  LogoutIcon,
   SendIcon,
   SparkleIcon,
   TrashIcon,
@@ -21,6 +19,8 @@ import { InvoiceFull, getRecentInvoicesGrouped } from "~/data/invoice.server";
 import { InvoiceStatus } from "~/data/invoice";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { ReactNode } from "react";
+import { Header } from "~/components/Header";
+import { HeroIcon } from "~/components/HeroIcon";
 
 export const meta: MetaFunction = () => {
   return [{ title: "ribeirolabs / invoice" }];
@@ -46,26 +46,7 @@ export default function Index() {
 
   return (
     <div>
-      <header className="bg-neutral-900 ">
-        <div className="p-4 flex items-center justify-between max-content">
-          <a href="/" className="text-xl">
-            <span className="text-neutral-400 hidden md:inline-block">
-              ribeirolabs
-            </span>
-            <span className="text-neutral-400 md:hidden">r</span>
-            <span className="font-bold text-primary"> / invoice</span>
-          </a>
-
-          <div className="flex items-center justify-center gap-2">
-            <h3 className="-font-bold">{data.user.name}</h3>
-            <a href="/logout" className="btn btn-sm btn-outline btn-neutral">
-              <LogoutIcon className="icon-xs" />
-              Sair
-            </a>
-          </div>
-        </div>
-      </header>
-
+      <Header user={data.user} />
       <PendingSection />
       <RecentSection />
     </div>
@@ -96,9 +77,7 @@ function PendingSection() {
                 <h3 className="font-serif font-bold text-xl">
                   Tudo certo por aqui!
                 </h3>
-                <p className="text-dim">
-                  Você não tem invoices pendentes
-                </p>
+                <p className="text-dim">Você não tem invoices pendentes</p>
               </div>
             </div>
           </Card>
@@ -272,36 +251,6 @@ function Card({
       )}
     >
       {children}
-    </div>
-  );
-}
-
-function HeroIcon({
-  className,
-  icon,
-  label,
-}: {
-  className?: string;
-  icon: (props: IconProps) => JSX.Element;
-  label?: string;
-}) {
-  const Icon = icon;
-
-  return (
-    <div
-      className={cn(
-        "hero-icon flex items-center justify-center w-18 aspect-square rounded-full relative flex-shrink-0 flex-grow-0",
-        label && "mb-2",
-        className
-      )}
-    >
-      <Icon className="icon-2xl" />
-
-      {label && (
-        <div className="badge rounded-full font-medium uppercase text-xs absolute bottom-[-10%] left-1/2 -translate-x-1/2 transition-none">
-          {label}
-        </div>
-      )}
     </div>
   );
 }

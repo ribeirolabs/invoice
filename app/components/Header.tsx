@@ -4,7 +4,7 @@ import { Logo } from "./Logo";
 
 export function Header({ user }: { user: User }) {
   return (
-    <header className="bg-neutral-900 print:hidden">
+    <header className="bg-neutral-900 print:hidden sticky top-0 z-30">
       <div className="p-4 flex items-center justify-between max-content">
         <Logo />
 

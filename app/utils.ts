@@ -1,5 +1,6 @@
 import { formatDistance } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
+import { twJoin, twMerge } from "tailwind-merge";
 
 export function getLocale() {
   if (typeof navigator === "undefined") {
@@ -24,7 +25,7 @@ export function cookieToObject(cookies: string): Record<string, string> {
 export function cn(
   ...args: (string | false | null | undefined | string[])[]
 ): string {
-  return args.filter(Boolean).flat().join(" ");
+  return twJoin(...args);
 }
 
 export function formatCurrency(amount: number, currency: string) {

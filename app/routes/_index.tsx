@@ -52,15 +52,13 @@ function PendingSection() {
       data-theme="light"
     >
       <div className="max-content">
-        {invoices.pending.length ? (
-          <ul className="grid md:grid-cols-2 gap-2">
-            {invoices.pending.map((invoice) => (
-              <InvoiceCard key={invoice.id} invoice={invoice} />
-            ))}
-          </ul>
-        ) : (
-          <Card>
-            <div className="flex gap-4 items-center">
+        <div className="grid md:grid-cols-2 gap-2">
+          {invoices.pending.map((invoice) => (
+            <InvoiceCard key={invoice.id} invoice={invoice} />
+          ))}
+
+          {invoices.pending.length === 0 && (
+            <Card className="p-2 flex gap-4 items-center">
               <HeroIcon icon={SparkleIcon} className="text-neutral-400" />
 
               <div>
@@ -69,9 +67,9 @@ function PendingSection() {
                 </h3>
                 <p className="text-dim">Você não tem invoices pendentes</p>
               </div>
-            </div>
-          </Card>
-        )}
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

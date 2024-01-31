@@ -1,18 +1,12 @@
-import {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  redirect,
-} from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { LoginIcon } from "~/components/Icons";
 import { authenticator } from "~/services/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  if (await authenticator.isAuthenticated(request)) {
-    return redirect("/");
-  }
-
-  return null;
+  return authenticator.isAuthenticated(request, {
+    successRedirect: "/",
+  });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -26,7 +20,10 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
 
-  return authenticator.authenticate(provider.toString(), request);
+  return authenticator.authenticate(provider.toString(), request, {
+    successRedirect: "/",
+    failureRedirect: "/login",
+  });
 }
 
 export default function Login() {

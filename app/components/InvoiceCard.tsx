@@ -57,7 +57,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
             <div className="">{formatCurrency(invoice.amount, "USD")}</div>
           </div>
 
-          <div className="flex flex-col gap-2 md:gap-0 md:flex-row -justify-between">
+          <div className="flex flex-col gap-2 md:gap-0 lg:flex-row justify-between">
             <div className="flex gap-1 items-center">
               <ArrowDownIcon className="-icon-lg" />
               <div className="flex-col">
@@ -68,7 +68,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
               </div>
             </div>
 
-            <div className="divider divider-horizontal hidden md:flex" />
+            <div className="divider divider-horizontal hidden sm:flex" />
 
             <div className="flex gap-1">
               <CalendarIcon />

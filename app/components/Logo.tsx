@@ -11,7 +11,7 @@ export function Logo({
         <span
           className={cn(
             "text-neutral-400",
-            variant === "responsive" && "hidden md:inline-block"
+            variant === "responsive" && "hidden sm:inline-block"
           )}
         >
           ribeirolabs
@@ -22,7 +22,7 @@ export function Logo({
         <span
           className={cn(
             "text-neutral-400",
-            variant === "responsive" && "md:hidden"
+            variant === "responsive" && "sm:hidden"
           )}
         >
           r

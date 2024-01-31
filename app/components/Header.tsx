@@ -9,10 +9,13 @@ export function Header({ user }: { user: User }) {
         <Logo />
 
         <div className="flex items-center justify-center gap-2">
-          <h3 className="-font-bold">{user.name}</h3>
+          <div className="text-end">
+            <p>{user.name}</p>
+            <p className="text-dim text-xs">{user.email}</p>
+          </div>
           <a href="/logout" className="btn btn-sm btn-outline btn-neutral">
             <LogoutIcon className="icon-xs" />
-            Sair
+            <span className="hidden sm:block">Sair</span>
           </a>
         </div>
       </div>

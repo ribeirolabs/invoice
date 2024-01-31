@@ -68,7 +68,7 @@
 
   .btn-sm,
   .btn-xs {
-    @apply font-medium;
+    @apply font-medium gap-1;
   }
 
   .btn-neutral.btn-outline {

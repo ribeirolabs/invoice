@@ -1,11 +1,19 @@
 import { User } from "@prisma/client";
-import { DocumentPlusIcon, LogoutIcon, UserCircleIcon } from "./Icons";
+import {
+  DocumentCheckIcon,
+  DocumentPlusIcon,
+  DownloadIcon,
+  LogoutIcon,
+  SendIcon,
+  TrashIcon,
+  UserCircleIcon,
+} from "./Icons";
 import { Logo } from "./Logo";
 
 export function Header({ user }: { user: User }) {
   return (
-    <header className="print:hidden sticky top-0 z-30 bg-neutral-900">
-      <div className="max-content flex-1 navbar py-0 min-h-fit">
+    <header className="print:hidden sticky w-full top-0 z-30 bg-neutral-900">
+      <div className="max-content flex-1 navbar py-0 min-h-fit relative">
         <div className="flex-1">
           <Logo />
         </div>
@@ -34,7 +42,7 @@ export function Header({ user }: { user: User }) {
             />
             <ul
               tabIndex={0}
-              className="sm:mt-1 p-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40"
+              className="sm:mt-1 p-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
             >
               <li className="p-2 flex flex-col overflow-hidden">
                 <span className="font-bold">{user.name}</span>
@@ -59,19 +67,24 @@ export function Header({ user }: { user: User }) {
             </ul>
           </div>
         </div>
+
+        <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full">
+          <a
+            href="/genearate"
+            className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
+          >
+            <DocumentPlusIcon />
+            <span className="hidden md:block whitespace-nowrap transition-all text-end">
+              Adicionar
+            </span>
+          </a>
+        </div>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full">
-        <a
-          href="/genearate"
-          className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
-        >
-          <DocumentPlusIcon />
-          <span className="hidden md:block whitespace-nowrap transition-all text-end">
-            Adicionar
-          </span>
-        </a>
-      </div>
+      <div
+        className="w-full bg-neutral-800 border-b border-base-300"
+        id="action-bar"
+      ></div>
     </header>
   );
 }

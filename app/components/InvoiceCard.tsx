@@ -107,18 +107,18 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
         {isPaid ? (
           <button className="btn btn-sm -btn-circle btn-base-ghost">
-            <TrashIcon /> Remover
+            <TrashIcon className="icon-sm" /> Remover
           </button>
         ) : (
           <div className="flex gap-1">
             {!isSent && (
-              <button className="btn btn-sm -btn-circle btn-secondary-ghost">
-                <SendIcon /> Enviar
+              <button className="btn btn-xs -btn-circle btn-secondary-ghost">
+                <SendIcon className="icon-sm" /> Enviar
               </button>
             )}
 
-            <button className="btn btn-sm -btn-circle btn-secondary-ghost">
-              <DocumentCheckIcon /> Concluir
+            <button className="btn btn-xs -btn-circle btn-secondary-ghost">
+              <DocumentCheckIcon className="icon-sm" /> Concluir
             </button>
           </div>
         )}

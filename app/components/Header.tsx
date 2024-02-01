@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import {
+  ChevronDownIcon,
   DocumentCheckIcon,
   DocumentPlusIcon,
   DownloadIcon,
@@ -13,7 +14,7 @@ import { Logo } from "./Logo";
 export function Header({ user }: { user: User }) {
   return (
     <header className="print:hidden sticky w-full top-0 z-30 bg-neutral-900">
-      <div className="max-content flex-1 navbar py-0 min-h-fit relative">
+      <div className="max-content flex-1 navbar py-0 -min-h-fit relative -min-h-0">
         <div className="flex-1">
           <Logo />
         </div>
@@ -27,11 +28,10 @@ export function Header({ user }: { user: User }) {
 
           <label
             htmlFor="setting-drawer"
-            className="btn btn-circle bg-transparent border-transparent avatar max-sm:drawer-button"
+            className="btn gap-1 px-1.5 bg-base-100 hover:bg-neutral-700 border-transparent avatar max-sm:drawer-button"
           >
-            <div className="rounded-full">
-              <UserCircleIcon className="icon-xl" />
-            </div>
+            <UserCircleIcon className="icon-xl" />
+            <ChevronDownIcon />
           </label>
 
           <div className="max-sm:drawer-side overflow-x-hidden dropdown-content z-40">
@@ -84,7 +84,7 @@ export function Header({ user }: { user: User }) {
       <div
         className="w-full bg-neutral-800 border-b border-base-300"
         id="action-bar"
-      ></div>
+      />
     </header>
   );
 }

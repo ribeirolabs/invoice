@@ -540,3 +540,19 @@ export function DownloadIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <path
+        className="fill-current"
+        d="M12.925 14.673a21.354 21.354 0 0 0 3.88-4.08 1 1 0 0 0-.881-1.59 51.713 51.713 0 0 1-7.848 0 1 1 0 0 0-.882 1.59 21.353 21.353 0 0 0 3.881 4.08 1.472 1.472 0 0 0 1.85 0Z"
+      />
+    </svg>
+  );
+}

@@ -500,3 +500,22 @@ export function UserCircleIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <path
+        className="stroke-current"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 19v-7m0 0V5m0 7H5m7 0h7"
+      />
+    </svg>
+  );
+}

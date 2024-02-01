@@ -54,7 +54,9 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
               {invoice.number}
             </a>
 
-            <div className="">{formatCurrency(invoice.amount, "USD")}</div>
+            <div className="leading-none">
+              {formatCurrency(invoice.amount, "USD")}
+            </div>
           </div>
 
           <div className="flex flex-col gap-2 md:gap-0 lg:flex-row justify-between">

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { LogoutIcon, UserCircleIcon } from "./Icons";
+import { LogoutIcon, PlusIcon, UserCircleIcon } from "./Icons";
 import { Logo } from "./Logo";
 
 export function Header({ user }: { user: User }) {
@@ -61,12 +61,12 @@ export function Header({ user }: { user: User }) {
         </div>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] border-4 border-neutral-950/90 rounded-full">
+      <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] border-4 border-neutral-900 rounded-full">
         <a
           href="/genearate"
           className="btn btn-primary group gap-0 transition-all btn-md"
         >
-          <span>+</span>
+          <PlusIcon />
           <span className="w-0 group-hover:w-[11ch] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all text-end">
             Gerar Invoice
           </span>

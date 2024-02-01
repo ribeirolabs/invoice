@@ -48,7 +48,7 @@ function PendingSection() {
 
   return (
     <div
-      className="py-6 bg-gradient-to-br from-primary to-secondary overflow-hidden"
+      className="py-8 bg-gradient-to-br from-primary to-secondary overflow-hidden"
       data-theme="light"
     >
       <div className="max-content">

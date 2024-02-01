@@ -1,21 +1,16 @@
 import { User } from "@prisma/client";
-import {
-  DocumentPlusIcon,
-  LogoutIcon,
-  PlusIcon,
-  UserCircleIcon,
-} from "./Icons";
+import { DocumentPlusIcon, LogoutIcon, UserCircleIcon } from "./Icons";
 import { Logo } from "./Logo";
 
 export function Header({ user }: { user: User }) {
   return (
-    <header className="print:hidden -navbar bg-neutral-900 -backdrop-blur-md sticky top-0 z-30">
-      <div className="max-content flex-1 navbar">
+    <header className="print:hidden sticky top-0 z-30 bg-neutral-900">
+      <div className="max-content flex-1 navbar py-0 min-h-fit">
         <div className="flex-1">
           <Logo />
         </div>
 
-        <div className="max-sm:drawer max-sm:!w-auto drawer-end sm:dropdown sm:dropdown-end">
+        <div className="max-sm:drawer max-sm:w-fit drawer-end sm:dropdown sm:dropdown-end">
           <input
             id="setting-drawer"
             type="checkbox"
@@ -31,7 +26,7 @@ export function Header({ user }: { user: User }) {
             </div>
           </label>
 
-          <div className="max-sm:drawer-side dropdown-content z-40">
+          <div className="max-sm:drawer-side overflow-x-hidden dropdown-content z-40">
             <label
               htmlFor="setting-drawer"
               aria-label="close sidebar"

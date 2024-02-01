@@ -40,6 +40,13 @@ export async function getRecentInvoicesGrouped(userId: string) {
     } else {
       pending.push({
         ...invoice,
+        id: "FAKE_ID",
+        status: InvoiceStatus.CREATED,
+        receiver: invoice.payer,
+        payer: invoice.receiver,
+      });
+      pending.push({
+        ...invoice,
         status:
           invoice._count.emailHistory > 0
             ? InvoiceStatus.SENT

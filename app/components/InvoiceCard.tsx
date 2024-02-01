@@ -19,26 +19,28 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
   return (
     <Card>
-      <Card.Content className="flex items-start">
-        {isSent ? (
-          <HeroIcon
-            className="hero-icon-secondary"
-            label="Enviada"
-            icon={EmailIcon}
-          />
-        ) : isPaid ? (
-          <HeroIcon
-            className="hero-icon-primary"
-            label="Paga"
-            icon={DocumentCheckIcon}
-          />
-        ) : (
-          <HeroIcon
-            className="bg-secondary/20 text-secondary"
-            label="Criada"
-            icon={DocumentPlusIcon}
-          />
-        )}
+      <Card.Content className="flex items-start flex-row-reverse">
+        <div className="flex flex-col justify-between self-stretch items-center">
+          {isSent ? (
+            <HeroIcon
+              className="hero-icon-secondary"
+              label="Enviada"
+              icon={EmailIcon}
+            />
+          ) : isPaid ? (
+            <HeroIcon
+              className="hero-icon-primary"
+              label="Paga"
+              icon={DocumentCheckIcon}
+            />
+          ) : (
+            <HeroIcon
+              className="hero-icon-secondary"
+              label="Criada"
+              icon={DocumentPlusIcon}
+            />
+          )}
+        </div>
 
         <div className="divider divider-horizontal mx-1" />
 
@@ -59,12 +61,12 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 md:gap-0 lg:flex-row justify-between">
+          <div className="flex flex-col gap-2 md:gap-0 lg:flex-row -justify-between">
             <div className="flex gap-1 items-center">
               <ArrowDownIcon className="-icon-lg" />
               <div className="flex-col">
                 <div className="font-bold">{invoice.payer.alias}</div>
-                <div className="text-sm text-dim normal-case">
+                <div className="text-sm text-dim leading-none">
                   {invoice.receiver.alias}
                 </div>
               </div>
@@ -84,7 +86,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
                 <div className="font-bold">
                   {isPaid ? "Pagamento" : "Vencimento"}
                 </div>
-                <div className="text-dim text-sm">
+                <div className="text-dim text-sm leading-none">
                   {dateToDistance(invoice.fullfilledAt ?? invoice.expiredAt)}
                 </div>
               </div>
@@ -102,31 +104,24 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
             Emitida {dateToDistance(invoice.issuedAt)}
           </p>
         </div>
-        <div className="flex gap-2 justify-between">
-          {!isPaid && (
-            <>
-              {!isSent && (
-                <button
-                  className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
-                  data-tip="Enviar"
-                >
-                  <SendIcon className="icon-sm" />
-                </button>
-              )}
 
-              <button
-                className="btn btn-sm btn-circle btn-secondary-ghost tooltip"
-                data-tip="Paga"
-              >
-                <DocumentCheckIcon className="icon-sm" />
-              </button>
-            </>
-          )}
-
-          <button className="btn btn-sm btn-circle btn-error btn-outline">
-            <TrashIcon className="icon-sm" />
+        {isPaid ? (
+          <button className="btn btn-sm -btn-circle btn-base-ghost">
+            <TrashIcon /> Remover
           </button>
-        </div>
+        ) : (
+          <div className="flex gap-1">
+            {!isSent && (
+              <button className="btn btn-sm -btn-circle btn-secondary-ghost">
+                <SendIcon /> Enviar
+              </button>
+            )}
+
+            <button className="btn btn-sm -btn-circle btn-secondary-ghost">
+              <DocumentCheckIcon /> Concluir
+            </button>
+          </div>
+        )}
       </Card.Footer>
     </Card>
   );

@@ -82,7 +82,7 @@ export function Header({ user }: { user: User }) {
       </div>
 
       <div
-        className="w-full bg-neutral-800 border-b border-base-300"
+        className="w-full bg-neutral-800 border-b border-base-300 fixed bottom-0"
         id="action-bar"
       />
     </header>

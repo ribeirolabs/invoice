@@ -9,7 +9,7 @@
   }
 
   html {
-    @apply font-sans leading-none;
+    @apply font-sans;
   }
 
   .border {
@@ -63,12 +63,16 @@
 
 @layer utilities {
   .max-content {
-    @apply max-w-screen-lg mx-auto px-4;
+    @apply max-w-screen-lg mx-auto px-2 md:px-4;
   }
 
   .btn-sm,
   .btn-xs {
     @apply font-medium gap-1;
+  }
+
+  .btn-md {
+    @apply min-h-9 h-9;
   }
 
   .btn-neutral.btn-outline {
@@ -142,5 +146,9 @@
     .badge {
       @apply badge-secondary;
     }
+  }
+
+  .drawer-toggle:checked ~ .drawer-side > .drawer-overlay {
+    @apply backdrop-blur-sm;
   }
 }

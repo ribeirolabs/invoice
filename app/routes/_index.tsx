@@ -80,7 +80,7 @@ function RecentSection() {
 
   return (
     <main className="p-4 max-content">
-      <h2 className="font-serif text-2xl font-black mb-2">Recentes</h2>
+      <h2 className="font-serif text-2xl font-black mb-2">Últimas Invoices</h2>
       <div className="grid md:grid-cols-2 gap-3">
         {invoices.fullfilled.map((invoice) => (
           <InvoiceCard key={invoice.id} invoice={invoice} />

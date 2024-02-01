@@ -126,6 +126,8 @@ export default function Page() {
         </footer>
       </main>
 
+      <Header.Actions title="Invoice" />
+
       <Portal selector="#action-bar">
         <div className="max-content py-2 flex justify-between">
           <button className="btn btn-md max-sm:btn-circle">

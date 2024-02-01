@@ -10,6 +10,8 @@ import {
   UserCircleIcon,
 } from "./Icons";
 import { Logo } from "./Logo";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export function Header({ user }: { user: User }) {
   return (
@@ -51,6 +53,8 @@ export function Header({ user }: { user: User }) {
                 </span>
               </li>
 
+              <div id="sidebar-actions" />
+
               <li>
                 <div className="divider m-0" />
               </li>
@@ -87,4 +91,84 @@ export function Header({ user }: { user: User }) {
       />
     </header>
   );
+}
+
+export function Actions({
+  title,
+  children,
+}: {
+  title: string;
+  children?: ReactNode;
+}) {
+  return (
+    <Portal selector="#sidebar-actions">
+      <li>
+        <div className="divider m-0" />
+      </li>
+      <li className="menu-title">{title}</li>
+
+      <li>
+        <a
+          href="#"
+          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
+        >
+          <DownloadIcon /> PDF
+        </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
+        >
+          <SendIcon /> Enviar
+        </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
+        >
+          <DocumentCheckIcon /> Concluir
+        </a>
+      </li>
+      <li>
+        <a
+          href="#"
+          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
+        >
+          <TrashIcon /> Remover
+        </a>
+      </li>
+    </Portal>
+  );
+}
+
+Header.Actions = Actions;
+
+function Portal({
+  children,
+  selector,
+}: {
+  children: ReactNode;
+  selector: string;
+}) {
+  const element = useRef<HTMLElement | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    element.current = document.querySelector(selector);
+
+    if (!element.current) {
+      console.error(`[Portal] element not found: ${selector}`);
+      return;
+    }
+
+    setReady(true);
+  }, [selector]);
+
+  if (!element.current || !ready) {
+    return null;
+  }
+
+  return createPortal(children, element.current);
 }

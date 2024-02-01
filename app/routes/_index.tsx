@@ -4,7 +4,11 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { authenticator } from "~/services/auth.server";
-import { DocumentPlusIcon, PlusIcon, SparkleIcon } from "~/components/Icons";
+import {
+  DocumentIcon,
+  DocumentOutlineIcon,
+  SparkleIcon,
+} from "~/components/Icons";
 import { getRecentInvoicesGrouped } from "~/data/invoice.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
@@ -63,7 +67,7 @@ function PendingSection() {
                 <h3 className="font-serif font-bold text-xl">
                   Nenhuma pendência
                 </h3>
-                <p className="text-dim leading-tight">
+                <p className="text-dim leading-tight text-sm">
                   Aqui você poderá consultar as invoices não foram concluídas.
                 </p>
               </div>
@@ -80,8 +84,8 @@ function RecentSection() {
   const { invoices } = useTypedLoaderData<typeof loader>();
 
   return (
-    <main className="p-4 max-content">
-      <h2 className="font-serif text-2xl font-black mb-2">Últimas Invoices</h2>
+    <main className="py-8 px-4 max-content">
+      <h2 className="-font-serif text-2xl font-bold mb-4">Últimas Invoices</h2>
       <div className="grid md:grid-cols-2 gap-3">
         {invoices.fullfilled.map((invoice) => (
           <InvoiceCard key={invoice.id} invoice={invoice} />
@@ -91,7 +95,7 @@ function RecentSection() {
           <Card className="flex p-3 gap-3 items-center justify-between">
             <div>
               <h3 className="font-serif text-xl font-bold">Nenhuma invoice</h3>
-              <p>
+              <p className="text-sm">
                 <a
                   href="/generate"
                   className="font-medium underline text-secondary"
@@ -102,7 +106,7 @@ function RecentSection() {
               </p>
             </div>
 
-            <HeroIcon icon={DocumentPlusIcon} className="opacity-50" />
+            <HeroIcon icon={DocumentOutlineIcon} className="opacity-50" />
           </Card>
         )}
       </div>

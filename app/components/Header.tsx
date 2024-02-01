@@ -38,7 +38,7 @@ export function Header({ user }: { user: User }) {
             >
               <li className="p-2 flex flex-col overflow-hidden">
                 <span className="font-bold">{user.name}</span>
-                <span className="text-dim text-sm leading-none text-ellipsis overflow-hidden">
+                <span className="text-dim text-sm text-ellipsis overflow-hidden">
                   {user.email}
                 </span>
               </li>
@@ -50,7 +50,7 @@ export function Header({ user }: { user: User }) {
               <li>
                 <a
                   href="/logout"
-                  className="flex gap-2 hover:bg-neutral-800 rounded p-2"
+                  className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
                 >
                   <LogoutIcon />
                   <span>Sair</span>

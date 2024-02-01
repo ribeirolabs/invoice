@@ -4,7 +4,7 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { authenticator } from "~/services/auth.server";
-import { DocumentPlusIcon, SparkleIcon } from "~/components/Icons";
+import { DocumentPlusIcon, PlusIcon, SparkleIcon } from "~/components/Icons";
 import { getRecentInvoicesGrouped } from "~/data/invoice.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
@@ -58,15 +58,16 @@ function PendingSection() {
           ))}
 
           {invoices.pending.length === 0 && (
-            <Card className="p-2 flex gap-4 items-center">
-              <HeroIcon icon={SparkleIcon} className="text-neutral-400" />
-
+            <Card className="p-3 flex gap-4 items-center justify-between">
               <div>
                 <h3 className="font-serif font-bold text-xl">
-                  Tudo certo por aqui!
+                  Nenhuma pendência
                 </h3>
-                <p className="text-dim">Você não tem invoices pendentes</p>
+                <p className="text-dim leading-tight">
+                  Aqui você poderá consultar as invoices não foram concluídas.
+                </p>
               </div>
+              <HeroIcon icon={SparkleIcon} className="text-neutral-400" />
             </Card>
           )}
         </div>
@@ -87,21 +88,21 @@ function RecentSection() {
         ))}
 
         {invoices.fullfilled.length === 0 && (
-          <Card className="flex gap-3 items-center">
-            <HeroIcon icon={DocumentPlusIcon} className="opacity-50" />
+          <Card className="flex p-3 gap-3 items-center justify-between">
             <div>
-              <h3 className="font-serif text-xl font-bold">
-                Você não tem invoices.
-              </h3>
-              <p className="flex gap-1">
-                <a href="/generate" className="underline text-secondary">
-                  Clique aqui
-                </a>
-                <span className="text-dim">
-                  para gerar sua primeira invoice.
-                </span>
+              <h3 className="font-serif text-xl font-bold">Nenhuma invoice</h3>
+              <p>
+                <a
+                  href="/generate"
+                  className="font-medium underline text-secondary"
+                >
+                  Adicione
+                </a>{" "}
+                <span className="text-dim">sua primeira invoice.</span>
               </p>
             </div>
+
+            <HeroIcon icon={DocumentPlusIcon} className="opacity-50" />
           </Card>
         )}
       </div>

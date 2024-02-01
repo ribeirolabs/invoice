@@ -49,7 +49,7 @@
   }
 
   .hero-icon {
-    @apply bg-base-200;
+    @apply bg-base-200 flex-grow-0 flex-shrink-0;
 
     .badge {
       @apply badge-neutral text-white;

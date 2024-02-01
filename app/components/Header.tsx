@@ -68,7 +68,7 @@ export function Header({ user }: { user: User }) {
         >
           <DocumentPlusIcon />
           <span className="hidden md:block whitespace-nowrap transition-all text-end">
-            Nova Invoice
+            Adicionar
           </span>
         </a>
       </div>

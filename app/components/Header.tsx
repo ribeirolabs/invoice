@@ -1,5 +1,10 @@
 import { User } from "@prisma/client";
-import { LogoutIcon, PlusIcon, UserCircleIcon } from "./Icons";
+import {
+  DocumentPlusIcon,
+  LogoutIcon,
+  PlusIcon,
+  UserCircleIcon,
+} from "./Icons";
 import { Logo } from "./Logo";
 
 export function Header({ user }: { user: User }) {
@@ -47,7 +52,7 @@ export function Header({ user }: { user: User }) {
                 <div className="divider m-0" />
               </li>
 
-              <li className="">
+              <li>
                 <a
                   href="/logout"
                   className="flex gap-2 hover:bg-neutral-800 rounded p-2"
@@ -61,14 +66,14 @@ export function Header({ user }: { user: User }) {
         </div>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] border-4 border-neutral-900 rounded-full">
+      <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full">
         <a
           href="/genearate"
-          className="btn btn-primary group gap-0 transition-all btn-md"
+          className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
         >
-          <PlusIcon />
-          <span className="w-0 group-hover:w-[11ch] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all text-end">
-            Gerar Invoice
+          <DocumentPlusIcon />
+          <span className="hidden md:block whitespace-nowrap transition-all text-end">
+            Nova Invoice
           </span>
         </a>
       </div>

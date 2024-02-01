@@ -95,7 +95,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
       <Card.Footer className="flex gap-2 items-center justify-between">
         <div
-          className="tooltip"
+          className="tooltip tooltip-right"
           data-tip={invoice.issuedAt.toLocaleDateString()}
         >
           <p className="text-xs text-dimmer">
@@ -123,10 +123,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
             </>
           )}
 
-          <button
-            className="btn btn-sm btn-circle btn-error btn-outline tooltip"
-            data-tip="Remover"
-          >
+          <button className="btn btn-sm btn-circle btn-error btn-outline">
             <TrashIcon className="icon-sm" />
           </button>
         </div>

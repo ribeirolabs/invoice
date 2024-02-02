@@ -15,9 +15,7 @@ export async function requireUser(request: Request): Promise<User> {
   const user = await authenticator.isAuthenticated(request);
 
   if (!user) {
-    throw redirect("/login", {
-      status: 401,
-    });
+    throw redirect("/login");
   }
 
   return user;

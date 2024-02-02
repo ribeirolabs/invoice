@@ -36,18 +36,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   return typedjson({
-    user,
     invoice,
   });
 }
 
 export default function Page() {
-  const { invoice, user } = useTypedLoaderData<typeof loader>();
+  const { invoice } = useTypedLoaderData<typeof loader>();
 
   return (
     <>
-      <Header user={user} />
-
       <main
         data-theme="light"
         className="max-content flex flex-col gap-5 flex-1 w-full min-h-screen !py-8 !px-6 print:!px-12 "

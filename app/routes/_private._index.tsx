@@ -3,7 +3,7 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
-import { authenticator } from "~/services/auth.server";
+import { authenticator, requireUser } from "~/services/auth.server";
 import {
   DocumentIcon,
   DocumentOutlineIcon,
@@ -21,29 +21,20 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await authenticator.isAuthenticated(request);
-
-  if (!user) {
-    throw redirect("/login");
-  }
-
+  const user = await requireUser(request);
   const invoices = await getRecentInvoicesGrouped(user.id);
 
   return typedjson({
-    user,
     invoices,
   });
 }
 
 export default function Index() {
-  const data = useTypedLoaderData<typeof loader>();
-
   return (
-    <div>
-      <Header user={data.user} />
+    <>
       <PendingSection />
       <RecentSection />
-    </div>
+    </>
   );
 }
 

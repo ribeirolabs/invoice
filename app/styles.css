@@ -49,7 +49,11 @@
   }
 
   .hero-icon {
-    @apply bg-base-200 flex-grow-0 flex-shrink-0;
+    @apply flex-grow-0 flex-shrink-0;
+
+    div:first-child {
+      @apply bg-base-200;
+    }
 
     .badge {
       @apply badge-neutral text-white;
@@ -70,7 +74,7 @@
 
 @layer utilities {
   .max-content {
-    @apply max-w-screen-lg mx-auto px-2 md:px-4 lg:px-0;
+    @apply max-w-screen-lg mx-auto px-2 md:px-4 xl:px-0;
   }
 
   .btn-sm,
@@ -152,7 +156,9 @@
   }
 
   .hero-icon-primary {
-    @apply bg-primary/10 text-primary;
+    div:first-child {
+      @apply bg-primary/10 text-primary;
+    }
 
     .badge {
       @apply badge-primary;
@@ -160,7 +166,9 @@
   }
 
   .hero-icon-secondary {
-    @apply bg-secondary/10 text-secondary;
+    div:first-child {
+      @apply bg-secondary/10 text-secondary;
+    }
 
     .badge {
       @apply badge-secondary;

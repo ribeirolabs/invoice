@@ -61,32 +61,35 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="p-8 text-center">
-        <h1 className="text-4xl font-black">
-          {isRouteErrorResponse(error) ? (
-            <>
-              <span className="text-base-content/50 block">{error.status}</span>{" "}
-              <span>
-                {ERROR_TRANSLATION[error.statusText] ?? error.statusText}
-              </span>
-            </>
-          ) : error instanceof Error ? (
-            error.message
-          ) : (
-            "Erro Desconhecido"
-          )}
-        </h1>
-
-        <p>
-          <a href="/" className="link link-secondary font-semibold">
-            Voltar
-          </a>{" "}
-          para página inicial
-        </p>
-
+      <body className="p-8">
+        <Logo variant="full" className="text-md" />
         <div className="divider" />
 
-        <Logo variant="full" className="text-md" />
+        <main className="text-center">
+          <h1 className="text-4xl font-black">
+            {isRouteErrorResponse(error) ? (
+              <>
+                <span className="text-base-content/50 block">
+                  {error.status}
+                </span>{" "}
+                <span>
+                  {ERROR_TRANSLATION[error.statusText] ?? error.statusText}
+                </span>
+              </>
+            ) : error instanceof Error ? (
+              error.message
+            ) : (
+              "Erro Desconhecido"
+            )}
+          </h1>
+
+          <p className="mt-2">
+            <a href="/" className="link link-secondary font-semibold">
+              Voltar
+            </a>{" "}
+            para página inicial
+          </p>
+        </main>
 
         <Scripts />
         <LiveReload />

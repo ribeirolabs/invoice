@@ -25,7 +25,7 @@ export function cookieToObject(cookies: string): Record<string, string> {
 export function cn(
   ...args: (string | false | null | undefined | string[])[]
 ): string {
-  return twJoin(...args);
+  return twMerge(...args);
 }
 
 export function formatCurrency(amount: number, currency: string) {

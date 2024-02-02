@@ -1,22 +1,20 @@
 import { User } from "@prisma/client";
 import {
   ChevronDownIcon,
-  DocumentCheckIcon,
+  CompaniesIcon,
+  CompaniesOutlineIcon,
   DocumentPlusIcon,
-  DownloadIcon,
   LogoutIcon,
-  SendIcon,
-  TrashIcon,
   UserCircleIcon,
 } from "./Icons";
 import { Logo } from "./Logo";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { ReactNode } from "react";
+import { Portal } from "./Portal";
 
 export function Header({ user }: { user: User }) {
   return (
     <header className="print:hidden sticky w-full top-0 z-30 bg-neutral-900">
-      <div className="max-content flex-1 navbar py-0 -min-h-fit relative -min-h-0">
+      <div className="max-content flex-1 navbar py-0 relative">
         <div className="flex-1">
           <Logo />
         </div>
@@ -30,7 +28,7 @@ export function Header({ user }: { user: User }) {
 
           <label
             htmlFor="setting-drawer"
-            className="btn gap-1 px-1.5 bg-base-100 hover:bg-neutral-700 border-transparent avatar max-sm:drawer-button"
+            className="btn gap-0 px-1.5 bg-base-100 hover:bg-neutral-700 border-transparent avatar max-sm:drawer-button"
           >
             <UserCircleIcon className="icon-xl" />
             <ChevronDownIcon />
@@ -44,19 +42,32 @@ export function Header({ user }: { user: User }) {
             />
             <ul
               tabIndex={0}
-              className="sm:mt-1 p-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
+              className="header-actions p-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
             >
-              <li className="p-2 flex flex-col overflow-hidden">
-                <span className="font-bold">{user.name}</span>
-                <span className="text-dim text-sm text-ellipsis overflow-hidden">
-                  {user.email}
-                </span>
+              <li className="flex py-2 gap-2 overflow-hidden items-center">
+                <div className="w-8 aspect-square rounded-full bg-neutral-700 overflow-hidden">
+                  {user.image && <img src={user.image} />}
+                </div>
+                <div className="overflow-hidden">
+                  <div className="font-bold leading-none">{user.name}</div>
+                  <div className="text-dim text-sm text-ellipsis overflow-hidden">
+                    {user.email}
+                  </div>
+                </div>
               </li>
-
-              <div id="sidebar-actions" />
 
               <li>
                 <div className="divider m-0" />
+              </li>
+
+              <li>
+                <a
+                  href="/companies"
+                  className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
+                >
+                  <CompaniesIcon />
+                  <span>Empresas</span>
+                </a>
               </li>
 
               <li>
@@ -68,11 +79,13 @@ export function Header({ user }: { user: User }) {
                   <span>Sair</span>
                 </a>
               </li>
+
+              <div id="sidebar-actions" />
             </ul>
           </div>
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full">
+        <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full bg-neutral-800">
           <a
             href="/genearate"
             className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
@@ -84,11 +97,6 @@ export function Header({ user }: { user: User }) {
           </a>
         </div>
       </div>
-
-      <div
-        className="w-full bg-neutral-800 border-b border-base-300 fixed bottom-0"
-        id="action-bar"
-      />
     </header>
   );
 }
@@ -106,69 +114,9 @@ export function Actions({
         <div className="divider m-0" />
       </li>
       <li className="menu-title">{title}</li>
-
-      <li>
-        <a
-          href="#"
-          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
-        >
-          <DownloadIcon /> PDF
-        </a>
-      </li>
-      <li>
-        <a
-          href="#"
-          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
-        >
-          <SendIcon /> Enviar
-        </a>
-      </li>
-      <li>
-        <a
-          href="#"
-          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
-        >
-          <DocumentCheckIcon /> Concluir
-        </a>
-      </li>
-      <li>
-        <a
-          href="#"
-          className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
-        >
-          <TrashIcon /> Remover
-        </a>
-      </li>
+      {children}
     </Portal>
   );
 }
 
 Header.Actions = Actions;
-
-function Portal({
-  children,
-  selector,
-}: {
-  children: ReactNode;
-  selector: string;
-}) {
-  const element = useRef<HTMLElement | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    element.current = document.querySelector(selector);
-
-    if (!element.current) {
-      console.error(`[Portal] element not found: ${selector}`);
-      return;
-    }
-
-    setReady(true);
-  }, [selector]);
-
-  if (!element.current || !ready) {
-    return null;
-  }
-
-  return createPortal(children, element.current);
-}

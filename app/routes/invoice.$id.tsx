@@ -1,6 +1,5 @@
 import { format } from "date-fns";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { createPortal, flushSync } from "react-dom";
+import { ReactNode } from "react";
 import { LoaderFunctionArgs } from "react-router";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
@@ -12,8 +11,9 @@ import {
   SendIcon,
   TrashIcon,
 } from "~/components/Icons";
+import { InvoiceStatus } from "~/data/invoice";
+import { getDetailedInvoice } from "~/data/invoice.server";
 import { requireUser } from "~/services/auth.server";
-import prisma from "~/services/prisma.server";
 import { formatCurrency } from "~/utils";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -26,21 +26,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     });
   }
 
-  const invoice = await prisma.invoice.findFirst({
-    where: {
-      id: params.id,
-      userId: user.id,
-    },
-    include: {
-      receiver: true,
-      payer: true,
-    },
-  });
+  const invoice = await getDetailedInvoice(params.id, user.id);
 
   if (!invoice) {
     throw new Response(null, {
       status: 404,
-      statusText: "Invoice not found",
+      statusText: "Invoice não encontrada",
     });
   }
 
@@ -126,30 +117,31 @@ export default function Page() {
         </footer>
       </main>
 
-      <Header.Actions title="Invoice" />
-
-      <Portal selector="#action-bar">
-        <div className="max-content py-2 flex justify-between">
-          <button className="btn btn-md max-sm:btn-circle">
-            <TrashIcon />
-            <span className="hidden md:block">Remover</span>
+      <Header.Actions title="Invoice">
+        <li>
+          <a
+            href={`/invoice/${invoice.id}.pdf`}
+            download={`${invoice.number}.pdf`}
+          >
+            <DownloadIcon /> PDF
+          </a>
+        </li>
+        <li>
+          <button>
+            <SendIcon /> Enviar
           </button>
-          <div className="flex gap-1">
-            <button className="btn btn-md max-sm:btn-circle">
-              <DownloadIcon />
-              <span className="hidden md:block">PDF</span>
-            </button>
-            <button className="btn btn-md max-sm:btn-circle">
-              <SendIcon />
-              <span className="hidden md:block">Enviar</span>
-            </button>
-            <button className="btn btn-md max-sm:btn-circle">
-              <DocumentCheckIcon />
-              <span className="hidden md:block">Concluir</span>
-            </button>
-          </div>
-        </div>
-      </Portal>
+        </li>
+        <li>
+          <button disabled={invoice.status === InvoiceStatus.PAID}>
+            <DocumentCheckIcon /> Concluir
+          </button>
+        </li>
+        <li>
+          <button>
+            <TrashIcon /> Remover
+          </button>
+        </li>
+      </Header.Actions>
     </>
   );
 }
@@ -160,32 +152,4 @@ function InfoLabel({ children }: { children: ReactNode }) {
 
 function InfoValue({ children }: { children: ReactNode }) {
   return <p className="text-dim">{children}</p>;
-}
-
-function Portal({
-  children,
-  selector,
-}: {
-  children: ReactNode;
-  selector: string;
-}) {
-  const element = useRef<HTMLElement | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    element.current = document.querySelector(selector);
-
-    if (!element.current) {
-      console.error(`[Portal] element not found: ${selector}`);
-      return;
-    }
-
-    setReady(true);
-  }, [selector]);
-
-  if (!element.current || !ready) {
-    return null;
-  }
-
-  return createPortal(children, element.current);
 }

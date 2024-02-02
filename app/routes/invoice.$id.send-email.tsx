@@ -38,7 +38,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!invoice) {
     throw new Response(null, {
       status: 404,
-      statusText: "Invoice not found",
+      statusText: "Invoice não encontrada",
     });
   }
 

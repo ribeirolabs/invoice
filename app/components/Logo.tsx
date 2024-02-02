@@ -2,11 +2,13 @@ import { cn } from "~/utils";
 
 export function Logo({
   variant = "responsive",
+  className,
 }: {
   variant?: "responsive" | "full" | "short";
+  className?: string;
 }) {
   return (
-    <a href="/" className="text-xl">
+    <a href="/" className={cn("text-xl", className)}>
       {variant !== "short" && (
         <span
           className={cn(

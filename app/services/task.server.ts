@@ -1,4 +1,4 @@
-import { Task } from "@prisma/client";
+import { Task, TaskSubject } from "@prisma/client";
 import prisma from "./prisma.server";
 
 export async function getPendingTasks(userId: string): Promise<Task[]> {
@@ -9,4 +9,13 @@ export async function getPendingTasks(userId: string): Promise<Task[]> {
   });
 
   return tasks;
+}
+
+export async function populateInitialTasks(userId: string): Promise<void> {
+  await prisma.task.create({
+    data: {
+      userId,
+      subject: TaskSubject.MissingCompanies,
+    },
+  });
 }

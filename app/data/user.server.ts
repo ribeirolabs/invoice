@@ -3,6 +3,7 @@ import { GoogleExtraParams, GoogleProfile } from "remix-auth-google";
 import invariant from "tiny-invariant";
 import { refreshAccessToken } from "~/services/google.server";
 import prisma from "~/services/prisma.server";
+import { populateInitialTasks } from "~/services/task.server";
 import { getTimezone } from "~/utils";
 
 export type UserWithAccessToken = User & {
@@ -91,6 +92,7 @@ export async function loginUser(
 
   if (!user) {
     user = await signupUser(auth);
+    await populateInitialTasks(user.id);
   }
 
   await prisma.account.update({

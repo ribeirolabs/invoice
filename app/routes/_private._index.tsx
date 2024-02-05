@@ -4,7 +4,6 @@ import {
   ArrowRightIcon,
   CompaniesIcon,
   DocumentOutlineIcon,
-  SparkleIcon,
 } from "~/components/Icons";
 import {
   getPendingInvoices,
@@ -48,6 +47,10 @@ export default function Index() {
 
 function PendingSection() {
   const { tasks, pendingInvoices } = useTypedLoaderData<typeof loader>();
+
+  if (tasks.length === 0 && pendingInvoices.length === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -98,20 +101,6 @@ function PendingSection() {
           {pendingInvoices.map((invoice) => (
             <InvoiceCard key={invoice.id} invoice={invoice} />
           ))}
-
-          {tasks.length === 0 && (
-            <Card className="p-3 flex gap-4 items-start justify-between">
-              <div>
-                <h3 className="font-serif font-bold text-xl">
-                  Nenhuma pendência
-                </h3>
-                <p className="text-dim leading-tight text-sm">
-                  Aqui você poderá consultar as invoices não foram concluídas.
-                </p>
-              </div>
-              <HeroIcon icon={SparkleIcon} className="text-neutral-400" />
-            </Card>
-          )}
         </div>
       </div>
     </div>

@@ -154,8 +154,12 @@ export default function Generate() {
   const latestInvoice = fetcher.data?.invoice;
   const latestId = latestInvoice?.id ?? "default";
 
+  const hasCompanies = fromUser.length > 0 && fromOther.length > 0;
+
   return (
     <FormPage title="Invoice" icon={DocumentPlusIcon}>
+      {hasCompanies ? null : <CompaniesAlert />}
+
       <ValidatedForm
         validator={VALIDATORS.generate}
         method="post"
@@ -251,6 +255,7 @@ export default function Generate() {
               name="intent"
               value={INTENTS.generate}
               className="btn btn-primary"
+              disabled={!hasCompanies}
             >
               <CheckCircleIcon /> Confirmar
             </button>
@@ -258,5 +263,41 @@ export default function Generate() {
         </div>
       </ValidatedForm>
     </FormPage>
+  );
+}
+
+function CompaniesAlert() {
+  return (
+    <div className="alert alert-error mb-4 leading-tight">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="icon icon-xl"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M13.39 3.284a3.546 3.546 0 0 0-2.78 0C7.96 4.412 1.695 14.422 1.88 17.097a3.63 3.63 0 0 0 1.424 2.645c2.212 1.677 15.181 1.677 17.394 0a3.63 3.63 0 0 0 1.424-2.645c.184-2.675-6.08-12.685-8.731-13.813Z"
+          opacity=".28"
+        />
+        <path
+          fill="currentColor"
+          d="M10.232 10.293a1 1 0 0 0-1.414 1.414l1.768 1.768-1.768 1.768a1 1 0 0 0 1.414 1.414L12 14.889l1.768 1.768a1 1 0 0 0 1.414-1.414l-1.768-1.768 1.768-1.768a1 1 0 0 0-1.414-1.414L12 12.06l-1.768-1.768Z"
+        />
+      </svg>
+      <div>
+        <p>
+          Você ainda não cadastrou nenhuma empresa, não é possível criar uma
+          invoice.
+        </p>
+
+        <a href="/companies/new" className="block underline mt-2 font-medium">
+          Cadastrar empresa
+        </a>
+      </div>
+    </div>
   );
 }

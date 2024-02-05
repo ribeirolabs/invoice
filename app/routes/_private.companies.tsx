@@ -5,9 +5,11 @@ import { Card } from "~/components/Card";
 import { HeroIcon } from "~/components/HeroIcon";
 import {
   AtIcon,
+  CompaniesIcon,
   CompaniesOutlineIcon,
   LinkSlantIcon,
   PencilIcon,
+  PlusIcon,
   TrashIcon,
 } from "~/components/Icons";
 import { requireUser } from "~/services/auth.server";
@@ -35,9 +37,17 @@ export default function Companies() {
   const { companies } = useTypedLoaderData<typeof loader>();
 
   return (
-    <div className="py-3">
+    <div className="py-3 mt-4">
       <div className="max-content">
-        <h1 className="text-2xl font-bold mb-4">Empresas</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold mb-4 flex gap-2 items-end leading-none">
+            <CompaniesIcon className="icon-lg" /> Empresas
+          </h1>
+
+          <a href="/companies/new" className="btn btn-sm">
+            <PlusIcon className="icon-sm" /> Adicionar
+          </a>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-2">
           {companies.map(({ company, ...info }) => (

@@ -76,7 +76,7 @@ export default function CreateCompany() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-3 max-w-xl mx-auto mt-4">
+    <div className="max-content lg:!max-w-xl lg:mx-auto mt-4">
       <div>
         <h1 className="text-2xl font-bold flex gap-2 items-end leading-none">
           <CompaniesIcon className="icon-lg" /> Empresa

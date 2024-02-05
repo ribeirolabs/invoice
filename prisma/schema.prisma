@@ -78,6 +78,7 @@ model User {
   shared               CompaniesOnUsers[] @relation("sharedBy")
   accountTransfersFrom AccountTransfer[]  @relation("from")
   accountTransfersTo   AccountTransfer[]  @relation("to")
+  tasks                Task[]
 }
 
 model VerificationToken {
@@ -170,4 +171,21 @@ model InvoiceEmailHistory {
   updatedAt DateTime @updatedAt
 
   @@index([invoiceId])
+}
+
+enum TaskSubject {
+  MissingCompanies
+}
+
+model Task {
+  id      String      @id @default(cuid())
+  subject TaskSubject
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }

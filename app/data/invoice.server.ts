@@ -1,32 +1,61 @@
 import prisma from "~/services/prisma.server";
 import { InvoiceStatus } from "./invoice";
-import { Invoice } from "@prisma/client";
+import { Company, Invoice, Prisma } from "@prisma/client";
 
-export type InvoiceFull = Awaited<
-  ReturnType<typeof getRecentInvoices>
->[number] & {
-  status: InvoiceStatus;
+const FULL_INVOICE: Prisma.InvoiceInclude = {
+  payer: true,
+  receiver: true,
+  _count: {
+    select: {
+      emailHistory: true,
+    },
+  },
 };
 
-export async function getRecentInvoices(userId: string) {
-  return prisma.invoice.findMany({
+export type InvoiceFull = Invoice & {
+  payer: Company;
+  receiver: Company;
+  status: InvoiceStatus;
+  _count: {
+    emailHistory: number;
+  };
+};
+
+export async function getRecentFullfilledInvoices(
+  userId: string
+): Promise<InvoiceFull[]> {
+  const invoices = await prisma.invoice.findMany({
     where: {
       userId,
-    },
-    include: {
-      payer: true,
-      receiver: true,
-      _count: {
-        select: {
-          emailHistory: true,
-        },
+      NOT: {
+        fullfilledAt: null,
       },
     },
+    include: FULL_INVOICE,
     take: 10,
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  return invoices.map(addStatus);
+}
+
+export async function getPendingInvoices(
+  userId: string
+): Promise<InvoiceFull[]> {
+  const invoices = await prisma.invoice.findMany({
+    where: {
+      userId,
+      fullfilledAt: null,
+    },
+    include: FULL_INVOICE,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return invoices.map(addStatus);
 }
 
 function addStatus(invoice: Omit<InvoiceFull, "status">): InvoiceFull {
@@ -42,28 +71,6 @@ function addStatus(invoice: Omit<InvoiceFull, "status">): InvoiceFull {
   };
 }
 
-export async function getRecentInvoicesGrouped(userId: string) {
-  const invoices = await getRecentInvoices(userId);
-
-  const pending: InvoiceFull[] = [];
-  const fullfilled: InvoiceFull[] = [];
-
-  for (const invoice of invoices) {
-    const transformed = addStatus(invoice);
-
-    if (invoice.fullfilledAt) {
-      fullfilled.push(transformed);
-    } else {
-      pending.push(transformed);
-    }
-  }
-
-  return {
-    pending,
-    fullfilled,
-  };
-}
-
 export async function getDetailedInvoice(
   id: string,
   userId: string
@@ -73,15 +80,7 @@ export async function getDetailedInvoice(
       id,
       userId: userId,
     },
-    include: {
-      receiver: true,
-      payer: true,
-      _count: {
-        select: {
-          emailHistory: true,
-        },
-      },
-    },
+    include: FULL_INVOICE,
   });
 
   if (!invoice) {

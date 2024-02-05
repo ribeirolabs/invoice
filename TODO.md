@@ -1,7 +1,10 @@
 # Global
-- [ ] Add `locale` to Company instead of using `currency`, that way we can localize the invoice.
+- [ ] Populate `Task` on signup with tasks to create companies
+- [ ] Have `Task` to create owned/not owned companies
+- [ ] Add `locale` to Company instead of using `currency`, that way we can localize the invoice
 - [ ] Change "delete" to "archive"
 - [ ] Notification system (?)
+- [x] Generic pending items instead of invoices only
 
 # Invoice
 - [ ] Finalize generating Invoice

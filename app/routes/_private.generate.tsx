@@ -227,7 +227,7 @@ export default function Generate() {
         <div className="grid lg:grid-cols-2 gap-3">
           <InputGroup name="amount" label="Valor">
             <div className="join">
-              <div className="join-item bg-base-300 grid place-items-center w-12">
+              <div className="join-item bg-base-300 grid place-items-center w-14">
                 {latestInvoice?.currency &&
                   getCurrencySymbol(latestInvoice.currency)}
               </div>

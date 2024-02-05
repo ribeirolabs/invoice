@@ -42,7 +42,16 @@ export function dateToDistance(date: Date | string) {
   });
 }
 
-export function getCurrencySymbol(currency = "USD") {
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  BRL: "R$",
+};
+
+export function getCurrencySymbol(currency = "USD"): string {
+  if (currency in CURRENCY_SYMBOLS) {
+    return CURRENCY_SYMBOLS[currency];
+  }
+
   return (
     new Intl.NumberFormat(getLocale(), {
       style: "currency",

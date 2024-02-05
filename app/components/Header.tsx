@@ -87,12 +87,12 @@ export function Header({ user }: { user: User }) {
 
         <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full bg-neutral-800">
           <a
-            href="/genearate"
+            href="/generate"
             className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
           >
             <DocumentPlusIcon />
             <span className="hidden md:block whitespace-nowrap transition-all text-end">
-              Adicionar
+              Invoice
             </span>
           </a>
         </div>

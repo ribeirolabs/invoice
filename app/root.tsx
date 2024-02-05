@@ -10,7 +10,6 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import styles from "~/styles.css";
-import { Header } from "./components/Header";
 import { Logo } from "./components/Logo";
 
 export const links: LinksFunction = () => [

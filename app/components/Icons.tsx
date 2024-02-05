@@ -27,6 +27,10 @@ export function ArrowRightIcon({ className }: IconProps) {
   return <ArrowDownIcon className={cn(className, "-rotate-90")} />;
 }
 
+export function ArrowLeftIcon({ className }: IconProps) {
+  return <ArrowDownIcon className={cn(className, "rotate-90")} />;
+}
+
 export function DocumentPlusIcon({ className }: IconProps) {
   return (
     <svg

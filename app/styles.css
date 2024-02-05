@@ -70,6 +70,10 @@
       @apply flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium cursor-pointer w-full;
     }
   }
+
+  .label {
+    @apply py-1;
+  }
 }
 
 @layer utilities {

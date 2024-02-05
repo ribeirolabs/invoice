@@ -4,8 +4,8 @@ import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Card } from "~/components/Card";
 import { HeroIcon } from "~/components/HeroIcon";
 import {
+  AtIcon,
   CompaniesOutlineIcon,
-  EmailOutlineIcon,
   LinkSlantIcon,
   PencilIcon,
   TrashIcon,
@@ -76,13 +76,13 @@ export default function Companies() {
                     )}
                   </div>
                   <div className="flex gap-1 items-center overflow-hidden">
-                    <EmailOutlineIcon className="icon-md" />
+                    <AtIcon />
                     <div className="flex flex-col">
                       <div className="text-ellipsis overflow-hidden font-bold -leading-none">
                         {company.email.split("@")[0]}
                       </div>
                       <div className="text-sm text-dim leading-none">
-                        @{company.email.split("@")[1]}
+                        {company.email.split("@")[1]}
                       </div>
                     </div>
                   </div>

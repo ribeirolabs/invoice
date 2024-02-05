@@ -41,3 +41,14 @@ export function dateToDistance(date: Date | string) {
     addSuffix: true,
   });
 }
+
+export function getCurrencySymbol(currency = "USD") {
+  return (
+    new Intl.NumberFormat(getLocale(), {
+      style: "currency",
+      currency,
+    })
+      .formatToParts(1)
+      .find((part) => part.type === "currency")?.value ?? "$"
+  );
+}

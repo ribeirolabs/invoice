@@ -74,6 +74,10 @@
   .label {
     @apply py-1;
   }
+
+  [type="checkbox"].toggle {
+    @apply rounded;
+  }
 }
 
 @layer utilities {
@@ -186,5 +190,10 @@
   .header-actions li > a:disabled,
   .header-actions li > button:disabled {
     @apply btn-disabled bg-base-content/10 opacity-40;
+  }
+
+  [type="checkbox"].toggle.toggle-xl {
+    --handleoffset: 4rem;
+    @apply h-12 w-32;
   }
 }

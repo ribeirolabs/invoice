@@ -1,20 +1,21 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { format } from "date-fns";
-import { FormEvent, ReactNode } from "react";
+import { FormEvent } from "react";
 import {
   redirect,
   typedjson,
   useTypedFetcher,
   useTypedLoaderData,
 } from "remix-typedjson";
-import { ValidatedForm, useField, validationError } from "remix-validated-form";
+import { ValidatedForm, validationError } from "remix-validated-form";
 import { z } from "zod";
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
   DocumentPlusIcon,
 } from "~/components/Icons";
+import { InputGroup } from "~/components/InputGroup";
 import { requireUser } from "~/services/auth.server";
 import prisma from "~/services/prisma.server";
 import { cn, getCurrencySymbol } from "~/utils";
@@ -263,32 +264,5 @@ export default function Generate() {
         </div>
       </ValidatedForm>
     </div>
-  );
-}
-
-function InputGroup({
-  children,
-  label,
-  name,
-}: {
-  children: ReactNode;
-  label: string;
-  name: string;
-}) {
-  const { error } = useField(name);
-  return (
-    <label className="form-control w-full group" aria-invalid={Boolean(error)}>
-      <div className="label">
-        <span className="label-text font-bold">{label}</span>
-      </div>
-
-      {children}
-
-      {error && (
-        <div className="flex justify-end mt-1">
-          <div className="label-text text-error">{error}</div>
-        </div>
-      )}
-    </label>
   );
 }

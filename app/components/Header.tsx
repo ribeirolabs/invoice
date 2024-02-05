@@ -1,9 +1,11 @@
 import { User } from "@prisma/client";
 import {
+  CancelIcon,
   ChevronDownIcon,
   CompaniesIcon,
   CompaniesOutlineIcon,
   DocumentPlusIcon,
+  HamburgerIcon,
   LogoutIcon,
   UserCircleIcon,
 } from "./Icons";
@@ -14,8 +16,8 @@ import { Portal } from "./Portal";
 export function Header({ user }: { user: User }) {
   return (
     <header className="print:hidden sticky w-full top-0 z-30 bg-neutral-900">
-      <div className="max-content flex-1 navbar py-0 relative">
-        <div className="flex-1">
+      <div className="max-content flex-1 navbar !p-0 relative">
+        <div className="flex-1 px-1">
           <Logo />
         </div>
 
@@ -28,10 +30,9 @@ export function Header({ user }: { user: User }) {
 
           <label
             htmlFor="setting-drawer"
-            className="btn gap-0 px-1.5 bg-base-100 hover:bg-neutral-700 border-transparent avatar max-sm:drawer-button"
+            className="btn gap-0 btn-circle btn-ghost max-sm:drawer-button"
           >
-            <UserCircleIcon className="icon-xl" />
-            <ChevronDownIcon />
+            <HamburgerIcon />
           </label>
 
           <div className="max-sm:drawer-side overflow-x-hidden dropdown-content z-40">
@@ -42,22 +43,30 @@ export function Header({ user }: { user: User }) {
             />
             <ul
               tabIndex={0}
-              className="header-actions p-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
+              className="header-actions shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
             >
-              <li className="flex py-2 gap-2 overflow-hidden items-center">
-                <div className="w-8 aspect-square rounded-full bg-neutral-700 overflow-hidden">
+              <li className="flex flex-col p-2 gap-2 overflow-hidden items-center">
+                <div className="w-16 aspect-square rounded-full bg-neutral-700 overflow-hidden">
                   {user.image && <img src={user.image} />}
                 </div>
-                <div className="overflow-hidden">
+                <div className="overflow-hidden text-center">
                   <div className="font-bold leading-none">{user.name}</div>
                   <div className="text-dim text-sm text-ellipsis overflow-hidden">
                     {user.email}
                   </div>
                 </div>
+
+                <label
+                  htmlFor="setting-drawer"
+                  aria-label="close sidebar"
+                  className="sm:hidden btn btn-circle btn-ghost absolute right-1 top-1"
+                >
+                  <CancelIcon />
+                </label>
               </li>
 
               <li>
-                <div className="divider m-0" />
+                <div className="divider" />
               </li>
 
               <li>

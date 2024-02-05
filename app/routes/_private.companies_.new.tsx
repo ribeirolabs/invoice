@@ -4,6 +4,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { redirect, typedjson } from "remix-typedjson";
 import { ValidatedForm, validationError } from "remix-validated-form";
 import { z } from "zod";
+import { FormPage } from "~/components/FormPage";
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -76,14 +77,7 @@ export default function CreateCompany() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-content lg:!max-w-xl lg:mx-auto mt-4">
-      <div>
-        <h1 className="text-2xl font-bold flex gap-2 items-end leading-none">
-          <CompaniesIcon className="icon-lg" /> Empresa
-        </h1>
-        <div className="divider" />
-      </div>
-
+    <FormPage title="Empresa" icon={CompaniesIcon}>
       <ValidatedForm validator={validator} method="post" className="grid gap-5">
         <InputGroup name="name" label="Razão Social">
           <input
@@ -169,6 +163,6 @@ export default function CreateCompany() {
           </div>
         </div>
       </ValidatedForm>
-    </div>
+    </FormPage>
   );
 }

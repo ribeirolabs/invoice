@@ -10,6 +10,7 @@ import {
 } from "remix-typedjson";
 import { ValidatedForm, validationError } from "remix-validated-form";
 import { z } from "zod";
+import { FormPage } from "~/components/FormPage";
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -154,14 +155,7 @@ export default function Generate() {
   const latestId = latestInvoice?.id ?? "default";
 
   return (
-    <div className="p-3 max-w-xl mx-auto mt-4">
-      <div>
-        <h1 className="text-2xl font-bold flex gap-2">
-          <DocumentPlusIcon className="icon-lg" /> Invoice
-        </h1>
-        <div className="divider" />
-      </div>
-
+    <FormPage title="Invoice" icon={DocumentPlusIcon}>
       <ValidatedForm
         validator={VALIDATORS.generate}
         method="post"
@@ -263,6 +257,6 @@ export default function Generate() {
           </div>
         </div>
       </ValidatedForm>
-    </div>
+    </FormPage>
   );
 }

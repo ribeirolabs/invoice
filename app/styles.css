@@ -40,6 +40,7 @@
   }
 
   .divider {
+    height: 1px;
     margin: 0.5rem 0;
   }
 
@@ -190,6 +191,10 @@
   .header-actions li > a:disabled,
   .header-actions li > button:disabled {
     @apply btn-disabled bg-base-content/10 opacity-40;
+  }
+
+  .header-actions li:has(a[href], button) {
+    @apply px-2;
   }
 
   [type="checkbox"].toggle.toggle-xl {

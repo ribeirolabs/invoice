@@ -84,7 +84,7 @@ export default function Companies() {
                       {company.name}
                     </h3>
                     {company.alias && (
-                      <h4 className="font-bold text-dim">{company.alias}</h4>
+                      <h4 className="font-medium text-dim">{company.alias}</h4>
                     )}
                   </div>
                   <div className="flex gap-1 items-center overflow-hidden">
@@ -93,7 +93,7 @@ export default function Companies() {
                       <div className="text-ellipsis overflow-hidden font-bold -leading-none">
                         {company.email.split("@")[0]}
                       </div>
-                      <div className="text-sm text-dim leading-none">
+                      <div className="text-sm text-dim">
                         {company.email.split("@")[1]}
                       </div>
                     </div>

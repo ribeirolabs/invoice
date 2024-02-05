@@ -28,7 +28,11 @@ export const gooleStrategy = new GoogleStrategy(
       "https://www.googleapis.com/auth/gmail.send",
     ],
   },
-  loginUser
+  (auth) =>
+    loginUser(auth).catch((e) => {
+      console.error(e);
+      throw e;
+    })
 );
 
 export async function refreshAccessToken(refreshToken: string) {

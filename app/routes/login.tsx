@@ -30,9 +30,9 @@ export default function Login() {
   return (
     <Form
       method="post"
-      className="flex flex-col items-center justify-center h-full"
+      className="flex flex-col gap-2 items-center justify-center h-screen"
     >
-      <div className="text-xl">
+      <div className="text-lg">
         <span className="text-neutral-500">ribeirolabs</span>
         <span className="font-bold text-primary"> / invoice</span>
       </div>

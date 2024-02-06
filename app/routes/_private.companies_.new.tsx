@@ -1,3 +1,4 @@
+import { TaskSubject, UserType } from "@prisma/client";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
@@ -52,22 +53,62 @@ const validator = withZod(
       .email("Email inválido")
       .min(1, { message: "Campo obrigatório" }),
     address: z.string().min(1, { message: "Campo obrigatório" }),
-    owner: z.boolean({
-      required_error: "Campo obrigatório",
-      invalid_type_error: "Campo inválido",
-    }),
+    owner: z
+      .string()
+      .optional()
+      .transform((value) => (value === "on" ? true : false)),
     currency: z.enum(["BRL", "USD"]),
     invoiceNumberPattern: z.string().min(1, { message: "Campo obrigatório" }),
   })
 );
 
 export async function action({ request }: ActionFunctionArgs) {
-  const data = await request.formData();
+  const user = await requireUser(request);
+  const payload = await request.formData();
 
-  const result = await validator.validate(data);
+  const result = await validator.validate(payload);
 
   if (result.error) {
     throw validationError(result.error);
+  }
+
+  const { owner, ...data } = result.data;
+
+  await prisma.company.create({
+    data: {
+      ...data,
+      users: {
+        create: {
+          owner,
+          type: UserType.OWNED,
+          userId: user.id,
+        },
+      },
+    },
+  });
+
+  const companiesCountByOwner = await prisma.$queryRaw<
+    { owner: number; count: BigInt }[]
+  >`
+SELECT owner, count(owner) as count FROM CompaniesOnUsers
+WHERE userId = ${user.id}
+GROUP BY owner`;
+
+  const grouped = companiesCountByOwner.reduce(
+    (acc, item) => {
+      acc[item.owner ? "owner" : "other"] = Number(item.count);
+      return acc;
+    },
+    { owner: 0, other: 0 }
+  );
+
+  if (grouped.owner > 0 && grouped.other > 0) {
+    await prisma.task.deleteMany({
+      where: {
+        userId: user.id,
+        subject: TaskSubject.MissingCompanies,
+      },
+    });
   }
 
   return redirect("/companies");
@@ -115,7 +156,11 @@ export default function CreateCompany() {
         <div className="grid grid-cols-2 gap-3">
           <InputGroup name="owner" label="Proprietário">
             <div className="relative h-12 w-fit">
-              <input type="checkbox" className="toggle toggle-xl" />
+              <input
+                type="checkbox"
+                name="owner"
+                className="toggle toggle-xl"
+              />
 
               <div className="flex items-center absolute left-0 top-0 w-full h-full pointer-events-none">
                 <div className="flex-1 grid place-items-center text-base-100">

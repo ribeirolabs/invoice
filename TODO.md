@@ -13,10 +13,11 @@
 - [ ] Invoice actions (fullfill, send, delete)
 
 # Company
-- [ ] Finalize creating Company
 - [ ] Company actions (delete, edit)
 - [ ] Empty state
 - [ ] Invoice Number Pattern field
+- [x] Finalize creating Company
+- [x] Remove pending company tasks when creating companies
 
 # Profile
 - [ ] Edit profile

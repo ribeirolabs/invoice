@@ -39,7 +39,7 @@ export default function Companies() {
   return (
     <div className="py-3 mt-4">
       <div className="max-content">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold flex gap-2 items-end leading-none">
             <CompaniesIcon className="icon-lg" /> Empresas
           </h1>
@@ -49,7 +49,7 @@ export default function Companies() {
           </a>
         </div>
 
-        <div className="divider" />
+        <div className="divider mb-6" />
 
         <div className="grid lg:grid-cols-2 gap-2">
           {companies.map(({ company, ...info }) => (

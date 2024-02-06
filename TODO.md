@@ -1,6 +1,6 @@
 # Global
+- [ ] Have individual `Tasks` to create owned/not owned companies
 - [ ] Make `en` default language
-- [ ] Have `Task` to create owned/not owned companies
 - [ ] Add `locale` to Company instead of using `currency`, that way we can localize the invoice
 - [ ] Change "delete" to "archive"
 - [ ] Notification system (?)

@@ -1,10 +1,11 @@
 # Global
-- [ ] Populate `Task` on signup with tasks to create companies
+- [ ] Make `en` default language
 - [ ] Have `Task` to create owned/not owned companies
 - [ ] Add `locale` to Company instead of using `currency`, that way we can localize the invoice
 - [ ] Change "delete" to "archive"
 - [ ] Notification system (?)
 - [x] Generic pending items instead of invoices only
+- [x] Populate `Task` on signup with tasks to create companies
 
 # Invoice
 - [ ] Finalize generating Invoice
@@ -15,6 +16,7 @@
 - [ ] Finalize creating Company
 - [ ] Company actions (delete, edit)
 - [ ] Empty state
+- [ ] Invoice Number Pattern field
 
 # Profile
 - [ ] Edit profile

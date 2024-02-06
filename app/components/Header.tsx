@@ -1,13 +1,10 @@
 import { User } from "@prisma/client";
 import {
   CancelIcon,
-  ChevronDownIcon,
   CompaniesIcon,
-  CompaniesOutlineIcon,
   DocumentPlusIcon,
   HamburgerIcon,
   LogoutIcon,
-  UserCircleIcon,
 } from "./Icons";
 import { Logo } from "./Logo";
 import { ReactNode } from "react";
@@ -22,14 +19,10 @@ export function Header({ user }: { user: User }) {
         </div>
 
         <div className="max-sm:drawer max-sm:w-fit drawer-end sm:dropdown sm:dropdown-end">
-          <input
-            id="setting-drawer"
-            type="checkbox"
-            className="drawer-toggle"
-          />
+          <input id="menu-drawer" type="checkbox" className="drawer-toggle" />
 
           <label
-            htmlFor="setting-drawer"
+            htmlFor="menu-drawer"
             className="btn gap-0 btn-circle btn-ghost max-sm:drawer-button"
           >
             <HamburgerIcon />
@@ -37,13 +30,13 @@ export function Header({ user }: { user: User }) {
 
           <div className="max-sm:drawer-side overflow-x-hidden dropdown-content z-40">
             <label
-              htmlFor="setting-drawer"
+              htmlFor="menu-drawer"
               aria-label="close sidebar"
               className="drawer-overlay -backdrop-blur-sm"
             />
             <ul
               tabIndex={0}
-              className="header-actions shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
+              className="header-actions lg:py-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
             >
               <li className="flex flex-col p-2 gap-2 overflow-hidden items-center">
                 <div className="w-16 aspect-square rounded-full bg-neutral-700 overflow-hidden">
@@ -57,7 +50,7 @@ export function Header({ user }: { user: User }) {
                 </div>
 
                 <label
-                  htmlFor="setting-drawer"
+                  htmlFor="menu-drawer"
                   aria-label="close sidebar"
                   className="sm:hidden btn btn-circle btn-ghost absolute right-1 top-1"
                 >
@@ -89,7 +82,7 @@ export function Header({ user }: { user: User }) {
                 </a>
               </li>
 
-              <div id="sidebar-actions" />
+              <div id="menu-actions" />
             </ul>
           </div>
         </div>
@@ -118,7 +111,7 @@ export function Actions({
   children?: ReactNode;
 }) {
   return (
-    <Portal selector="#sidebar-actions">
+    <Portal selector="#menu-actions">
       <li>
         <div className="divider m-0" />
       </li>

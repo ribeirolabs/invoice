@@ -7,7 +7,7 @@ import { HeroIcon } from "~/components/HeroIcon";
 import {
   DocumentCheckIcon,
   DocumentIcon,
-  DownloadIcon,
+  DocumentPdfIcon,
   SendIcon,
   TrashIcon,
 } from "~/components/Icons";
@@ -120,7 +120,7 @@ export default function Page() {
             href={`/invoice/${invoice.id}.pdf`}
             download={`${invoice.number}.pdf`}
           >
-            <DownloadIcon /> PDF
+            <DocumentPdfIcon /> Baixar
           </a>
         </li>
         <li>

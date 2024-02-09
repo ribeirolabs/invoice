@@ -13,6 +13,7 @@
 - [ ] Invoice actions (fullfill, send, delete)
 
 # Company
+- [ ] Add loader while submitting
 - [ ] Company actions (delete, edit)
 - [ ] Empty state
 - [ ] Invoice Number Pattern field

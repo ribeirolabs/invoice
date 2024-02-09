@@ -1,5 +1,5 @@
 import prisma from "~/services/prisma.server";
-import { InvoiceStatus } from "./invoice";
+import { InvoiceStatus, parseInvoicePattern } from "./invoice";
 import { Company, Invoice, Prisma } from "@prisma/client";
 
 const FULL_INVOICE: Prisma.InvoiceInclude = {
@@ -109,4 +109,77 @@ export async function getLatestInvoiceFromCompanies(
       createdAt: "desc",
     },
   });
+}
+
+export async function generateInvoice({
+  userId,
+  payerId,
+  receiverId,
+  issueDate,
+  dueDate,
+  description,
+  amount,
+}: {
+  userId: string;
+  payerId: string;
+  receiverId: string;
+  issueDate: string;
+  dueDate: string;
+  description: string;
+  amount: number;
+}) {
+  const [payer, receiver, totalInvoices] = await Promise.all([
+    prisma.company.findFirstOrThrow({
+      where: {
+        id: payerId,
+      },
+    }),
+
+    prisma.company.findFirstOrThrow({
+      where: {
+        id: receiverId,
+      },
+    }),
+
+    prisma.invoice.count({
+      where: {
+        receiverId,
+        payerId,
+      },
+    }),
+  ]);
+
+  const invoiceNumber = parseInvoicePattern(payer.invoiceNumberPattern, {
+    INCREMENT: totalInvoices,
+  });
+
+  const time = new Date().toTimeString();
+
+  const response = await prisma.invoice.create({
+    data: {
+      userId,
+      payerId,
+      receiverId,
+      number: invoiceNumber,
+      currency: payer.currency,
+      issuedAt: new Date(`${issueDate} ${time}`),
+      expiredAt: new Date(`${dueDate} ${time}`),
+      description,
+      amount,
+      data: {
+        receiver: {
+          name: receiver.name,
+          address: receiver.address,
+          currency: receiver.currency,
+        },
+        payer: {
+          name: payer.name,
+          address: payer.address,
+          currency: payer.currency,
+        },
+      },
+    },
+  });
+
+  return response;
 }

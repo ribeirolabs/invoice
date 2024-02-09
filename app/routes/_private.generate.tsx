@@ -17,7 +17,10 @@ import {
   DocumentPlusIcon,
 } from "~/components/Icons";
 import { InputGroup } from "~/components/InputGroup";
-import { getLatestInvoiceFromCompanies } from "~/data/invoice.server";
+import {
+  generateInvoice,
+  getLatestInvoiceFromCompanies,
+} from "~/data/invoice.server";
 import { requireUser } from "~/services/auth.server";
 import prisma from "~/services/prisma.server";
 import { cn, getCurrencySymbol } from "~/utils";
@@ -60,8 +63,8 @@ const VALIDATORS = {
   generate: withZod(
     z.object({
       intent: z.literal(INTENTS.generate),
-      receiver: z.string().min(1, { message: "Campo obrigatório" }),
-      payer: z.string().min(1, { message: "Campo obrigatório" }),
+      receiverId: z.string().min(1, { message: "Campo obrigatório" }),
+      payerId: z.string().min(1, { message: "Campo obrigatório" }),
       issueDate: z.string().min(1, { message: "Campo obrigatório" }),
       dueDate: z.string().min(1, { message: "Campo obrigatório" }),
       description: z.string().min(1, { message: "Campo obrigatório" }),
@@ -78,13 +81,14 @@ const VALIDATORS = {
   getLatest: withZod(
     z.object({
       intent: z.literal(INTENTS.getLatest),
-      receiver: z.string().cuid(),
-      payer: z.string().cuid(),
+      receiverId: z.string().cuid(),
+      payerId: z.string().cuid(),
     })
   ),
 };
 
 export async function action({ request }: ActionFunctionArgs) {
+  const user = await requireUser(request);
   const data = await request.formData();
   const intent = data.get("intent") as string;
 
@@ -96,15 +100,11 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const invoice = await getLatestInvoiceFromCompanies(
-      result.data.payer,
-      result.data.receiver
+      result.data.receiverId,
+      result.data.payerId
     );
 
-    return typedjson({
-      ok: true,
-      intent: INTENTS.getLatest,
-      invoice,
-    });
+    return typedjson({ ok: true, intent: INTENTS.getLatest, invoice });
   }
 
   if (intent === INTENTS.generate) {
@@ -113,6 +113,13 @@ export async function action({ request }: ActionFunctionArgs) {
     if (result.error) {
       throw validationError(result.error);
     }
+
+    const { intent, ...payload } = result.data;
+
+    await generateInvoice({
+      ...payload,
+      userId: user.id,
+    });
 
     return redirect("/");
   }
@@ -130,7 +137,7 @@ export default function Generate() {
   function onFormChange(e: FormEvent<HTMLFormElement>) {
     const data = new FormData(e.currentTarget);
 
-    if (data.get("receiver") && data.get("payer")) {
+    if (data.get("receiverId") && data.get("payerId")) {
       data.set("intent", INTENTS.getLatest);
 
       fetcher.submit(data, {
@@ -155,9 +162,9 @@ export default function Generate() {
         onChange={onFormChange}
       >
         <div className="grid lg:grid-cols-2 gap-5 lg:gap-3">
-          <InputGroup name="receiver" label="Recebedor">
+          <InputGroup name="receiverId" label="Recebedor">
             <select
-              name="receiver"
+              name="receiverId"
               className="select select-bordered w-full group-aria-[invalid='true']:input-error"
             >
               {fromUser.map(({ company }) => (
@@ -168,9 +175,9 @@ export default function Generate() {
             </select>
           </InputGroup>
 
-          <InputGroup name="payer" label="Pagador">
+          <InputGroup name="payerId" label="Pagador">
             <select
-              name="payer"
+              name="payerId"
               className="select select-bordered w-full group-aria-[invalid='true']:input-error"
             >
               <option></option>

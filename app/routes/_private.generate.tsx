@@ -17,6 +17,7 @@ import {
   DocumentPlusIcon,
 } from "~/components/Icons";
 import { InputGroup } from "~/components/InputGroup";
+import { getLatestInvoiceFromCompanies } from "~/data/invoice.server";
 import { requireUser } from "~/services/auth.server";
 import prisma from "~/services/prisma.server";
 import { cn, getCurrencySymbol } from "~/utils";
@@ -94,23 +95,10 @@ export async function action({ request }: ActionFunctionArgs) {
       throw validationError(result.error);
     }
 
-    const { payer, receiver } = result.data;
-
-    const invoice = await prisma.invoice.findFirst({
-      select: {
-        id: true,
-        amount: true,
-        description: true,
-        currency: true,
-      },
-      where: {
-        payerId: payer,
-        receiverId: receiver,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const invoice = await getLatestInvoiceFromCompanies(
+      result.data.payer,
+      result.data.receiver
+    );
 
     return typedjson({
       ok: true,

@@ -89,3 +89,24 @@ export async function getDetailedInvoice(
 
   return addStatus(invoice);
 }
+
+export async function getLatestInvoiceFromCompanies(
+  receiverId: string,
+  payerId: string
+) {
+  return prisma.invoice.findFirst({
+    select: {
+      id: true,
+      amount: true,
+      description: true,
+      currency: true,
+    },
+    where: {
+      payerId,
+      receiverId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}

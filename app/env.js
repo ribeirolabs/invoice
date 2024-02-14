@@ -1,7 +1,9 @@
-import d from "dotenv";
 import { z } from "zod";
 
-d.config();
+if (process.env.NODE_ENV === "development") {
+  const d = await import("dotenv");
+  d.config();
+}
 
 const requiredString = z.string().refine((value) => value.length > 0, {
   message: "Required",

@@ -1,9 +1,7 @@
-import { ENV } from "./app/env.js";
-
 /** @type {import('@remix-run/dev').AppConfig} */
 export default {
   dev: {
-    port: ENV.SOCKET_PORT,
+    port: process.env.SOCKET_PORT,
   },
   ignoredRouteFiles: ["**/.*"],
   // appDirectory: "app",

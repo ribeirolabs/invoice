@@ -9,7 +9,7 @@ const callbackURL = new URL(
   DOMAIN || "http://localhost"
 );
 
-if (PORT) {
+if (PORT && PORT !== "80") {
   callbackURL.port = String(PORT);
 }
 

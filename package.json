@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
-    "dev": "run-p dev:db dev:app",
+    "dev:all": "run-p dev:db dev:app",
     "dev:db": "flyctl proxy 3306 -a ribeirolabs-invoice-mysql",
-    "dev:app": "remix dev --manual",
+    "dev": "remix dev --manual",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/index.js",
     "typecheck": "tsc",

@@ -40,7 +40,9 @@ export function Header({ user }: { user: User }) {
             >
               <li className="flex flex-col p-2 gap-2 overflow-hidden items-center">
                 <div className="w-16 aspect-square rounded-full bg-neutral-700 overflow-hidden">
-                  {user.image && <img src={user.image} />}
+                  {user.image && (
+                    <img src={user.image} referrerPolicy="no-referrer" />
+                  )}
                 </div>
                 <div className="overflow-hidden text-center">
                   <div className="font-bold leading-none">{user.name}</div>

@@ -88,7 +88,7 @@
 
   .btn-sm,
   .btn-xs {
-    @apply font-medium gap-1;
+    @apply gap-1;
   }
 
   .btn-md {

@@ -15,6 +15,7 @@ import { Card } from "~/components/Card";
 import { InvoiceCard } from "~/components/InvoiceCard";
 import { getPendingTasks } from "~/services/task.server";
 import { TaskSubject } from "@prisma/client";
+import { EmptyState } from "~/components/EmptyState";
 
 export const meta: MetaFunction = () => {
   return [{ title: "ribeirolabs / invoice" }];
@@ -112,29 +113,24 @@ function RecentSection() {
 
   return (
     <main className="py-8 px-4 max-content">
-      <h2 className="text-2xl font-bold mb-4">Últimas Invoices</h2>
+      <h2 className="text-2xl font-bold">Últimas Invoices</h2>
+      <div className="divider mb-6" />
+
       <div className="grid md:grid-cols-2 gap-3">
         {invoices.map((invoice) => (
           <InvoiceCard key={invoice.id} invoice={invoice} />
         ))}
 
         {invoices.length === 0 && (
-          <Card className="flex p-3 gap-3 items-center justify-between">
-            <div>
-              <h3 className="font-serif text-xl font-bold">Nenhuma invoice</h3>
-              <p className="text-sm">
-                <a
-                  href="/generate"
-                  className="font-medium underline text-secondary"
-                >
-                  Adicione
-                </a>{" "}
-                <span className="text-dim">sua primeira invoice.</span>
-              </p>
-            </div>
-
-            <HeroIcon icon={DocumentOutlineIcon} className="opacity-50" />
-          </Card>
+          <EmptyState
+            title="Nenhuma invoice"
+            description="Você ainda não criou nenhuma invoice"
+            icon={DocumentOutlineIcon}
+          >
+            <a href="/generate" className="btn btn-sm text-white rounded">
+              Criar Invoice
+            </a>
+          </EmptyState>
         )}
       </div>
     </main>

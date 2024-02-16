@@ -6,11 +6,7 @@ import { redirect, typedjson } from "remix-typedjson";
 import { ValidatedForm, validationError } from "remix-validated-form";
 import { z } from "zod";
 import { FormPage } from "~/components/FormPage";
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  CompaniesIcon,
-} from "~/components/Icons";
+import { ArrowLeftIcon, CheckCircleIcon } from "~/components/Icons";
 import { InputGroup } from "~/components/InputGroup";
 import { requireUser } from "~/services/auth.server";
 import prisma from "~/services/prisma.server";
@@ -118,7 +114,7 @@ export default function CreateCompany() {
   const navigate = useNavigate();
 
   return (
-    <FormPage title="Empresa" icon={CompaniesIcon}>
+    <FormPage title="Empresa">
       <ValidatedForm validator={validator} method="post" className="grid gap-5">
         <InputGroup name="name" label="Razão Social">
           <input

@@ -11,11 +11,7 @@ import {
 import { ValidatedForm, validationError } from "remix-validated-form";
 import { z } from "zod";
 import { FormPage } from "~/components/FormPage";
-import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  DocumentPlusIcon,
-} from "~/components/Icons";
+import { ArrowLeftIcon, CheckCircleIcon } from "~/components/Icons";
 import { InputGroup } from "~/components/InputGroup";
 import {
   generateInvoice,
@@ -152,10 +148,12 @@ export default function Generate() {
   const hasCompanies = fromUser.length > 0 && fromOther.length > 0;
 
   return (
-    <FormPage title="Invoice" icon={DocumentPlusIcon}>
+    <FormPage title="Invoice">
       {hasCompanies ? null : <CompaniesAlert />}
 
       <ValidatedForm
+        // @ts-ignore
+        fetcher={fetcher}
         validator={VALIDATORS.generate}
         method="post"
         className="grid gap-5"
@@ -250,9 +248,14 @@ export default function Generate() {
               name="intent"
               value={INTENTS.generate}
               className="btn btn-primary"
-              disabled={!hasCompanies}
+              disabled={!hasCompanies || fetcher.state !== "submitting"}
             >
-              <CheckCircleIcon /> Confirmar
+              {fetcher.state !== "idle" ? (
+                <div className="loading loading-sm" />
+              ) : (
+                <CheckCircleIcon />
+              )}
+              Confirmar
             </button>
           </div>
         </div>
@@ -284,13 +287,10 @@ function CompaniesAlert() {
         />
       </svg>
       <div>
-        <p>
-          Você ainda não cadastrou nenhuma empresa, não é possível criar uma
-          invoice.
-        </p>
+        <p>Você ainda não possui empresas, não é possível criar uma invoice.</p>
 
         <a href="/companies/new" className="block underline mt-2 font-medium">
-          Cadastrar empresa
+          Adicionar empresa
         </a>
       </div>
     </div>

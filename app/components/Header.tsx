@@ -36,7 +36,7 @@ export function Header({ user }: { user: User }) {
             />
             <ul
               tabIndex={0}
-              className="header-actions lg:py-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
+              className="header-actions sm:py-2 shadow bg-base-200 sm:rounded w-56 overflow-hidden max-sm:min-h-full z-40 border border-neutral-900"
             >
               <li className="flex flex-col p-2 gap-2 overflow-hidden items-center">
                 <div className="w-16 aspect-square rounded-full bg-neutral-700 overflow-hidden">
@@ -44,11 +44,19 @@ export function Header({ user }: { user: User }) {
                     <img src={user.image} referrerPolicy="no-referrer" />
                   )}
                 </div>
-                <div className="overflow-hidden text-center">
+
+                <div className="overflow-hidden text-center w-full">
                   <div className="font-bold leading-none">{user.name}</div>
                   <div className="text-dim text-sm text-ellipsis overflow-hidden">
                     {user.email}
                   </div>
+                  <a
+                    href="/logout"
+                    className="btn btn-sm btn-neutral w-full btn-outline"
+                  >
+                    <LogoutIcon className="icon-sm" />
+                    Sair
+                  </a>
                 </div>
 
                 <label
@@ -74,16 +82,6 @@ export function Header({ user }: { user: User }) {
                 </a>
               </li>
 
-              <li>
-                <a
-                  href="/logout"
-                  className="flex gap-2 hover:bg-neutral-800 rounded p-2 font-medium"
-                >
-                  <LogoutIcon />
-                  <span>Sair</span>
-                </a>
-              </li>
-
               <div id="menu-actions" />
             </ul>
           </div>
@@ -92,7 +90,7 @@ export function Header({ user }: { user: User }) {
         <div className="absolute left-1/2 -translate-x-1/2 top-[100%] -translate-y-[50%] rounded-full bg-neutral-800">
           <a
             href="/generate"
-            className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900"
+            className="btn btn-primary group md:gap-2 transition-all border-4 !border-neutral-900 rounded-full"
           >
             <DocumentPlusIcon />
             <span className="hidden md:block whitespace-nowrap transition-all text-end">

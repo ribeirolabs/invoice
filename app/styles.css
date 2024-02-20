@@ -32,7 +32,7 @@
 
 @layer components {
   .btn {
-    @apply font-bold inline-flex items-center gap-2 rounded-full;
+    @apply font-bold inline-flex items-center gap-2;
   }
 
   .icon {
@@ -79,6 +79,11 @@
   [type="checkbox"].toggle {
     @apply rounded;
   }
+
+  .table :where(thead, tbody) :where(tr:not(:last-child)),
+  .table :where(thead, tbody) :where(tr:first-child:last-child) {
+    @apply border-neutral-700/50;
+  }
 }
 
 @layer utilities {
@@ -97,6 +102,14 @@
 
   .btn-circle:where(.btn-md) {
     @apply w-9 h-9;
+  }
+
+  .btn-neutral:not(.btn-outline) {
+    @apply bg-neutral-950 border-neutral-950;
+  }
+
+  .btn-neutral:hover:not(.btn-outline) {
+    @apply bg-neutral-900 border-neutral-900;
   }
 
   .btn-neutral.btn-outline {

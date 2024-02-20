@@ -4,6 +4,7 @@ import {
   ArrowRightIcon,
   CompaniesIcon,
   DocumentOutlineIcon,
+  PlusIcon,
 } from "~/components/Icons";
 import {
   getPendingInvoices,
@@ -127,7 +128,8 @@ function RecentSection() {
             description="Você ainda não criou nenhuma invoice"
             icon={DocumentOutlineIcon}
           >
-            <a href="/generate" className="btn btn-sm text-white rounded">
+            <a href="/generate" className="btn btn-sm text-white">
+              <PlusIcon className="icon-sm" />
               Criar Invoice
             </a>
           </EmptyState>

@@ -1,7 +1,8 @@
+import { ActionFunctionArgs } from "@remix-run/node";
 import { format } from "date-fns";
 import { ReactNode } from "react";
 import { LoaderFunctionArgs } from "react-router";
-import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import { HeroIcon } from "~/components/HeroIcon";
 import {
@@ -12,7 +13,8 @@ import {
   TrashIcon,
 } from "~/components/Icons";
 import { InvoiceStatus } from "~/data/invoice";
-import { getDetailedInvoice } from "~/data/invoice.server";
+import { fullfillInvoice, getDetailedInvoice } from "~/data/invoice.server";
+import { INVOICE_INTENTS } from "~/intents";
 import { requireUser } from "~/services/auth.server";
 import { formatCurrency } from "~/utils";
 
@@ -33,6 +35,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       status: 404,
       statusText: "Invoice não encontrada",
     });
+  }
+
+  return typedjson({
+    invoice,
+  });
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const user = await requireUser(request);
+
+  if (!params.id) {
+    throw new Response(null, {
+      status: 400,
+      statusText: "Missing invoice id",
+    });
+  }
+
+  const invoice = await getDetailedInvoice(params.id, user.id);
+
+  if (!invoice) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "Invoice não encontrada",
+    });
+  }
+
+  const data = await request.formData();
+
+  if (data.get("intent") === INVOICE_INTENTS.fullfill) {
+    await fullfillInvoice(params.id);
+
+    return redirect(request.headers.get("referrer") ?? "/");
   }
 
   return typedjson({

@@ -7,15 +7,18 @@ import {
   EmailIcon,
   DocumentCheckIcon,
   DocumentPlusIcon,
-  ArrowDownIcon,
   CalendarIcon,
   SendIcon,
   TrashIcon,
+  ArrowTurnLeftDownIcon,
 } from "./Icons";
+import { useFetcher } from "@remix-run/react";
+import { INVOICE_INTENTS } from "~/intents";
 
 export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
   const isSent = invoice.status === InvoiceStatus.SENT;
   const isPaid = invoice.status === InvoiceStatus.PAID;
+  const fetcher = useFetcher();
 
   return (
     <Card>
@@ -63,7 +66,7 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
 
           <div className="flex flex-col gap-2 md:gap-0 lg:flex-row -justify-between">
             <div className="flex gap-1 items-center">
-              <ArrowDownIcon className="-icon-lg" />
+              <ArrowTurnLeftDownIcon />
               <div className="flex-col">
                 <div className="font-bold">{invoice.payer.alias}</div>
                 <div className="text-sm text-dim leading-none">
@@ -117,9 +120,22 @@ export function InvoiceCard({ invoice }: { invoice: InvoiceFull }) {
               </button>
             )}
 
-            <button className="btn btn-xs btn-secondary-ghost">
-              <DocumentCheckIcon className="icon-sm" /> Concluir
-            </button>
+            <fetcher.Form method="post" action={`/invoice/${invoice.id}`}>
+              <button
+                type="submit"
+                name="intent"
+                value={INVOICE_INTENTS.fullfill}
+                className="btn btn-xs btn-secondary-ghost"
+                disabled={fetcher.state !== "idle"}
+              >
+                {fetcher.state !== "idle" ? (
+                  <div className="loading loading-xs" />
+                ) : (
+                  <DocumentCheckIcon className="icon-sm" />
+                )}{" "}
+                Concluir
+              </button>
+            </fetcher.Form>
           </div>
         )}
       </Card.Footer>

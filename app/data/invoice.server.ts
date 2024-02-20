@@ -183,3 +183,14 @@ export async function generateInvoice({
 
   return response;
 }
+
+export async function fullfillInvoice(invoiceId: string): Promise<void> {
+  await prisma.invoice.update({
+    data: {
+      fullfilledAt: new Date(),
+    },
+    where: {
+      id: invoiceId,
+    },
+  });
+}

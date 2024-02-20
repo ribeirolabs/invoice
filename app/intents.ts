@@ -5,4 +5,5 @@ export const AUTH_INTENTS = {
 
 export const INVOICE_INTENTS = {
   sendEmail: "sendEmail",
+  fullfill: "fullfill",
 };

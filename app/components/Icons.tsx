@@ -761,3 +761,27 @@ export function DocumentPdfOutlineIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ArrowTurnLeftDownIcon({ className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={iconClass(className)}
+    >
+      <g
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      >
+        <path
+          d="M9.5 20v-8c0-2.8 0-4.2.545-5.27a5 5 0 0 1 2.185-2.185C13.3 4 14.7 4 17.5 4h3"
+          opacity=".28"
+        />
+        <path d="M4.5 15.142a25.196 25.196 0 0 0 4.505 4.684.79.79 0 0 0 .99 0 25.198 25.198 0 0 0 4.505-4.684" />
+      </g>
+    </svg>
+  );
+}

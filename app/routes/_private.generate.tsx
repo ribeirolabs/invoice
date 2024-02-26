@@ -248,7 +248,7 @@ export default function Generate() {
               name="intent"
               value={INTENTS.generate}
               className="btn btn-primary"
-              disabled={!hasCompanies || fetcher.state !== "submitting"}
+              disabled={!hasCompanies || fetcher.state !== "idle"}
             >
               {fetcher.state !== "idle" ? (
                 <div className="loading loading-sm" />

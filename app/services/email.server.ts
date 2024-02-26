@@ -5,14 +5,16 @@ import { getValidAccount } from "~/data/user.server";
 import Mail from "nodemailer/lib/mailer";
 
 export async function sendEmail({
-  user: user,
-  to,
+  user,
+  fromName,
+  toEmail,
   attachments,
   subject,
   content,
 }: {
   user: User;
-  to: string;
+  fromName: string;
+  toEmail: string;
   subject: string;
   content: string;
   attachments?: Mail.Attachment[];
@@ -20,7 +22,7 @@ export async function sendEmail({
   const account = await getValidAccount(user.id, "google");
 
   const message = new MailComposer({
-    to,
+    to: toEmail,
     from: `${user.name} <${user.email}>`,
     subject,
     html: content,

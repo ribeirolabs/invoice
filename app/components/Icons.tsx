@@ -725,7 +725,7 @@ export function DocumentPdfIcon({ className }: IconProps) {
         fill="currentColor"
         fillRule="evenodd"
         d="M3 13a1 1 0 0 0-1 1v7a1 1 0 1 0 2 0v-1h.5a3.5 3.5 0 1 0 0-7H3Zm1.5 5H4v-3h.5a1.5 1.5 0 0 1 0 3Zm5.5-5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5a4.5 4.5 0 1 0 0-9H10Zm3 4.5a2.5 2.5 0 0 1-2 2.45v-4.9a2.5 2.5 0 0 1 2 2.45Z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       />
       <path
         fill="currentColor"

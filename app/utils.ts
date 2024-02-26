@@ -1,6 +1,6 @@
 import { formatDistance } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 export function getLocale() {
   if (typeof navigator === "undefined") {
@@ -60,4 +60,8 @@ export function getCurrencySymbol(currency = "USD"): string {
       .formatToParts(1)
       .find((part) => part.type === "currency")?.value ?? "$"
   );
+}
+
+export function nlToBr(text: string) {
+  return text.replace(/\n/g, "<br />");
 }

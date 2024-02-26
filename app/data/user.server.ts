@@ -99,7 +99,7 @@ export async function loginUser(
     data: {
       access_token: auth.accessToken,
       refresh_token: auth.refreshToken,
-      expires_at: Date.now() * auth.extraParams.expires_in * 1000,
+      expires_at: Date.now() + auth.extraParams.expires_in * 1000,
     },
     where: {
       provider_providerAccountId: {

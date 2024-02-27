@@ -11,6 +11,7 @@ import {
 } from "@remix-run/react";
 import styles from "~/styles.css";
 import { Logo } from "./components/Logo";
+import { ToastProvider } from "./components/Toast";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,10 +37,14 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <ToastProvider>
+          <Outlet />
+        </ToastProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+
+        <div id="toasts" />
       </body>
     </html>
   );

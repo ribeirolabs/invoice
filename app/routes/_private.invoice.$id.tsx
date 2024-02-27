@@ -2,23 +2,22 @@ import { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { format } from "date-fns";
 import ms from "ms";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { LoaderFunctionArgs } from "react-router";
 import { redirect, typedjson, useTypedLoaderData } from "remix-typedjson";
 import { Header } from "~/components/Header";
 import {
-  CancelIcon,
-  CheckCircleIcon,
   DocumentCheckIcon,
   DocumentPdfIcon,
   SendIcon,
   TrashIcon,
 } from "~/components/Icons";
+import { useToastActions } from "~/components/Toast";
 import { InvoiceStatus } from "~/data/invoice";
 import { fullfillInvoice, getDetailedInvoice } from "~/data/invoice.server";
 import { INVOICE_INTENTS } from "~/intents";
 import { requireUser } from "~/services/auth.server";
-import { cn, formatCurrency } from "~/utils";
+import { formatCurrency } from "~/utils";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const user = await requireUser(request);
@@ -76,113 +75,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 }
 
-function EmailToast() {
-  const fetcher = useFetcher<
-    { success: true } | { success: false; message: string }
-  >({
-    key: "invoice.send-email",
-  });
-
-  const [toast, setToast] = useState<{
-    type: "success" | "error" | "neutral";
-    timeout?: number;
-    content: ReactNode;
-  } | null>(null);
-
-  const timeoutHandle = useRef(0);
-
-  useEffect(() => {
-    if (fetcher.state === "submitting") {
-      setToast({
-        type: "neutral",
-        content: (
-          <>
-            <span className="loading" />
-            <span>Sending email</span>
-          </>
-        ),
-      });
-    }
-  }, [fetcher.state]);
-
-  useEffect(() => {
-    const data = fetcher.data;
-
-    if (!data) {
-      return;
-    }
-
-    if (data.success) {
-      setToast({
-        type: "success",
-        timeout: ms("3s"),
-        content: (
-          <>
-            <CheckCircleIcon />
-            <span>Email enviado com sucesso</span>
-          </>
-        ),
-      });
-    } else {
-      setToast({
-        type: "error",
-        content: (
-          <>
-            <CancelIcon />
-            <span>{data.message}</span>
-          </>
-        ),
-      });
-    }
-  }, [fetcher.data]);
-
-  useEffect(() => {
-    if (timeoutHandle.current) {
-      clearTimeout(timeoutHandle.current);
-    }
-
-    if (!toast) {
-      return;
-    }
-
-    if (toast?.timeout) {
-      // @ts-ignore
-      timeoutHandle.current = setTimeout(() => setToast(null), toast.timeout);
-    }
-  }, [toast]);
-
-  if (!toast) {
-    return null;
-  }
-
-  return (
-    <div className="toast">
-      <div
-        onClick={() => setToast(null)}
-        className={cn(
-          "alert cursor-pointer",
-          toast.type === "success"
-            ? "alert-success"
-            : toast.type === "error"
-            ? "alert-error"
-            : ""
-        )}
-      >
-        {toast.content}
-      </div>
-    </div>
-  );
-}
-
 export default function Page() {
   const { invoice } = useTypedLoaderData<typeof loader>();
   const fetcher = useFetcher({
-    key: "invoice.send-email",
+    key: FETCHER_KEY,
   });
 
   return (
     <>
-      <EmailToast />
       <main
         data-theme="light"
         className="max-content flex flex-col gap-5 flex-1 w-full min-h-screen !py-8 !px-6 print:!px-12 "
@@ -280,6 +180,8 @@ export default function Page() {
           </button>
         </li>
       </Header.Actions>
+
+      <ToastMessages />
     </>
   );
 }
@@ -290,4 +192,50 @@ function InfoLabel({ children }: { children: ReactNode }) {
 
 function InfoValue({ children }: { children: ReactNode }) {
   return <p className="text-dim">{children}</p>;
+}
+
+const FETCHER_KEY = "invoice.send-email";
+
+function ToastMessages() {
+  const { add } = useToastActions();
+  const fetcher = useFetcher<
+    { success: true } | { success: false; message: string }
+  >({
+    key: FETCHER_KEY,
+  });
+
+  useEffect(() => {
+    if (fetcher.state === "submitting") {
+      add({
+        key: FETCHER_KEY,
+        type: "loading",
+        content: "Sending email",
+      });
+    }
+  }, [fetcher.state]);
+
+  useEffect(() => {
+    const data = fetcher.data;
+
+    if (!data) {
+      return;
+    }
+
+    if (data.success) {
+      add({
+        key: FETCHER_KEY,
+        type: "success",
+        timeout: ms("3s"),
+        content: "Email enviado com sucesso",
+      });
+    } else {
+      add({
+        key: FETCHER_KEY,
+        type: "error",
+        content: data.message,
+      });
+    }
+  }, [fetcher.data]);
+
+  return null;
 }

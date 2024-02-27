@@ -12,7 +12,7 @@ import {
   SendIcon,
   TrashIcon,
 } from "~/components/Icons";
-import { useToastActions } from "~/components/Toast";
+import { addToast } from "~/components/Toast";
 import { InvoiceStatus } from "~/data/invoice";
 import { fullfillInvoice, getDetailedInvoice } from "~/data/invoice.server";
 import { INVOICE_INTENTS } from "~/intents";
@@ -197,7 +197,6 @@ function InfoValue({ children }: { children: ReactNode }) {
 const FETCHER_KEY = "invoice.send-email";
 
 function ToastMessages() {
-  const { add } = useToastActions();
   const fetcher = useFetcher<
     { success: true } | { success: false; message: string }
   >({
@@ -206,10 +205,8 @@ function ToastMessages() {
 
   useEffect(() => {
     if (fetcher.state === "submitting") {
-      add({
+      addToast("loading", "Sending email", {
         key: FETCHER_KEY,
-        type: "loading",
-        content: "Sending email",
       });
     }
   }, [fetcher.state]);
@@ -222,17 +219,13 @@ function ToastMessages() {
     }
 
     if (data.success) {
-      add({
+      addToast("success", "Email enviado com sucesso", {
         key: FETCHER_KEY,
-        type: "success",
         timeout: ms("3s"),
-        content: "Email enviado com sucesso",
       });
     } else {
-      add({
+      addToast("error", data.message, {
         key: FETCHER_KEY,
-        type: "error",
-        content: data.message,
       });
     }
   }, [fetcher.data]);

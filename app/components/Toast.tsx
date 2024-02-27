@@ -8,6 +8,8 @@ import {
 import { Portal } from "./Portal";
 import { cn } from "~/utils";
 import { CancelIcon, CheckCircleIcon } from "./Icons";
+import { dispatchCustomEvent } from "@ribeirolabs/events";
+import { useEvent } from "@ribeirolabs/events/react";
 
 type Toast = {
   key: string;
@@ -114,6 +116,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     send({ type: "CLEAR", key });
   }, []);
 
+  useEvent(
+    "add-toast",
+    useCallback((event) => add(event.detail), [add])
+  );
+
+  useEvent(
+    "clear-toast",
+    useCallback((event) => clear(event.detail), [clear])
+  );
+
   return (
     <>
       <ActionsContext.Provider value={{ add, clear }}>
@@ -161,3 +173,32 @@ const ICON_BY_TYPE: Record<Toast["type"], ReactNode> = {
   error: <CancelIcon />,
   loading: <div className="loading" />,
 };
+
+declare global {
+  interface CustomEvents {
+    "add-toast": Toast;
+    "clear-toast"?: string;
+  }
+}
+
+export function addToast(
+  type: Toast["type"],
+  content: Toast["content"],
+  {
+    icon,
+    timeout,
+    key = TOAST_FIXED_KEY,
+  }: Omit<Toast, "type" | "content" | "key"> & { key?: string } = {}
+) {
+  dispatchCustomEvent("add-toast", {
+    key,
+    icon,
+    timeout,
+    type,
+    content,
+  });
+}
+
+export function clearToast(key?: string) {
+  dispatchCustomEvent("clear-toast", key);
+}

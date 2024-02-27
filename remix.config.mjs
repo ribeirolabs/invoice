@@ -4,6 +4,7 @@ export default {
     port: process.env.SOCKET_PORT,
   },
   ignoredRouteFiles: ["**/.*"],
+  serverDependenciesToBundle: ["@ribeirolabs/events", "@ribeirolabs/events/react"]
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",

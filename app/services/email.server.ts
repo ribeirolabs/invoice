@@ -6,14 +6,12 @@ import Mail from "nodemailer/lib/mailer";
 
 export async function sendEmail({
   user,
-  fromName,
   toEmail,
   attachments,
   subject,
   content,
 }: {
   user: User;
-  fromName: string;
   toEmail: string;
   subject: string;
   content: string;

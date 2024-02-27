@@ -7,6 +7,7 @@ import { ENV } from "~/env";
 import { requireUser } from "~/services/auth.server";
 import { sendEmail } from "~/services/email.server";
 import { generatePdf } from "~/services/pdf.server";
+import prisma from "~/services/prisma.server";
 
 async function getInvoiceHtml(invoice: InvoiceFull): Promise<string> {
   const html = renderToStaticMarkup(
@@ -67,9 +68,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
       throw new Error(`Unable to get invoice HTML: ${e}`);
     });
 
-    await sendEmail({
+    const response = await sendEmail({
       user,
-      fromName: invoice.receiver.name,
       toEmail: invoice.payer.email,
       subject: `Invoice from: ${invoice.receiver.name}`,
       content: html,
@@ -81,6 +81,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
       ],
     }).catch((e) => {
       throw new Error(`Unable to send email: ${e}`);
+    });
+
+    await prisma.invoiceEmailHistory.create({
+      data: {
+        provider: "google",
+        email: invoice.payer.email,
+        invoiceId: invoice.id,
+        data: {
+          id: response.id,
+          threadId: response.threadId,
+          date: response.internalDate,
+          historyId: response.historyId,
+          from: user.email,
+        },
+      },
     });
 
     return json({

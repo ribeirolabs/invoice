@@ -1,6 +1,6 @@
 import { GoogleStrategy } from "remix-auth-google";
 import { loginUser } from "~/data/user.server";
-import { ENV } from "~/env";
+import { ENV } from "~/env.server";
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PORT, DOMAIN } = ENV;
 

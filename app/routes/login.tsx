@@ -1,12 +1,17 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { LoginIcon } from "~/components/Icons";
+import { ENV } from "~/env.server";
 import { authenticator } from "~/services/auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  return authenticator.isAuthenticated(request, {
+  await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
+
+  return {
+    revision: ENV.APP_REVISION,
+  };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -27,6 +32,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Login() {
+  const { revision } = useLoaderData<typeof loader>();
+
   return (
     <Form
       method="post"
@@ -42,7 +49,7 @@ export default function Login() {
         Entrar com Google
       </button>
 
-      <pre className="text-xs">fly.io v0</pre>
+      <pre className="text-xs">{revision}</pre>
     </Form>
   );
 }

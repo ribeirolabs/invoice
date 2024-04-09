@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { ENV } from "~/env";
+import { ENV } from "~/env.server";
 import { generatePdf } from "~/services/pdf.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

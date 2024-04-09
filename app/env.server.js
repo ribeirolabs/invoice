@@ -31,6 +31,7 @@ const envSchema = z.object({
   DOMAIN: z.string().url().optional().default(DEFAULT_DOMAIN),
   BROWSERLESS_API_KEY: requiredString,
   DATABASE_URL: z.string().url(),
+  APP_REVISION: z.string().optional().default("v0-local"),
 });
 
 function buildEnv() {

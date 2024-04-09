@@ -10,12 +10,13 @@ import { Logo } from "./Logo";
 import { ReactNode } from "react";
 import { Portal } from "./Portal";
 
-export function Header({ user }: { user: User }) {
+export function Header({ user, revision }: { user: User; revision: string }) {
   return (
     <header className="print:hidden sticky w-full top-0 z-30 bg-neutral-900">
       <div className="max-content flex-1 navbar !p-0 relative">
-        <div className="flex-1 px-1">
+        <div className="flex-1 px-1 flex flex-col items-start">
           <Logo />
+          <span className="text-xs font-mono">{revision}</span>
         </div>
 
         <div className="max-sm:drawer max-sm:w-fit drawer-end sm:dropdown sm:dropdown-end">

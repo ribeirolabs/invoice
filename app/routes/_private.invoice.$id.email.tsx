@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import invariant from "tiny-invariant";
 import { InvoiceFull, getDetailedInvoice } from "~/data/invoice.server";
 import { InvoiceEmail } from "~/emails/Invoice";
-import { ENV } from "~/env";
+import { ENV } from "~/env.server";
 import { requireUser } from "~/services/auth.server";
 import { sendEmail } from "~/services/email.server";
 import { generatePdf } from "~/services/pdf.server";

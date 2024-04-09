@@ -41,6 +41,8 @@ export default function Login() {
         <LoginIcon />
         Entrar com Google
       </button>
+
+      <pre>fly.io</pre>
     </Form>
   );
 }

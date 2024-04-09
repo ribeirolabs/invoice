@@ -42,7 +42,7 @@ export default function Login() {
         Entrar com Google
       </button>
 
-      <pre>fly.io</pre>
+      <pre className="text-xs">fly.io v0</pre>
     </Form>
   );
 }
